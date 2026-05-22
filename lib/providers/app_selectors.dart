@@ -1053,25 +1053,207 @@ final favoriteCafesProvider = Provider<List<Cafe>>((ref) {
     return const <Cafe>[];
   }
 
-  final fallback = ref.watch(cafesByIdsProvider(orderedIds));
+  final localHydrationSources = _favoriteLocalHydrationSources(ref);
+  final fallback = _resolveOrderedCafesByIds(
+    orderedIds: orderedIds,
+    primary: localHydrationSources.map((source) => source.cafe).toList(),
+    secondary: const <Cafe>[],
+  );
   final resolved =
       ref.watch(resolvedFavoriteCafesProvider).valueOrNull ?? const <Cafe>[];
+  final hydrationSources = <({Cafe cafe, String source})>[
+    ...localHydrationSources,
+    for (final cafe in resolved) (cafe: cafe, source: 'repository'),
+  ];
 
   final favoriteIds = ref.watch(favoriteIdsProvider);
   return _resolveOrderedCafesByIds(
     orderedIds: orderedIds,
     primary: resolved,
     secondary: fallback,
-  )
-      .map(
-        (cafe) => _withFavoriteCountFloor(
-          cafe,
-          favoriteIds,
-          source: 'favorite_cafes',
-        ),
-      )
-      .toList(growable: false);
+  ).map(
+    (cafe) {
+      final hydrated = _hydrateFavoriteCafeImages(
+        favorite: cafe,
+        hydrationSources: hydrationSources,
+      );
+      return _withFavoriteCountFloor(
+        hydrated,
+        favoriteIds,
+        source: 'favorite_cafes',
+      );
+    },
+  ).toList(growable: false);
 });
+
+List<({Cafe cafe, String source})> _favoriteLocalHydrationSources(Ref ref) {
+  return <({Cafe cafe, String source})>[
+    for (final cafe in ref.watch(homeCafesProvider))
+      (cafe: cafe, source: 'home_cache'),
+    for (final cafe in ref.watch(cafesProvider))
+      (cafe: cafe, source: 'repository'),
+    for (final cafe in ref.watch(activeFeaturedCafesProvider))
+      (cafe: cafe, source: 'home_cache'),
+  ];
+}
+
+Cafe _hydrateFavoriteCafeImages({
+  required Cafe favorite,
+  required List<({Cafe cafe, String source})> hydrationSources,
+}) {
+  final matched = _bestFavoriteImageHydrationMatch(
+    favorite,
+    hydrationSources,
+  );
+  if (matched == null ||
+      _displayHydrationImageCount(matched.cafe.photoUrls) == 0) {
+    _logFavoriteImageSourceDiag(
+      favorite: favorite,
+      matched: matched,
+      selectedImages: favorite.photoUrls,
+      finalSource:
+          favorite.photoUrls.isEmpty ? 'fallback' : 'favorite_original',
+    );
+    return favorite;
+  }
+
+  final mergedImages = _mergeFavoriteImageCandidates(
+    preferredImages: matched.cafe.photoUrls,
+    favoriteImages: favorite.photoUrls,
+  );
+  if (mergedImages.isEmpty || listEquals(mergedImages, favorite.photoUrls)) {
+    _logFavoriteImageSourceDiag(
+      favorite: favorite,
+      matched: matched,
+      selectedImages: favorite.photoUrls,
+      finalSource:
+          favorite.photoUrls.isEmpty ? 'fallback' : 'favorite_original',
+    );
+    return favorite;
+  }
+
+  _logFavoriteImageSourceDiag(
+    favorite: favorite,
+    matched: matched,
+    selectedImages: mergedImages,
+    finalSource: matched.source,
+  );
+  return favorite.copyWith(images: mergedImages);
+}
+
+({Cafe cafe, String source})? _bestFavoriteImageHydrationMatch(
+  Cafe favorite,
+  List<({Cafe cafe, String source})> hydrationSources,
+) {
+  ({Cafe cafe, String source})? best;
+  for (final candidate in hydrationSources) {
+    if (!_favoriteCafeIdentitiesMatch(favorite, candidate.cafe)) {
+      continue;
+    }
+    final candidateUsable =
+        _usableHydrationImageCount(candidate.cafe.photoUrls);
+    final candidateDisplay =
+        _displayHydrationImageCount(candidate.cafe.photoUrls);
+    final bestUsable =
+        best == null ? -1 : _usableHydrationImageCount(best.cafe.photoUrls);
+    final bestDisplay =
+        best == null ? -1 : _displayHydrationImageCount(best.cafe.photoUrls);
+    if (best == null ||
+        candidateUsable > bestUsable ||
+        (candidateUsable == bestUsable && candidateDisplay > bestDisplay) ||
+        (candidateUsable == bestUsable &&
+            candidateDisplay == bestDisplay &&
+            candidate.cafe.photoUrls.length > best.cafe.photoUrls.length)) {
+      best = candidate;
+    }
+  }
+  return best;
+}
+
+bool _favoriteCafeIdentitiesMatch(Cafe favorite, Cafe candidate) {
+  final favoriteIds = _favoriteIdentityKeys(favorite);
+  final candidateIds = _favoriteIdentityKeys(candidate);
+  return favoriteIds.intersection(candidateIds).isNotEmpty;
+}
+
+Set<String> _favoriteIdentityKeys(Cafe cafe) {
+  final keys = <String>{};
+  void add(String? value) {
+    final normalized = value?.trim();
+    if (normalized == null || normalized.isEmpty) {
+      return;
+    }
+    keys.add(normalized);
+  }
+
+  add(cafe.id);
+  add(cafe.placeId);
+  add(cafe.googlePlaceData?.googlePlaceId);
+  return keys;
+}
+
+List<String> _mergeFavoriteImageCandidates({
+  required List<String> preferredImages,
+  required List<String> favoriteImages,
+}) {
+  final merged = <String>[];
+  final seen = <String>{};
+
+  void add(List<String> values, {required bool includeGenerated}) {
+    for (final value in values) {
+      final normalized = resolveCafeImageUrl(value);
+      if (normalized == null ||
+          isKnownFailedCafeImageUrl(normalized) ||
+          (!includeGenerated && isGeneratedPlacesMediaImageUrl(normalized))) {
+        continue;
+      }
+      if (!seen.add(normalized)) {
+        continue;
+      }
+      merged.add(normalized);
+      if (merged.length >= 8) {
+        return;
+      }
+    }
+  }
+
+  add(preferredImages, includeGenerated: false);
+  if (merged.length < 8) {
+    add(favoriteImages, includeGenerated: false);
+  }
+  if (merged.isEmpty) {
+    add(preferredImages, includeGenerated: true);
+  }
+  if (merged.isEmpty) {
+    add(favoriteImages, includeGenerated: true);
+  }
+
+  return List<String>.unmodifiable(merged);
+}
+
+int _displayHydrationImageCount(List<String> urls) {
+  return urls.where((url) {
+    final normalized = resolveCafeImageUrl(url);
+    return normalized != null && !isKnownFailedCafeImageUrl(normalized);
+  }).length;
+}
+
+void _logFavoriteImageSourceDiag({
+  required Cafe favorite,
+  required ({Cafe cafe, String source})? matched,
+  required List<String> selectedImages,
+  required String finalSource,
+}) {
+  if (!kDebugMode || !kVerboseCafeDiagnostics) {
+    return;
+  }
+  final first = selectedImages.isEmpty ? null : selectedImages.first;
+  AppLogger.debug(
+    '[FAVORITE_IMAGE_SOURCE_DIAG] cafeId=${favorite.id} cafeName="${favorite.name}" googlePlaceIdPresent=${favorite.placeId?.trim().isNotEmpty == true || favorite.googlePlaceData?.googlePlaceId?.trim().isNotEmpty == true} favoriteSource=unknown favoritePhotoUrlCount=${favorite.photoUrls.length} favoriteGeneratedPhotoUrlCount=${_generatedPhotoUrlCount(favorite.photoUrls)} matchedHomeCafe=${matched != null} matchedHomeCafePhotoUrlCount=${matched?.cafe.photoUrls.length ?? 0} finalPhotoUrlCount=${selectedImages.length} finalSource=$finalSource firstHost=${_urlHostForProof(first)} firstPathShape=${_urlPathShapeForProof(first)} firstGenerated=${isGeneratedPlacesMediaImageUrl(first)}',
+    key: 'favorite-image-source-diag-${favorite.id}',
+    throttle: Duration.zero,
+  );
+}
 
 final isCafeFavoritedProvider = Provider.family<bool, String>((ref, cafeId) {
   final normalized = cafeId.trim();
