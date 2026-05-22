@@ -1368,6 +1368,9 @@ class CafeQueryService implements CafeOverlaySource {
     required String source,
     required List rows,
   }) {
+    if (!kVerboseCafeDiagnostics) {
+      return;
+    }
     if (rows.isEmpty) {
       AppLogger.debug(
         '[CAFE_DIAG_PHOTO_RAW_SUPABASE] source=$source rows=0',

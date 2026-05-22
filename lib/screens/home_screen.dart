@@ -151,14 +151,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         cafes.isNotEmpty || featured.isNotEmpty || sponsored.isNotEmpty;
     final showBlockingLoader =
         isHomeCafesLoading && cafes.isEmpty && sponsored.isEmpty;
-    AppLogger.debug(
-      '[HOME_SPONSORED_RENDER] source=activeFeaturedCafesProvider count=${sponsored.length} featuredLoaded=${featuredState.loaded} featuredLoading=${featuredState.loading} rawFeatured=${featured.length} homeCafes=${cafes.length} showBlockingLoader=$showBlockingLoader',
-      key: 'home-sponsored-render',
-      throttle: Duration.zero,
-    );
+    if (kVerboseCafeDiagnostics) {
+      AppLogger.debug(
+        '[HOME_SPONSORED_RENDER] source=activeFeaturedCafesProvider count=${sponsored.length} featuredLoaded=${featuredState.loaded} featuredLoading=${featuredState.loading} rawFeatured=${featured.length} homeCafes=${cafes.length} showBlockingLoader=$showBlockingLoader',
+        key: 'home-sponsored-render',
+        throttle: Duration.zero,
+      );
+    }
     final hideDuplicateFeaturedSection =
         isDuplicateHomeFeaturedSection(sponsored, featured);
-    if (hideDuplicateFeaturedSection) {
+    if (hideDuplicateFeaturedSection && kVerboseCafeDiagnostics) {
       AppLogger.debug(
         '[HOME_FEATURED_DUPLICATE_GUARD] hidden=true reason=same_ids sponsoredCount=${sponsored.length} featuredCount=${featured.length}',
         key: 'home-featured-duplicate-guard',
@@ -187,16 +189,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             : (featuredState.loading
                 ? 'loading'
                 : (featuredState.loaded ? 'empty' : 'not_loaded')));
-    AppLogger.debug(
-      '[HOME_FEATURED_RENDER] visible=$showFeaturedSection reason=$featuredReason featuredCount=${featured.length} featuredLoaded=${featuredState.loaded} featuredLoading=${featuredState.loading}',
-      key: 'home-featured-render',
-      throttle: Duration.zero,
-    );
-    AppLogger.debug(
-      '[HOME_NORMAL_SECTION_RENDER] source=homeCafes count=${normalHomeCafes.length} rendered=${normalHomePreview.length} excludedSponsored=$excludedSponsoredCount',
-      key: 'home-normal-section-render',
-      throttle: Duration.zero,
-    );
+    if (kVerboseCafeDiagnostics) {
+      AppLogger.debug(
+        '[HOME_FEATURED_RENDER] visible=$showFeaturedSection reason=$featuredReason featuredCount=${featured.length} featuredLoaded=${featuredState.loaded} featuredLoading=${featuredState.loading}',
+        key: 'home-featured-render',
+        throttle: Duration.zero,
+      );
+      AppLogger.debug(
+        '[HOME_NORMAL_SECTION_RENDER] source=homeCafes count=${normalHomeCafes.length} rendered=${normalHomePreview.length} excludedSponsored=$excludedSponsoredCount',
+        key: 'home-normal-section-render',
+        throttle: Duration.zero,
+      );
+    }
 
     return Scaffold(
       backgroundColor: colors.bg,

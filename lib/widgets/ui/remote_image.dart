@@ -121,7 +121,9 @@ class RemoteImage extends StatelessWidget {
   }
 
   void _probeImageUrlOnDebug(String url) {
-    if (!kDebugMode || !url.contains('places.googleapis.com')) {
+    if (!kDebugMode ||
+        !kVerboseCafeDiagnostics ||
+        !url.contains('places.googleapis.com')) {
       return;
     }
     if (_probedUrls.length >= _maxDebugProbes || !_probedUrls.add(url)) {

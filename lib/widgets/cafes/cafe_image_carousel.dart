@@ -253,7 +253,7 @@ class _CafeImageCarouselState extends State<CafeImageCarousel> {
     required int itemCount,
     required bool hasProvidedImages,
   }) {
-    if (!kDebugMode) {
+    if (!kDebugMode || !kVerboseCafeDiagnostics) {
       return;
     }
     final traceTag = widget.traceTag;
@@ -389,7 +389,7 @@ class _CafeImageCarouselState extends State<CafeImageCarousel> {
     required List<String> normalizedUrls,
     required bool hasProvidedImages,
   }) {
-    if (!kDebugMode) {
+    if (!kDebugMode || !kVerboseCafeDiagnostics) {
       return;
     }
     final surface = traceSurface;
@@ -414,7 +414,7 @@ class _CafeImageCarouselState extends State<CafeImageCarousel> {
   }
 
   void _logCandidateFailover(String failedUrl, int? status) {
-    if (!kDebugMode) {
+    if (!kDebugMode || !kVerboseCafeDiagnostics) {
       return;
     }
     final surface = traceSurface;
@@ -467,7 +467,7 @@ class _CafeImageCarouselState extends State<CafeImageCarousel> {
   }
 
   void _logImageProviderFailure(Object error) {
-    if (!kDebugMode) {
+    if (!kDebugMode || !kVerboseCafeDiagnostics) {
       return;
     }
     AppLogger.debug(

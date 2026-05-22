@@ -150,7 +150,7 @@ void _logMediaClassificationDiag(
   required String? rejectedReason,
   String? diagnosticSurface,
 }) {
-  if (!kDebugMode) {
+  if (!kDebugMode || !kVerboseCafeDiagnostics) {
     return;
   }
   final surface = diagnosticSurface?.trim();

@@ -393,11 +393,13 @@ final mapVisibleCafesProvider = Provider<List<Cafe>>((ref) {
     visible.add(selectedFallback);
   }
 
-  AppLogger.debug(
-    '[CAFE_DIAG_MAP_VISIBLE] baseCount=${cafes.length} radius=${radiusPreset.radiusMeters} visibleCount=${visible.length} center=${center.lat.toStringAsFixed(3)},${center.lng.toStringAsFixed(3)}',
-    key: 'cafe-diag-map-visible',
-    throttle: const Duration(seconds: 2),
-  );
+  if (kVerboseCafeDiagnostics) {
+    AppLogger.debug(
+      '[CAFE_DIAG_MAP_VISIBLE] baseCount=${cafes.length} radius=${radiusPreset.radiusMeters} visibleCount=${visible.length} center=${center.lat.toStringAsFixed(3)},${center.lng.toStringAsFixed(3)}',
+      key: 'cafe-diag-map-visible',
+      throttle: const Duration(seconds: 2),
+    );
+  }
   CafeDiscoveryDebugReportRecorder.instance.recordFinalVisible(
     base: cafes,
     visible: visible,
@@ -704,7 +706,7 @@ void _logFeaturedMergeProof({
   required Cafe? matched,
   required List<String> selectedImages,
 }) {
-  if (!kDebugMode) {
+  if (!kDebugMode || !kVerboseCafeDiagnostics) {
     return;
   }
   final matchedFirst =
@@ -797,7 +799,7 @@ void _logFeaturedFinalOutput(
   List<Cafe> featured, {
   required List<Cafe> cacheSources,
 }) {
-  if (featured.isEmpty) {
+  if (featured.isEmpty || !kVerboseCafeDiagnostics) {
     return;
   }
 
@@ -832,7 +834,7 @@ void _logFeaturedImageSourceChoice({
   required Cafe? matched,
   required List<String> selectedImages,
 }) {
-  if (!kDebugMode) {
+  if (!kDebugMode || !kVerboseCafeDiagnostics) {
     return;
   }
   final selected = selectedImages.isEmpty ? null : selectedImages.first;

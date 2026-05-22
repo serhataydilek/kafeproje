@@ -220,13 +220,16 @@ class CafeDetailPhotoSection extends ConsumerWidget {
     final l10n = context.l10n;
     final layout =
         AdaptiveLayoutData.fromWidth(MediaQuery.sizeOf(context).width);
-    final firstUrl =
-        cafe.photoUrls.isNotEmpty ? redactUrlForLog(cafe.photoUrls.first) : '';
-    AppLogger.debug(
-      '[CAFE_DIAG_PHOTO_UI] surface=detail cafeId=${cafe.id} cafeName="${cafe.name}" listLength=${cafe.photoUrls.length} firstUrl=$firstUrl',
-      key: 'cafe-diag-photo-ui-detail-${cafe.id}',
-      throttle: Duration.zero,
-    );
+    if (kVerboseCafeDiagnostics) {
+      final firstUrl = cafe.photoUrls.isNotEmpty
+          ? redactUrlForLog(cafe.photoUrls.first)
+          : '';
+      AppLogger.debug(
+        '[CAFE_DIAG_PHOTO_UI] surface=detail cafeId=${cafe.id} cafeName="${cafe.name}" listLength=${cafe.photoUrls.length} firstUrl=$firstUrl',
+        key: 'cafe-diag-photo-ui-detail-${cafe.id}',
+        throttle: Duration.zero,
+      );
+    }
 
     return SliverAppBar(
       expandedHeight: layout.detailExpandedHeight(),

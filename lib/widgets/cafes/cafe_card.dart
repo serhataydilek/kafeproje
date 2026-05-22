@@ -496,7 +496,7 @@ void _logHomeSponsoredImageDiagnostics({
   required List<String> normalizedUrls,
   required double height,
 }) {
-  if (!kDebugMode || surface != 'home-sponsored') {
+  if (!kDebugMode || !kVerboseCafeDiagnostics || surface != 'home-sponsored') {
     return;
   }
   final hasResolved = normalizedUrls.isNotEmpty;
@@ -516,7 +516,7 @@ void _logImageSourceDiagnostics({
   required String surface,
   required List<String> selectedUrls,
 }) {
-  if (!kDebugMode) {
+  if (!kDebugMode || !kVerboseCafeDiagnostics) {
     return;
   }
   final selected = selectedUrls.isEmpty ? null : selectedUrls.first;

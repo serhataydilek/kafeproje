@@ -407,6 +407,9 @@ class CafeRepository {
   }
 
   void _logFeaturedImageDiagnostics(List<Cafe> cafes) {
+    if (!kVerboseCafeDiagnostics) {
+      return;
+    }
     for (final cafe in cafes.take(5)) {
       final resolvedUrl = cafe.photoUrls
           .map((url) => resolveCafeImageUrl(
@@ -462,18 +465,20 @@ class CafeRepository {
       final placeId = cafe.placeId!.trim();
       final needsImageRefresh = _needsFeaturedImageRefresh(cafe);
       try {
-        if (needsImageRefresh) {
+        if (needsImageRefresh && kVerboseCafeDiagnostics) {
           AppLogger.debug(
             '[FEATURED_IMAGE_REFRESH_START] cafeId=${cafe.id} name="${cafe.name}" googlePlaceIdPresent=true reason=no_usable_candidates',
             key: 'featured-image-refresh-start-${cafe.id}',
             throttle: Duration.zero,
           );
         }
-        AppLogger.debug(
-          '[SPONSORED_RATING_HYDRATE] placeIdPresent=true result=start',
-          key: 'sponsored-rating-hydrate-start-${cafe.id}',
-          throttle: Duration.zero,
-        );
+        if (kVerboseCafeDiagnostics) {
+          AppLogger.debug(
+            '[SPONSORED_RATING_HYDRATE] placeIdPresent=true result=start',
+            key: 'sponsored-rating-hydrate-start-${cafe.id}',
+            throttle: Duration.zero,
+          );
+        }
 
         final bool fetchDetails = needsImageRefresh || cafe.images.isEmpty;
         double? rating;
@@ -518,11 +523,13 @@ class CafeRepository {
               errorType: 'empty',
             );
           }
-          AppLogger.debug(
-            '[SPONSORED_RATING_HYDRATE] placeIdPresent=true result=failure',
-            key: 'sponsored-rating-hydrate-empty-${cafe.id}',
-            throttle: Duration.zero,
-          );
+          if (kVerboseCafeDiagnostics) {
+            AppLogger.debug(
+              '[SPONSORED_RATING_HYDRATE] placeIdPresent=true result=failure',
+              key: 'sponsored-rating-hydrate-empty-${cafe.id}',
+              throttle: Duration.zero,
+            );
+          }
           continue;
         }
 
@@ -577,11 +584,13 @@ class CafeRepository {
             errorType: freshImageCandidates.isEmpty ? 'empty' : null,
           );
         }
-        AppLogger.debug(
-          '[SPONSORED_RATING_HYDRATE] placeIdPresent=true result=success photosCount=${updatedCafe.images.length}',
-          key: 'sponsored-rating-hydrate-success-${cafe.id}',
-          throttle: Duration.zero,
-        );
+        if (kVerboseCafeDiagnostics) {
+          AppLogger.debug(
+            '[SPONSORED_RATING_HYDRATE] placeIdPresent=true result=success photosCount=${updatedCafe.images.length}',
+            key: 'sponsored-rating-hydrate-success-${cafe.id}',
+            throttle: Duration.zero,
+          );
+        }
       } catch (error) {
         if (needsImageRefresh) {
           _logFeaturedImageRefreshResult(
@@ -592,11 +601,13 @@ class CafeRepository {
             errorType: classifyServiceError(error).name,
           );
         }
-        AppLogger.debug(
-          '[SPONSORED_RATING_HYDRATE] placeIdPresent=true result=failure error=$error',
-          key: 'sponsored-rating-hydrate-failure-${cafe.id}',
-          throttle: Duration.zero,
-        );
+        if (kVerboseCafeDiagnostics) {
+          AppLogger.debug(
+            '[SPONSORED_RATING_HYDRATE] placeIdPresent=true result=failure error=$error',
+            key: 'sponsored-rating-hydrate-failure-${cafe.id}',
+            throttle: Duration.zero,
+          );
+        }
       }
     }
     if (updated.isNotEmpty) {
@@ -692,6 +703,9 @@ class CafeRepository {
     required bool success,
     String? errorType,
   }) {
+    if (!kVerboseCafeDiagnostics) {
+      return;
+    }
     final first = freshCandidates.isEmpty ? null : freshCandidates.first;
     AppLogger.debug(
       '[FEATURED_IMAGE_REFRESH_RESULT] cafeId=${cafe.id} googlePlaceId=$placeId success=$success freshCandidateCount=${freshCandidates.length} firstHost=${_urlHostForFeaturedRefresh(first)} firstPathShape=${_urlPathShapeForFeaturedRefresh(first)} source=google_place_details errorType=${errorType ?? ''}',

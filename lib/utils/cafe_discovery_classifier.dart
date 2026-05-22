@@ -435,11 +435,13 @@ CafeVenueAssessment assessGoogleCafeCandidate(Map<String, dynamic> place) {
   ].where((value) => value.isNotEmpty).join(' ');
 
   if (shouldRejectForPublicDiscoveryScript(rawName)) {
-    AppLogger.debug(
-      '[CAFE_CLASSIFIER_REJECT] reason=arabic_script_name nameHash=${rawName.hashCode.abs()} surface=merge',
-      key: 'cafe-classifier-reject-arabic-${rawName.hashCode.abs()}',
-      throttle: Duration.zero,
-    );
+    if (kVerboseCafeDiagnostics) {
+      AppLogger.debug(
+        '[CAFE_CLASSIFIER_REJECT] reason=arabic_script_name nameHash=${rawName.hashCode.abs()} surface=merge',
+        key: 'cafe-classifier-reject-arabic-${rawName.hashCode.abs()}',
+        throttle: Duration.zero,
+      );
+    }
     return CafeVenueAssessment(
       isValidCafe: false,
       score: 0,
@@ -583,11 +585,13 @@ bool isStrictlyValidCafe(Cafe cafe) {
   }
 
   if (isPublicDiscoveryScriptBlockedCafe(cafe)) {
-    AppLogger.debug(
-      '[CAFE_CLASSIFIER_REJECT] reason=arabic_script_name nameHash=${cafe.name.hashCode.abs()} surface=cache',
-      key: 'cafe-classifier-reject-arabic-cafe-${cafe.id}',
-      throttle: Duration.zero,
-    );
+    if (kVerboseCafeDiagnostics) {
+      AppLogger.debug(
+        '[CAFE_CLASSIFIER_REJECT] reason=arabic_script_name nameHash=${cafe.name.hashCode.abs()} surface=cache',
+        key: 'cafe-classifier-reject-arabic-cafe-${cafe.id}',
+        throttle: Duration.zero,
+      );
+    }
     return false;
   }
 
@@ -630,11 +634,13 @@ CafeVenueAssessment _assessVenueSignals({
   final hardBlocked = _matchesHardBlockedPattern(
       tokenSet, bigrams, trigrams, normalizedSearchableText);
   if (hardBlocked) {
-    AppLogger.debug(
-      '[CAFE_CLASSIFIER_REJECT] reason=hard_blocked_venue_identity name=${normalizedName.length > 40 ? normalizedName.substring(0, 40) : normalizedName} primaryType=$normalizedPrimaryType',
-      key: 'cafe-classifier-reject-hard-${normalizedName.hashCode.abs()}',
-      throttle: Duration.zero,
-    );
+    if (kVerboseCafeDiagnostics) {
+      AppLogger.debug(
+        '[CAFE_CLASSIFIER_REJECT] reason=hard_blocked_venue_identity name=${normalizedName.length > 40 ? normalizedName.substring(0, 40) : normalizedName} primaryType=$normalizedPrimaryType',
+        key: 'cafe-classifier-reject-hard-${normalizedName.hashCode.abs()}',
+        throttle: Duration.zero,
+      );
+    }
     return CafeVenueAssessment(
       isValidCafe: false,
       score: -10,
@@ -702,11 +708,14 @@ CafeVenueAssessment _assessVenueSignals({
   }
 
   if (hasRestaurantIdentityToken && !hasStrongCafeGoogleType) {
-    AppLogger.debug(
-      '[CAFE_CLASSIFIER_REJECT] reason=restaurant_false_positive name=${normalizedName.length > 40 ? normalizedName.substring(0, 40) : normalizedName}',
-      key: 'cafe-classifier-reject-restaurant-${normalizedName.hashCode.abs()}',
-      throttle: Duration.zero,
-    );
+    if (kVerboseCafeDiagnostics) {
+      AppLogger.debug(
+        '[CAFE_CLASSIFIER_REJECT] reason=restaurant_false_positive name=${normalizedName.length > 40 ? normalizedName.substring(0, 40) : normalizedName}',
+        key:
+            'cafe-classifier-reject-restaurant-${normalizedName.hashCode.abs()}',
+        throttle: Duration.zero,
+      );
+    }
     return CafeVenueAssessment(
       isValidCafe: false,
       score: -4,
@@ -725,11 +734,13 @@ CafeVenueAssessment _assessVenueSignals({
   // penalties. They must not be rescued by a cafe token, known brand, or
   // Google primary/secondary cafe type.
   if (strongNegativeHits > 0) {
-    AppLogger.debug(
-      '[CAFE_CLASSIFIER_REJECT] reason=strong_negative_venue_token name=${normalizedName.length > 40 ? normalizedName.substring(0, 40) : normalizedName} primaryType=$normalizedPrimaryType hits=$strongNegativeHits',
-      key: 'cafe-classifier-reject-neg-${normalizedName.hashCode.abs()}',
-      throttle: Duration.zero,
-    );
+    if (kVerboseCafeDiagnostics) {
+      AppLogger.debug(
+        '[CAFE_CLASSIFIER_REJECT] reason=strong_negative_venue_token name=${normalizedName.length > 40 ? normalizedName.substring(0, 40) : normalizedName} primaryType=$normalizedPrimaryType hits=$strongNegativeHits',
+        key: 'cafe-classifier-reject-neg-${normalizedName.hashCode.abs()}',
+        throttle: Duration.zero,
+      );
+    }
     return CafeVenueAssessment(
       isValidCafe: false,
       score: -(strongNegativeHits * 3),
@@ -817,7 +828,7 @@ CafeVenueAssessment _assessVenueSignals({
           score: score,
         );
 
-  if (isValidCafe) {
+  if (isValidCafe && kVerboseCafeDiagnostics) {
     if (hasRestaurantIdentityToken && hasStrongCafeGoogleType) {
       AppLogger.debug(
         '[CAFE_CLASSIFIER_ACCEPT] reason=coffee_or_cafe_overrides_restaurant name=${normalizedName.length > 40 ? normalizedName.substring(0, 40) : normalizedName}',
@@ -831,7 +842,7 @@ CafeVenueAssessment _assessVenueSignals({
       key: 'cafe-classifier-accept-${normalizedName.hashCode.abs()}',
       throttle: Duration.zero,
     );
-  } else {
+  } else if (kVerboseCafeDiagnostics) {
     AppLogger.debug(
       '[CAFE_CLASSIFIER_REJECT] reason=${denyReason ?? 'unknown'} name=${normalizedName.length > 40 ? normalizedName.substring(0, 40) : normalizedName} primaryType=$normalizedPrimaryType score=$score',
       key: 'cafe-classifier-reject-score-${normalizedName.hashCode.abs()}',
