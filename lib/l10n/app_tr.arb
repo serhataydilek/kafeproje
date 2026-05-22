@@ -1,0 +1,508 @@
+{
+  "@@locale": "tr",
+  "appTitle": "Istanbul Kafe",
+  "commonBack": "Geri",
+  "commonSave": "Kaydet",
+  "commonCancel": "İptal",
+  "commonRetry": "Tekrar dene",
+  "commonClose": "Kapat",
+  "commonClear": "Temizle",
+  "commonEdit": "Düzenle",
+  "commonLoadMore": "Daha fazla yukle",
+  "@commonLoadMore": {
+    "description": "Daha fazla icerik yuklemek icin genel eylem etiketi."
+  },
+  "commonReset": "Sıfırla",
+  "commonApply": "Uygula",
+  "commonLoading": "Yükleniyor...",
+  "commonRefreshing": "Yenileniyor...",
+  "commonOpen": "Açık",
+  "commonClosed": "Kapalı",
+  "commonUnknown": "Bilinmiyor",
+  "cafeNoRatingsYet": "Henuz puan yok",
+  "commonNoData": "Veri yok",
+  "commonCategory": "Kategori",
+  "cafeCategoryNormal": "Standart kafe",
+  "cafeCategoryLounge": "Kafe lounge",
+  "commonDetails": "Detay",
+  "commonSettings": "Ayarlar",
+  "commonTheme": "Tema",
+  "commonAbout": "Hakkında",
+  "commonLight": "Açık",
+  "commonDark": "Koyu",
+  "commonSystem": "Sistem",
+  "commonLanguage": "Dil",
+  "commonSystemLanguage": "Sistem dili",
+  "commonTurkish": "Türkçe",
+  "commonEnglish": "İngilizce",
+  "errorGenericTitle": "Bir sorun oluştu",
+  "offlineBannerMessage": "Cevrimdisisin. Onbellekteki veriler gosteriliyor ve degisiklikler esitleme icin kuyruklaniyor.",
+  "@offlineBannerMessage": {
+    "description": "Cihaz cevrimdisiyken ve uygulama onbellekteki verileri gosterirken acilan banner mesaji."
+  },
+  "navHome": "Ana Sayfa",
+  "navExplore": "Keşfet",
+  "navMap": "Harita",
+  "navFavorites": "Favoriler",
+  "navProfile": "Profil",
+  "districtKadikoy": "Kadıköy",
+  "districtBesiktas": "Beşiktaş",
+  "districtUskudar": "Üsküdar",
+  "districtSisli": "Şişli",
+  "districtFatih": "Fatih",
+  "districtBeyoglu": "Beyoğlu",
+  "districtBakirkoy": "Bakırköy",
+  "wifiWeak": "Zayıf",
+  "wifiAverage": "Orta",
+  "wifiStrong": "Güçlü",
+  "outletLow": "Az",
+  "outletMedium": "Orta",
+  "outletHigh": "Çok",
+  "quietnessBusy": "Kalabalık",
+  "quietnessBalanced": "Dengeli",
+  "quietnessQuiet": "Sessiz",
+  "smokingAllowed": "Serbest",
+  "smokingOutdoorOnly": "Dış mekan",
+  "smokingNotAllowed": "Yasak",
+  "dayMonday": "Pazartesi",
+  "dayTuesday": "Salı",
+  "dayWednesday": "Çarşamba",
+  "dayThursday": "Perşembe",
+  "dayFriday": "Cuma",
+  "daySaturday": "Cumartesi",
+  "daySunday": "Pazar",
+  "categoryStudy": "Çalışmaya uygun",
+  "categoryBestCoffee": "En iyi kahve",
+  "categoryAffordable": "Uygun fiyatlı",
+  "categoryAesthetic": "Estetik",
+  "categoryQuiet": "Sessiz",
+  "categoryOutdoor": "Açık hava",
+  "sortTopRated": "En yüksek puan",
+  "sortNearest": "En yakın",
+  "sortCheapest": "En uygun fiyat",
+  "sortStudy": "Çalışmaya uygun",
+  "sortAesthetic": "En estetik",
+  "preferenceWifi": "Güçlü Wi‑Fi",
+  "preferenceQuiet": "Sessiz ortam",
+  "preferenceOutlet": "Priz imkanı",
+  "preferenceStudy": "Çalışmaya uygun",
+  "preferenceAesthetic": "Estetik ambiyans",
+  "preferenceOutdoor": "Açık hava",
+  "preferencePetFriendly": "Evcil hayvan dostu",
+  "preferenceBudget": "Uygun fiyat",
+  "homeTitle": "Istanbul'da kafe bul",
+  "homeSearchHint": "Kafe ara...",
+  "homePopularDistricts": "Popüler semtler",
+  "homeCategories": "Kategoriler",
+  "homeFeatured": "Öne çıkan kafeler",
+  "homeSponsoredCafes": "Sponsorlu kafeler",
+  "homeSponsoredBadge": "Sponsorlu",
+  "homeViewAll": "Tümünü gör",
+  "homeEmptyTitle": "Kafe bulunamadı",
+  "homeEmptyMessage": "Arama kriterlerini değiştirerek tekrar deneyin.",
+  "homeMockDataInfo": "Supabase hazır olana kadar örnek kafe verileri gösteriliyor.",
+  "homeMockFallbackInfo": "Canlı veri alınamadı. Uygulama şu an örnek verilerle çalışıyor.",
+  "exploreTitle": "Keşfet",
+  "exploreEmptyTitle": "Filtrelere uygun kafe bulunamadı",
+  "exploreEmptyMessage": "Arama veya filtreleri gevşeterek tekrar deneyin.",
+  "exploreEmptyCompareMessage": "Geçerli filtrelere uygun kafe yok, ancak seçtiğin kafeler karşılaştırmaya hazır.",
+  "favoritesTitle": "Favori kafelerim",
+  "favoritesLoading": "Favoriler yükleniyor",
+  "favoritesEmptyTitle": "Henüz favori kafen yok",
+  "favoritesEmptyMessage": "Beğendiğin kafeleri kaydet, buradan kolayca ulaş.",
+  "favoritesExploreAction": "Kafeleri keşfet",
+  "profileGuestTitle": "Giriş yapılmadı",
+  "profileGuestAction": "Giriş yap",
+  "profileSectionAccount": "Hesap",
+  "profileSyncQueued": "Degisikliklerin cevrimdisi kaydedildi ve baglanti gelince otomatik esitlenecek.",
+  "@profileSyncQueued": {
+    "description": "Profil degisikligi cevrimdisi kuyruga alindiginda gosterilen basari mesaji."
+  },
+  "profileSyncPending": "{count} degisiklik esitleme bekliyor.",
+  "@profileSyncPending": {
+    "description": "Hala kuyrukta bekleyen cevrimdisi degisiklik sayisini gosteren durum metni.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileSyncDeadLetters": "{count} degisiklik otomatik olarak esitlenemedi.",
+  "@profileSyncDeadLetters": {
+    "description": "Otomatik esitlemesi basarisiz olan kuyruktaki degisiklik sayisini gosteren durum metni.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileEdit": "Profili düzenle",
+  "profileAdminPanel": "Yönetim paneli",
+  "profileManagerBadge": "Yönetici",
+  "profileEmail": "E-posta",
+  "profileUsername": "Kullanıcı adı",
+  "profileFullName": "Ad soyad",
+  "profileSignOut": "Çıkış yap",
+  "authWelcome": "Hoş geldin",
+  "authSignUpTitle": "Kayıt ol",
+  "authDarkMode": "Koyu",
+  "authSignUpSubtitle": "Hesap oluşturmak için bilgilerini gir.",
+  "authSignInSubtitle": "E-posta veya kullanıcı adınla giriş yap.",
+  "authUsername": "Kullanıcı adı",
+  "authFirstName": "Ad",
+  "authLastName": "Soyad",
+  "authEmail": "E-posta",
+  "authEmailOrUsername": "E-posta veya kullanıcı adı",
+  "authPassword": "Şifre (en az 6 karakter)",
+  "authEmailRequired": "E-posta adresini gir.",
+  "authIdentifierRequired": "E-posta veya kullanıcı adını gir.",
+  "authResetNeedsEmail": "Şifreni sıfırlamak için e-posta adresini gir.",
+  "authPasswordRequired": "Şifreni gir.",
+  "authPasswordTooShort": "Şifre en az 6 karakter olmalı.",
+  "authShowPassword": "Şifreyi göster",
+  "authHidePassword": "Şifreyi gizle",
+  "authForgotPassword": "Şifremi unuttum",
+  "authResetPasswordSent": "Şifre sıfırlama bağlantısı gönderildi. Gelen kutunu kontrol et.",
+  "authSignIn": "Giriş yap",
+  "authSignUp": "Kayıt ol",
+  "authHasAccount": "Zaten hesabım var",
+  "authCreateAccount": "Yeni hesap oluştur",
+  "authRetryIn": "Tekrar dene ({seconds}s)",
+  "@authRetryIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "authTooManyAttempts": "Çok fazla deneme. {seconds} saniye sonra tekrar dene.",
+  "@authTooManyAttempts": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "authSignUpSuccess": "Hesabın oluşturuldu. E-posta adresini doğrulamak için gelen kutunu kontrol et.",
+  "authGenericError": "Bir şeyler ters gitti.",
+  "reviewsQueuedSuccess": "Yorumun cevrimdisi kaydedildi ve baglanti gelince otomatik esitlenecek.",
+  "@reviewsQueuedSuccess": {
+    "description": "Yorum cevrimdisi kuyruga alindiginda gosterilen basari mesaji."
+  },
+  "onboardingBrand": "Istanbul Kafe",
+  "onboardingTitle": "Istanbul'da bir sonraki favori kafeni keşfet",
+  "onboardingSubtitle": "Senin için en önemli şeyleri seç, önerileri buna göre düzenleyelim.",
+  "onboardingContinue": "Keşfetmeye başla",
+  "filterTitle": "Filtreler",
+  "filterDistrict": "İlçe",
+  "filterPrice": "Fiyat",
+  "filterMinRating": "Min. puan",
+  "filterMinRatingOption": "Puan {rating}+",
+  "@filterMinRatingOption": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "filterWifi": "Wi‑Fi",
+  "filterOutlet": "Priz",
+  "filterQuietness": "Sessizlik",
+  "filterSmoking": "Sigara",
+  "filterOpenNow": "Şu an açık",
+  "filterStudyFriendly": "Çalışmaya uygun",
+  "filterPetFriendly": "Evcil hayvan dostu",
+  "filterOutdoorSeating": "Açık hava oturma",
+  "filterApplyCount": "Uygula ({count} filtre)",
+  "@filterApplyCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mapPreparing": "Harita görünümü hazırlanıyor",
+  "mapLocateMe": "Konumumu bul",
+  "mapEmptyTitle": "Haritada gösterilecek kafe yok",
+  "mapNearbyEmptyMessage": "Yakındaki harita alanında kafe bulunamadı. Daha geniş keşif için bir ilçe seçin.",
+  "mapNoResultsForFiltersMessage": "İstanbul genelinde daha fazla kafe görmek için filtreleri sıfırlamayı deneyin.",
+  "mapDataUnavailableOverlayMessage": "Kafe verileri hâlâ yükleniyor veya şu anda kullanılamıyor.",
+  "mapNearbyRadiusMessage": "{radius} içindeki kafeler gösteriliyor. Daha geniş keşif için bir ilçe seçin.",
+  "@mapNearbyRadiusMessage": {
+    "placeholders": {
+      "radius": {
+        "type": "String"
+      }
+    }
+  },
+  "mapEmptyMessage": "Veri geldikçe burada yer işaretleri görünecek.",
+  "mapUnavailableMessage": "Bu özellik şu anda kullanılamıyor.",
+  "mapNoPhotos": "Henüz fotoğraf eklenmemiş",
+  "mapPhotoCount": "{current}/{total}",
+  "@mapPhotoCount": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mapDevModeInfo": "Geliştirme haritası aktif. {count} kafe sahte pinlerle gösteriliyor.",
+  "@mapDevModeInfo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mapDevModeHint": "Google Maps API anahtarı hazır olduğunda bu ekran gerçek harita ile değiştirilebilir.",
+  "mapFilterCount": "{count} filtre",
+  "@mapFilterCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mapRadiusSmall": "1 km",
+  "mapRadiusMedium": "2 km",
+  "mapRadiusLarge": "4 km",
+  "mapDevLabel": "Istanbul geliştirme haritası",
+  "cafeDetailNotFound": "Bu kafe bulunamadı veya veri henüz yüklenmedi.",
+  "cafeDetailDetails": "Detaylar",
+  "cafeDetailContributionTitle": "Bu kafeyi birlikte iyileştirelim",
+  "cafeDetailContributionSubtitle": "Wi‑Fi, ses seviyesi, priz ve çalışma konforu gibi gerçek detaylar ekleyin.",
+  "cafeDetailHours": "Çalışma saatleri",
+  "cafeDetailHoursEmpty": "Saat bilgisi henüz eklenmemiş.",
+  "cafeDetailMenuHighlights": "Menü öne çıkanlar",
+  "cafeDetailDescriptionFallback": "Bu kafe için henüz açıklama eklenmemiş.",
+  "cafeDetailSave": "Kaydet",
+  "cafeDetailSaved": "Kaydedildi",
+  "cafeDetailCompare": "Karşılaştır",
+  "cafeDetailCompared": "Eklendi",
+  "cafeDetailOpenOnMap": "Haritada aç",
+  "metricWifi": "Wi‑Fi",
+  "metricOutlet": "Priz",
+  "metricQuietness": "Sessizlik",
+  "metricPrice": "Fiyat",
+  "metricSeating": "Oturma",
+  "metricAmbiance": "Ambiyans",
+  "metricStudyFriendly": "Çalışmaya uygun",
+  "metricPetFriendly": "Evcil hayvan",
+  "metricOutdoor": "Açık hava",
+  "metricSmoking": "Sigara",
+  "metricAvailable": "Var",
+  "metricYes": "Evet",
+  "metricFriendly": "Dostu",
+  "cafeCardSemanticLabel": "{name} kafe kartı",
+  "@cafeCardSemanticLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cafeCardCompare": "Karşılaştır",
+  "cafeCardCompared": "Eklendi",
+  "cafeCardSave": "Kaydet",
+  "cafeCardSaved": "Kaydedildi",
+  "compareTitle": "Karşılaştır",
+  "compareCategory": "Kategori",
+  "compareAddCafeAction": "Karşılaştırmaya kafe ekle",
+  "compareOpenCafeAction": "Kafeyi aç",
+  "compareSelectedCount": "{count} kafe seçildi",
+  "@compareSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "compareEmptyMessage": "Karşılaştırmak için kafe ekle.",
+  "compareEmptyAddCafes": "Kafe ekle",
+  "compareEmptyExploreCafes": "Kafeleri keşfet",
+  "compareUnresolvedMessage": "Bu seçili kafe yüklenemedi.",
+  "compareUnresolvedCount": "{count, plural, =1{1 seçili kafe yüklenemedi.} other{{count} seçili kafe yüklenemedi.}}",
+  "@compareUnresolvedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "compareCompactHint": "En iyi değerler hızlı karşılaştırma için vurgulanır.",
+  "compareFeature": "Özellik",
+  "compareRating": "Puan",
+  "compareCommunityRating": "Topluluk puanı",
+  "compareGoogleRating": "Google puanı",
+  "compareGoogleReviews": "Google yorumları",
+  "compareDistance": "Mesafe",
+  "compareFeatures": "Özellikler",
+  "compareHighlights": "Önerilenler",
+  "compareOpeningStatus": "Açılış durumu",
+  "compareHoursUnavailable": "Saat bilgisi yok",
+  "compareAddAnotherPrompt": "Başka bir kafe ekle",
+  "compareUnresolvedSlot": "Kafe kullanılamıyor",
+  "compareAddressDistrict": "Adres / ilçe",
+  "comparePrice": "Fiyat",
+  "compareNoAppReviewsYet": "Henüz uygulama yorumu yok",
+  "compareGoogleRatingUnavailable": "Google puanı mevcut değil",
+  "compareWifi": "Wi‑Fi",
+  "compareOutlet": "Priz",
+  "compareQuietness": "Sessizlik",
+  "compareAmbiance": "Ambiyans",
+  "compareSeatingComfort": "Oturma konforu",
+  "compareStudyFriendly": "Çalışmaya uygun",
+  "comparePetFriendly": "Evcil hayvan",
+  "compareOutdoor": "Açık hava",
+  "compareSmoking": "Sigara",
+  "compareDistrict": "İlçe",
+  "compareYes": "Evet",
+  "compareNo": "Hayır",
+  "compareAvailable": "Var",
+  "compareUnavailable": "Yok",
+  "compareEmptyFeatureCommunityRating": "Uygulama yorumlarÄ±ndan gelen kullanÄ±cÄ± puanÄ±.",
+  "compareEmptyFeaturePrice": "Tipik bir ziyaret iÃ§in tahmini fiyat seviyesi.",
+  "compareEmptyFeatureDistrict": "Kafenin konum bÃ¶lgesi ve adres baÄŸlamÄ±.",
+  "compareEmptyFeatureWifi": "Kafenin Ã§alÄ±ÅŸmaya veya ders Ã§alÄ±ÅŸmaya uygunluÄŸu.",
+  "compareEmptyFeatureAmbiance": "Genel atmosfer ve konfor sinyalleri.",
+  "compareEmptyFeatureOutlet": "DizÃ¼stÃ¼ ve telefonlar iÃ§in ÅŸarj imkanÄ±.",
+  "settingsAboutDescription": "Istanbul'daki en iyi kafeleri keşfet, karşılaştır ve favorilerine ekle.",
+  "adminTitle": "Yönetim paneli",
+  "adminBlockedTitle": "Erişim engellendi",
+  "adminBlockedMessage": "Bu sayfa yalnızca yöneticiler tarafından görüntülenebilir.",
+  "adminUsersTab": "Kullanıcılar ({count})",
+  "@adminUsersTab": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminCafesTab": "Kafeler ({count})",
+  "@adminCafesTab": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminSearchUsers": "İsim, kullanıcı adı veya e-posta ara...",
+  "adminRoleAll": "Tümü",
+  "adminRoleAdmin": "Yönetici",
+  "adminRoleUser": "Kullanıcı",
+  "adminNoResults": "Sonuç bulunamadı.",
+  "adminUnnamedUser": "İsimsiz kullanıcı",
+  "adminAddCafe": "Yeni kafe ekle",
+  "adminEdit": "Düzenle",
+  "profileEditTitle": "Profili düzenle",
+  "profileEditFirstNameRequired": "Ad alanı boş bırakılamaz.",
+  "profileEditLastNameRequired": "Soyad alanı boş bırakılamaz.",
+  "profileEditUsernameRequired": "Kullanıcı adı boş bırakılamaz.",
+  "profileEditUsernameInvalid": "Kullanıcı adı 3-24 karakter olmalı.",
+  "profileEditEmailRequired": "E-posta alanı boş bırakılamaz.",
+  "profileEditEmailInvalid": "Geçerli bir e-posta girin.",
+  "profileEditUnavailable": "Supabase ayarlanmadan profil güncellenemez.",
+  "profileEditSuccess": "Profil güncellendi.",
+  "profileEditEmailHint": "E-posta değişikliği doğrulama gerektirir",
+  "cafeFormName": "Kafe adı",
+  "cafeFormDistrict": "İlçe",
+  "cafeFormNeighborhood": "Mahalle",
+  "cafeFormAddress": "Adres",
+  "cafeFormDescription": "Açıklama",
+  "cafeFormPrice": "Fiyat",
+  "cafeFormPriceUnknown": "Bilinmiyor",
+  "cafeFormWifi": "Wi‑Fi",
+  "cafeFormOutlet": "Priz",
+  "cafeFormQuietness": "Sessizlik",
+  "cafeFormStudyFriendly": "Çalışmaya uygun",
+  "cafeFormPetFriendly": "Evcil hayvan dostu",
+  "cafeFormOutdoorSeating": "Açık hava oturma",
+  "cafeFormSmoking": "Sigara",
+  "cafeFormTags": "Etiketler (virgülle ayır)",
+  "cafeFormPhotos": "Fotoğraf URL'leri",
+  "cafeFormPhotosHint": "Görsel URL'lerini virgül veya yeni satır ile ayırarak ekleyin.",
+  "cafeFormSaving": "Kaydediliyor...",
+  "errorPhotoUrlsInvalid": "Geçerli görsel URL'leri girin veya alanı boş bırakın.",
+  "cafeAddTitle": "Yeni kafe ekle",
+  "cafeAddNameRequired": "Kafe adı boş bırakılamaz.",
+  "cafeAddUnavailable": "Supabase ayarlanmadan kafe eklenemez.",
+  "cafeAddSuccess": "Kafe eklendi.",
+  "cafeAddFailed": "Ekleme başarısız oldu.",
+  "cafeEditTitle": "Kafe düzenle",
+  "cafeEditUnavailable": "Supabase ayarlanmadan kafe güncellenemez.",
+  "cafeEditSuccess": "Kafe güncellendi.",
+  "cafeEditFailed": "Güncelleme başarısız.",
+  "reviewsSectionTitle": "Uygulama yorumları",
+  "reviewsWriteAction": "Yorum yaz",
+  "reviewsEditAction": "Yorumu düzenle",
+  "reviewsSignInAction": "Yorum için giriş yap",
+  "reviewsEmptyState": "Henüz uygulama yorumu yok. İlk yorumu sen bırak!",
+  "reviewsLoadError": "Yorumlar yüklenemedi.",
+  "reviewsDeleteTitle": "Yorumu sil",
+  "reviewsDeleteMessage": "Bu yorumu silmek istediğine emin misin?",
+  "reviewsDeleteCancel": "Vazgeç",
+  "reviewsDeleteConfirm": "Sil",
+  "reviewsDeleteSuccess": "Yorum silindi.",
+  "reviewsDeleteError": "Yorum silinemedi.",
+  "reviewsFormTitle": "Bu kafeyi değerlendir",
+  "reviewsFormUpdateTitle": "Yorumunu güncelle",
+  "reviewsFormRatingHint": "Devam etmek için bir puan seç.",
+  "reviewsFormCommentLabel": "Yorum (isteğe bağlı)",
+  "reviewsFormCommentHint": "İstersen neleri beğendiğini veya beğenmediğini yaz.",
+  "reviewsFormCommentHelper": "Yorum zorunlu değil. Yalnızca puan vererek de gönderebilirsin.",
+  "reviewsFormSubmit": "Yorumu gönder",
+  "reviewsFormUpdate": "Yorumu güncelle",
+  "reviewsFormSubmitting": "Gönderiliyor...",
+  "reviewsFormUpdating": "Güncelleniyor...",
+  "reviewsSubmitSuccess": "Yorumun gönderildi.",
+  "reviewsUpdateSuccess": "Yorumun güncellendi.",
+  "reviewsRefreshWarning": "Yorumun kaydedildi ama yorum listesi henüz yenilenemedi.",
+  "reviewsAuthRequired": "Yorum göndermeden önce giriş yapman gerekiyor.",
+  "reviewsRatingRequired": "Göndermeden önce bir puan seç.",
+  "reviewsValidationError": "Yorum doğrulanamadı.",
+  "reviewsConflictError": "Bu kafe için zaten bir yorumun var.",
+  "reviewsUnavailable": "Yorum servisi şu anda kullanılamıyor.",
+  "placeholderNotImplemented": "Bu ekran henüz hazır değil.",
+  "errorCafeListLoadFailed": "Kafe listesi yüklenemedi.",
+  "errorCafeDetailLoadFailed": "Kafe bilgileri yüklenemedi.",
+  "errorCafeUpdateFailed": "Kafe güncellenemedi.",
+  "errorCafeAddFailed": "Kafe eklenemedi.",
+  "errorCafeNameRequired": "Kafe adı gereklidir.",
+  "errorCafeNameInvalid": "Kafe adı geçersiz.",
+  "errorNeighborhoodInvalid": "Mahalle bilgisi geçersiz.",
+  "errorAddressInvalid": "Adres bilgisi geçersiz.",
+  "errorDescriptionInvalid": "Açıklama geçersiz.",
+  "errorUserListLoadFailed": "Kullanıcı listesi yüklenemedi.",
+  "errorRoleChangeFailedNoPermissions": "Rol değişikliği uygulanamadı. Yönetici yetkiniz olmayabilir."
+  ,
+  "errorPermissionDenied": "Bu işlem için yetkiniz yok.",
+  "errorRequestTimedOut": "İstek zaman aşımına uğradı. Lütfen tekrar deneyin.",
+  "errorNetworkUnavailable": "Ağ hatası nedeniyle işlem tamamlanamadı.",
+  "errorDataConflict": "İstek mevcut verilerle çakışıyor.",
+  "errorValidationFailed": "Gönderilen bilgiler geçersiz.",
+  "errorRecordNotFound": "İstenen kayıt bulunamadı.",
+  "errorParseFailed": "Sunucudan beklenmeyen veri alındı.",
+  "errorServiceUnavailable": "Bu hizmet şu anda kullanılamıyor.",
+  "errorAuthInvalidCredentials": "E-posta, kullanıcı adı veya şifre hatalı.",
+  "errorAuthRateLimited": "Çok fazla deneme var. Lütfen biraz bekleyip tekrar deneyin.",
+  "errorAuthEmailRegistered": "Bu e-posta adresi zaten kayıtlı.",
+  "errorAuthPasswordResetFailed": "Şifre sıfırlama şu anda başlatılamadı.",
+  "errorUsernameInvalid": "Bu kullanıcı adı geçersiz.",
+  "errorUsernameTaken": "Bu kullanıcı adı zaten alınmış.",
+  "errorProfileUpdateFailed": "Profil güncellenemedi.",
+  "errorAvatarEmpty": "Boş fotoğraf yüklenemez.",
+  "errorAvatarUploadFailed": "Profil fotoğrafı yüklenemedi.",
+  "errorProfileLoadFailed": "Profil yüklenemedi.",
+  "errorReviewSubmitFailed": "Yorum gönderilemedi.",
+  "errorReviewRatingOutOfRange": "Lütfen 1 ile 5 arasında bir puan seçin.",
+  "errorReviewProfanityBlocked": "Lütfen yorumlarda saygılı olun ve küfür kullanmayın.",
+  "errorReviewTextTooLong": "Yorum metni 2000 karakterden uzun olamaz.",
+  "errorReviewDuplicateText": "Bu kafe için aynı yorum metnini zaten gönderdiniz.",
+  "errorReviewSubmissionRateLimited": "Yeni bir yorum göndermeden önce 30 saniye bekleyin.",
+  "errorReviewNotOwner": "Yalnızca kendi yorumunuzu değiştirebilirsiniz.",
+  "errorReviewProfileMissing": "Bu yorum için profiliniz bulunamadı.",
+  "errorReviewFieldMissing": "Zorunlu bir yorum alanı eksikti."
+}

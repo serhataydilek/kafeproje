@@ -1,0 +1,88 @@
+# Environment / secrets
+.env
+.env.*
+*.env
+.env.local
+.env.local.json
+.env.*.local
+
+# Firebase local config - keep local unless intentionally public
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+*.apk
+*.aab
+
+# Android
+android/.gradle
+android/captures/
+android/gradlew
+android/gradlew.bat
+android/local.properties
+android/**/GeneratedPluginRegistrant.java
+
+# iOS
+ios/.symlinks/
+ios/.generated/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/generated.xcconfig
+ios/Podfile.lock
+
+# macOS
+macos/Flutter/Flutter-Release.xcconfig
+macos/Flutter/GeneratedPluginRegistrant.swift
+
+# Windows
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugin_registrant.h
+windows/flutter/generated_plugins.cmake
+
+# Linux
+linux/flutter/generated_plugin_registrant.cc
+linux/flutter/generated_plugin_registrant.h
+linux/flutter/generated_plugins.cmake
+
+# Coverage
+coverage/
+
+# IDE
+.idea/
+.vscode/
+.iml
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Diagnostics / runtime artifacts
+*.log
+*.pid
+*.png
+*.xml
+.codex-runtime/
+flutter_run_debug*.log
+runtime_featured_*.log
+runtime_featured_*.pid
+runtime_home_*.log
+runtime_home_pid.txt
+android_runtime_diag.png
+android_runtime_screen.png
+window_dump*.xml
+temp_parse_logs.*
+temp_maps_page.html
+test_output.txt
+crash_diag_logcat_full.log
+crash_diag_logcat.err.log
+crash_diag_logcat.pid
+crash_diag_screen.png
+safety_commit_files_*.txt
+working_emulator_build_featured_images.apk

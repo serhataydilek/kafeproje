@@ -1,0 +1,507 @@
+{
+  "@@locale": "en",
+  "appTitle": "Istanbul Cafe",
+  "commonBack": "Back",
+  "commonSave": "Save",
+  "commonCancel": "Cancel",
+  "commonRetry": "Retry",
+  "commonClose": "Close",
+  "commonClear": "Clear",
+  "commonEdit": "Edit",
+  "commonLoadMore": "Load more",
+  "@commonLoadMore": {
+    "description": "Generic action label for loading another page of content."
+  },
+  "commonReset": "Reset",
+  "commonApply": "Apply",
+  "commonLoading": "Loading...",
+  "commonRefreshing": "Refreshing...",
+  "commonOpen": "Open",
+  "commonClosed": "Closed",
+  "commonUnknown": "Unknown",
+  "cafeNoRatingsYet": "No ratings yet",
+  "commonNoData": "No data",
+  "commonCategory": "Category",
+  "cafeCategoryNormal": "Cafe",
+  "cafeCategoryLounge": "Cafe lounge",
+  "commonDetails": "Details",
+  "commonSettings": "Settings",
+  "commonTheme": "Theme",
+  "commonAbout": "About",
+  "commonLight": "Light",
+  "commonDark": "Dark",
+  "commonSystem": "System",
+  "commonLanguage": "Language",
+  "commonSystemLanguage": "System language",
+  "commonTurkish": "Turkish",
+  "commonEnglish": "English",
+  "errorGenericTitle": "Something went wrong",
+  "offlineBannerMessage": "Offline. Showing cached data and queueing changes for sync.",
+  "@offlineBannerMessage": {
+    "description": "Banner shown when the device is offline and the app is serving cached data."
+  },
+  "navHome": "Home",
+  "navExplore": "Explore",
+  "navMap": "Map",
+  "navFavorites": "Favorites",
+  "navProfile": "Profile",
+  "districtKadikoy": "Kadikoy",
+  "districtBesiktas": "Besiktas",
+  "districtUskudar": "Uskudar",
+  "districtSisli": "Sisli",
+  "districtFatih": "Fatih",
+  "districtBeyoglu": "Beyoglu",
+  "districtBakirkoy": "Bakirkoy",
+  "wifiWeak": "Weak",
+  "wifiAverage": "Average",
+  "wifiStrong": "Strong",
+  "outletLow": "Low",
+  "outletMedium": "Medium",
+  "outletHigh": "High",
+  "quietnessBusy": "Busy",
+  "quietnessBalanced": "Balanced",
+  "quietnessQuiet": "Quiet",
+  "smokingAllowed": "Allowed",
+  "smokingOutdoorOnly": "Outdoor only",
+  "smokingNotAllowed": "Not allowed",
+  "dayMonday": "Monday",
+  "dayTuesday": "Tuesday",
+  "dayWednesday": "Wednesday",
+  "dayThursday": "Thursday",
+  "dayFriday": "Friday",
+  "daySaturday": "Saturday",
+  "daySunday": "Sunday",
+  "categoryStudy": "Study-friendly",
+  "categoryBestCoffee": "Best coffee",
+  "categoryAffordable": "Affordable",
+  "categoryAesthetic": "Aesthetic",
+  "categoryQuiet": "Quiet",
+  "categoryOutdoor": "Outdoor",
+  "sortTopRated": "Top rated",
+  "sortNearest": "Nearest",
+  "sortCheapest": "Cheapest",
+  "sortStudy": "Best for work",
+  "sortAesthetic": "Most aesthetic",
+  "preferenceWifi": "Strong Wi-Fi",
+  "preferenceQuiet": "Quiet atmosphere",
+  "preferenceOutlet": "Power outlets",
+  "preferenceStudy": "Study-friendly",
+  "preferenceAesthetic": "Aesthetic vibe",
+  "preferenceOutdoor": "Outdoor seating",
+  "preferencePetFriendly": "Pet-friendly",
+  "preferenceBudget": "Budget-friendly",
+  "homeTitle": "Find a cafe in Istanbul",
+  "homeSearchHint": "Search cafes...",
+  "homePopularDistricts": "Popular districts",
+  "homeCategories": "Categories",
+  "homeFeatured": "Featured cafes",
+  "homeSponsoredCafes": "Sponsored cafes",
+  "homeSponsoredBadge": "Sponsored",
+  "homeViewAll": "See all",
+  "homeEmptyTitle": "No cafes found",
+  "homeEmptyMessage": "Try changing your search criteria.",
+  "homeMockDataInfo": "Sample cafe data is shown until Supabase is ready.",
+  "homeMockFallbackInfo": "Live data could not be loaded. The app is currently using sample data.",
+  "exploreTitle": "Explore",
+  "exploreEmptyTitle": "No cafes match these filters",
+  "exploreEmptyMessage": "Try loosening your search or filters.",
+  "exploreEmptyCompareMessage": "No cafes match current filters, but you still have selected cafes ready to compare.",
+  "favoritesTitle": "My favorite cafes",
+  "favoritesLoading": "Loading favorites",
+  "favoritesEmptyTitle": "You do not have any favorite cafes yet",
+  "favoritesEmptyMessage": "Save the cafes you like and reach them easily here.",
+  "favoritesExploreAction": "Explore cafes",
+  "profileGuestTitle": "You are not signed in",
+  "profileGuestAction": "Sign in",
+  "profileSectionAccount": "Account",
+  "profileSyncQueued": "Your changes were saved offline and will sync automatically.",
+  "@profileSyncQueued": {
+    "description": "Success message shown after a profile change is queued while offline."
+  },
+  "profileSyncPending": "{count} change(s) waiting to sync.",
+  "@profileSyncPending": {
+    "description": "Status text showing how many offline profile changes are still queued.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileSyncDeadLetters": "{count} change(s) could not be synced automatically.",
+  "@profileSyncDeadLetters": {
+    "description": "Status text showing how many queued changes failed automatic sync and need attention.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileEdit": "Edit profile",
+  "profileAdminPanel": "Admin panel",
+  "profileManagerBadge": "Admin",
+  "profileEmail": "Email",
+  "profileUsername": "Username",
+  "profileFullName": "Full name",
+  "profileSignOut": "Sign out",
+  "authWelcome": "Welcome back",
+  "authSignUpTitle": "Sign up",
+  "authDarkMode": "Dark",
+  "authSignUpSubtitle": "Enter your details to create an account.",
+  "authSignInSubtitle": "Sign in with your email or username.",
+  "authUsername": "Username",
+  "authFirstName": "First name",
+  "authLastName": "Last name",
+  "authEmail": "Email",
+  "authEmailOrUsername": "Email or username",
+  "authPassword": "Password (at least 6 characters)",
+  "authEmailRequired": "Enter your email address.",
+  "authIdentifierRequired": "Enter your email or username.",
+  "authResetNeedsEmail": "Enter your email address to reset your password.",
+  "authPasswordRequired": "Enter your password.",
+  "authPasswordTooShort": "Password must be at least 6 characters.",
+  "authShowPassword": "Show password",
+  "authHidePassword": "Hide password",
+  "authForgotPassword": "Forgot password?",
+  "authResetPasswordSent": "Password reset link sent. Check your inbox.",
+  "authSignIn": "Sign in",
+  "authSignUp": "Sign up",
+  "authHasAccount": "I already have an account",
+  "authCreateAccount": "Create a new account",
+  "authRetryIn": "Try again ({seconds}s)",
+  "@authRetryIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "authTooManyAttempts": "Too many attempts. Try again in {seconds} seconds.",
+  "@authTooManyAttempts": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "authSignUpSuccess": "Your account was created. Check your inbox to verify your email address.",
+  "authGenericError": "Something went wrong.",
+  "reviewsQueuedSuccess": "Your review was saved offline and will sync automatically.",
+  "@reviewsQueuedSuccess": {
+    "description": "Success message shown after a review is queued locally because the app is offline."
+  },
+  "onboardingBrand": "Istanbul Cafe",
+  "onboardingTitle": "Discover your next favorite cafe in Istanbul",
+  "onboardingSubtitle": "Choose what matters most to you so we can tailor suggestions.",
+  "onboardingContinue": "Start exploring",
+  "filterTitle": "Filters",
+  "filterDistrict": "District",
+  "filterPrice": "Price",
+  "filterMinRating": "Min. rating",
+  "filterMinRatingOption": "Rating {rating}+",
+  "@filterMinRatingOption": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "filterWifi": "Wi-Fi",
+  "filterOutlet": "Outlets",
+  "filterQuietness": "Quietness",
+  "filterSmoking": "Smoking",
+  "filterOpenNow": "Open now",
+  "filterStudyFriendly": "Good for working",
+  "filterPetFriendly": "Pet-friendly",
+  "filterOutdoorSeating": "Outdoor seating",
+  "filterApplyCount": "Apply ({count} filters)",
+  "@filterApplyCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mapPreparing": "Preparing map view",
+  "mapLocateMe": "Locate me",
+  "mapEmptyTitle": "There are no cafes to show on the map",
+  "mapNearbyEmptyMessage": "No cafes were found in the nearby map area. Select a district to explore farther.",
+  "mapNoResultsForFiltersMessage": "Try resetting filters to see more cafes across Istanbul.",
+  "mapDataUnavailableOverlayMessage": "Cafe data is still loading or unavailable right now.",
+  "mapNearbyRadiusMessage": "Showing cafes within {radius}. Select a district to explore farther.",
+  "@mapNearbyRadiusMessage": {
+    "placeholders": {
+      "radius": {
+        "type": "String"
+      }
+    }
+  },
+  "mapEmptyMessage": "Markers will appear here as data becomes available.",
+  "mapUnavailableMessage": "This feature is currently unavailable.",
+  "mapNoPhotos": "No photos available yet",
+  "mapPhotoCount": "{current}/{total}",
+  "@mapPhotoCount": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mapDevModeInfo": "Development map is active. {count} cafes are shown with placeholder pins.",
+  "@mapDevModeInfo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mapDevModeHint": "This screen can be replaced with a real Google Maps implementation once the API key is ready.",
+  "mapFilterCount": "{count} filters",
+  "@mapFilterCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mapRadiusSmall": "1 km",
+  "mapRadiusMedium": "2 km",
+  "mapRadiusLarge": "4 km",
+  "mapDevLabel": "Istanbul dev map",
+  "cafeDetailNotFound": "This cafe could not be found or the data has not loaded yet.",
+  "cafeDetailDetails": "Details",
+  "cafeDetailContributionTitle": "Help us improve this cafe",
+  "cafeDetailContributionSubtitle": "Add real details like Wi-Fi, noise, sockets, and study comfort.",
+  "cafeDetailHours": "Opening hours",
+  "cafeDetailHoursEmpty": "Opening hours have not been added yet.",
+  "cafeDetailMenuHighlights": "Menu highlights",
+  "cafeDetailDescriptionFallback": "No description has been added for this cafe yet.",
+  "cafeDetailSave": "Save",
+  "cafeDetailSaved": "Saved",
+  "cafeDetailCompare": "Compare",
+  "cafeDetailCompared": "Added",
+  "cafeDetailOpenOnMap": "Open on map",
+  "metricWifi": "Wi-Fi",
+  "metricOutlet": "Outlets",
+  "metricQuietness": "Quietness",
+  "metricPrice": "Price",
+  "metricSeating": "Seating",
+  "metricAmbiance": "Ambiance",
+  "metricStudyFriendly": "Good for work",
+  "metricPetFriendly": "Pets",
+  "metricOutdoor": "Outdoor",
+  "metricSmoking": "Smoking",
+  "metricAvailable": "Available",
+  "metricYes": "Yes",
+  "metricFriendly": "Friendly",
+  "cafeCardSemanticLabel": "{name} cafe card",
+  "@cafeCardSemanticLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cafeCardCompare": "Compare",
+  "cafeCardCompared": "Added",
+  "cafeCardSave": "Save",
+  "cafeCardSaved": "Saved",
+  "compareTitle": "Compare",
+  "compareCategory": "Category",
+  "compareAddCafeAction": "Add cafe to compare",
+  "compareOpenCafeAction": "Open cafe",
+  "compareSelectedCount": "{count} cafes selected",
+  "@compareSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "compareEmptyMessage": "Add cafes to compare.",
+  "compareEmptyAddCafes": "Add cafes",
+  "compareEmptyExploreCafes": "Explore cafes",
+  "compareUnresolvedMessage": "This selected cafe could not be loaded.",
+  "compareUnresolvedCount": "{count, plural, =1{1 selected cafe could not be loaded.} other{{count} selected cafes could not be loaded.}}",
+  "@compareUnresolvedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "compareCompactHint": "Best values are highlighted so you can compare quickly.",
+  "compareFeature": "Feature",
+  "compareRating": "Rating",
+  "compareCommunityRating": "Community rating",
+  "compareGoogleRating": "Google rating",
+  "compareGoogleReviews": "Google reviews",
+  "compareDistance": "Distance",
+  "compareFeatures": "Features",
+  "compareHighlights": "Recommended",
+  "compareOpeningStatus": "Opening status",
+  "compareHoursUnavailable": "Hours unavailable",
+  "compareAddAnotherPrompt": "Add another cafe",
+  "compareUnresolvedSlot": "Cafe unavailable",
+  "compareAddressDistrict": "Address / district",
+  "comparePrice": "Price",
+  "compareNoAppReviewsYet": "No app reviews yet",
+  "compareGoogleRatingUnavailable": "Google rating unavailable",
+  "compareWifi": "Wi-Fi",
+  "compareOutlet": "Outlets",
+  "compareQuietness": "Quietness",
+  "compareAmbiance": "Ambiance",
+  "compareSeatingComfort": "Seating comfort",
+  "compareStudyFriendly": "Good for work",
+  "comparePetFriendly": "Pets",
+  "compareOutdoor": "Outdoor",
+  "compareSmoking": "Smoking",
+  "compareDistrict": "District",
+  "compareYes": "Yes",
+  "compareNo": "No",
+  "compareAvailable": "Available",
+  "compareUnavailable": "Unavailable",
+  "compareEmptyFeatureCommunityRating": "User review score from app reviews.",
+  "compareEmptyFeaturePrice": "Estimated price level for a typical visit.",
+  "compareEmptyFeatureDistrict": "Cafe location area and address context.",
+  "compareEmptyFeatureWifi": "Whether the cafe is suitable for working or studying.",
+  "compareEmptyFeatureAmbiance": "General atmosphere and comfort signals.",
+  "compareEmptyFeatureOutlet": "Charging availability for laptops and phones.",
+  "settingsAboutDescription": "Discover, compare, and save the best cafes in Istanbul.",
+  "adminTitle": "Admin panel",
+  "adminBlockedTitle": "Access denied",
+  "adminBlockedMessage": "This page can only be viewed by administrators.",
+  "adminUsersTab": "Users ({count})",
+  "@adminUsersTab": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminCafesTab": "Cafes ({count})",
+  "@adminCafesTab": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminSearchUsers": "Search by name, username, or email...",
+  "adminRoleAll": "All",
+  "adminRoleAdmin": "Admin",
+  "adminRoleUser": "User",
+  "adminNoResults": "No results found.",
+  "adminUnnamedUser": "Unnamed user",
+  "adminAddCafe": "Add new cafe",
+  "adminEdit": "Edit",
+  "profileEditTitle": "Edit profile",
+  "profileEditFirstNameRequired": "First name cannot be empty.",
+  "profileEditLastNameRequired": "Last name cannot be empty.",
+  "profileEditUsernameRequired": "Username cannot be empty.",
+  "profileEditUsernameInvalid": "Username must be 3-24 characters.",
+  "profileEditEmailRequired": "Email cannot be empty.",
+  "profileEditEmailInvalid": "Enter a valid email address.",
+  "profileEditUnavailable": "Profile cannot be updated before Supabase is configured.",
+  "profileEditSuccess": "Profile updated.",
+  "profileEditEmailHint": "Changing email requires verification",
+  "cafeFormName": "Cafe name",
+  "cafeFormDistrict": "District",
+  "cafeFormNeighborhood": "Neighborhood",
+  "cafeFormAddress": "Address",
+  "cafeFormDescription": "Description",
+  "cafeFormPrice": "Price",
+  "cafeFormPriceUnknown": "Unknown",
+  "cafeFormWifi": "Wi-Fi",
+  "cafeFormOutlet": "Outlets",
+  "cafeFormQuietness": "Quietness",
+  "cafeFormStudyFriendly": "Good for working",
+  "cafeFormPetFriendly": "Pet-friendly",
+  "cafeFormOutdoorSeating": "Outdoor seating",
+  "cafeFormSmoking": "Smoking",
+  "cafeFormTags": "Tags (comma separated)",
+  "cafeFormPhotos": "Photo URLs",
+  "cafeFormPhotosHint": "Paste image URLs separated by commas or new lines.",
+  "cafeFormSaving": "Saving...",
+  "errorPhotoUrlsInvalid": "Enter valid image URLs or leave the field empty.",
+  "cafeAddTitle": "Add new cafe",
+  "cafeAddNameRequired": "Cafe name cannot be empty.",
+  "cafeAddUnavailable": "A cafe cannot be added before Supabase is configured.",
+  "cafeAddSuccess": "Cafe added.",
+  "cafeAddFailed": "Adding the cafe failed.",
+  "cafeEditTitle": "Edit cafe",
+  "cafeEditUnavailable": "A cafe cannot be updated before Supabase is configured.",
+  "cafeEditSuccess": "Cafe updated.",
+  "cafeEditFailed": "Updating failed.",
+  "reviewsSectionTitle": "App reviews",
+  "reviewsWriteAction": "Write review",
+  "reviewsEditAction": "Edit review",
+  "reviewsSignInAction": "Sign in to review",
+  "reviewsEmptyState": "No app reviews yet. Be the first!",
+  "reviewsLoadError": "Reviews could not be loaded.",
+  "reviewsDeleteTitle": "Delete review",
+  "reviewsDeleteMessage": "Are you sure you want to delete this review?",
+  "reviewsDeleteCancel": "Cancel",
+  "reviewsDeleteConfirm": "Delete",
+  "reviewsDeleteSuccess": "Review deleted.",
+  "reviewsDeleteError": "Review could not be deleted.",
+  "reviewsFormTitle": "Rate this cafe",
+  "reviewsFormUpdateTitle": "Update your review",
+  "reviewsFormRatingHint": "Select a rating to continue.",
+  "reviewsFormCommentLabel": "Comment (optional)",
+  "reviewsFormCommentHint": "Optionally share what you liked or disliked.",
+  "reviewsFormCommentHelper": "A comment is optional. Your rating alone can be submitted.",
+  "reviewsFormSubmit": "Submit review",
+  "reviewsFormUpdate": "Update review",
+  "reviewsFormSubmitting": "Sending...",
+  "reviewsFormUpdating": "Updating...",
+  "reviewsSubmitSuccess": "Your review was submitted.",
+  "reviewsUpdateSuccess": "Your review was updated.",
+  "reviewsRefreshWarning": "Your review was saved, but the reviews list could not be refreshed yet.",
+  "reviewsAuthRequired": "You need to sign in before sending a review.",
+  "reviewsRatingRequired": "Please choose a rating before submitting.",
+  "reviewsValidationError": "The review could not be validated.",
+  "reviewsConflictError": "You already have a review for this cafe.",
+  "reviewsUnavailable": "Review service is unavailable right now.",
+  "placeholderNotImplemented": "This screen is not ready yet.",
+  "errorCafeListLoadFailed": "Cafe list could not be loaded.",
+  "errorCafeDetailLoadFailed": "Cafe details could not be loaded.",
+  "errorCafeUpdateFailed": "Cafe could not be updated.",
+  "errorCafeAddFailed": "Cafe could not be added.",
+  "errorCafeNameRequired": "Cafe name is required.",
+  "errorCafeNameInvalid": "Cafe name is invalid.",
+  "errorNeighborhoodInvalid": "Neighborhood information is invalid.",
+  "errorAddressInvalid": "Address information is invalid.",
+  "errorDescriptionInvalid": "Description is invalid.",
+  "errorUserListLoadFailed": "User list could not be loaded.",
+  "errorRoleChangeFailedNoPermissions": "Role change could not be applied. You may not have admin permissions.",
+  "errorPermissionDenied": "You do not have permission to perform this action.",
+  "errorRequestTimedOut": "The request timed out. Please try again.",
+  "errorNetworkUnavailable": "A network error prevented the request from completing.",
+  "errorDataConflict": "The request conflicts with existing data.",
+  "errorValidationFailed": "The submitted data is invalid.",
+  "errorRecordNotFound": "The requested record could not be found.",
+  "errorParseFailed": "The server returned unexpected data.",
+  "errorServiceUnavailable": "This service is currently unavailable.",
+  "errorAuthInvalidCredentials": "Email, username, or password is incorrect.",
+  "errorAuthRateLimited": "Too many attempts. Please wait a little before trying again.",
+  "errorAuthEmailRegistered": "This email address is already registered.",
+  "errorAuthPasswordResetFailed": "Password reset could not be started right now.",
+  "errorUsernameInvalid": "This username is invalid.",
+  "errorUsernameTaken": "This username is already taken.",
+  "errorProfileUpdateFailed": "Profile could not be updated.",
+  "errorAvatarEmpty": "An empty photo cannot be uploaded.",
+  "errorAvatarUploadFailed": "Profile photo could not be uploaded.",
+  "errorProfileLoadFailed": "Profile could not be loaded.",
+  "errorReviewSubmitFailed": "Review could not be submitted.",
+  "errorReviewRatingOutOfRange": "Please choose a rating between 1 and 5.",
+  "errorReviewProfanityBlocked": "Please keep reviews respectful and avoid profanity.",
+  "errorReviewTextTooLong": "Review text must be 2000 characters or fewer.",
+  "errorReviewDuplicateText": "You already submitted this review text for this cafe.",
+  "errorReviewSubmissionRateLimited": "Please wait 30 seconds before submitting another review.",
+  "errorReviewNotOwner": "You can only modify your own review.",
+  "errorReviewProfileMissing": "Your profile could not be found for this review.",
+  "errorReviewFieldMissing": "A required review field was missing."
+}
