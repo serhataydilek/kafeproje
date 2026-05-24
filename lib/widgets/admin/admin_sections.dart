@@ -509,13 +509,37 @@ class AdminOwnerClaimsSection extends ConsumerWidget {
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
-                '${claim.businessName} - ${claim.phone ?? claim.userId}',
+                'Cafe: ${cafe?.name ?? claim.cafeId} (${claim.cafeId})',
+                style: TextStyle(color: colors.mutedText, fontSize: 12),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                <String?>[
+                  claim.businessName,
+                  claim.businessEmail,
+                  claim.businessPhone ?? claim.phone,
+                  claim.userId,
+                ]
+                    .whereType<String>()
+                    .where((item) => item.isNotEmpty)
+                    .join(' - '),
                 style: TextStyle(color: colors.mutedText),
+              ),
+              Text(
+                claim.createdAt.toLocal().toString(),
+                style: TextStyle(color: colors.mutedText, fontSize: 12),
               ),
               if (claim.note?.isNotEmpty == true) ...[
                 const SizedBox(height: AppSpacing.xs),
                 Text(
                   claim.note!,
+                  style: TextStyle(color: colors.text),
+                ),
+              ],
+              if (claim.evidenceUrl?.isNotEmpty == true) ...[
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  claim.evidenceUrl!,
                   style: TextStyle(color: colors.text),
                 ),
               ],
@@ -1586,6 +1610,12 @@ class AdminPhotoManagementSection extends ConsumerWidget {
                 Text(
                   '${districtLabel(l10n, cafe.district)} / ${cafe.neighborhood}',
                   style: TextStyle(color: colors.mutedText),
+                ),
+                Text(
+                  cafe.ownerUserId?.trim().isNotEmpty == true
+                      ? 'Owner: ${cafe.ownerUserId!.trim()}'
+                      : 'Owner: Unassigned',
+                  style: TextStyle(color: colors.mutedText, fontSize: 12),
                 ),
                 const SizedBox(height: 6),
                 Wrap(

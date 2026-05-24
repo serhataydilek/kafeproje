@@ -726,9 +726,6 @@ class CafeQueryService implements CafeOverlaySource {
               break;
             case 'all':
             default:
-              query = query
-                  .or('is_deleted.eq.false,is_deleted.is.null')
-                  .isFilter('deleted_at', null);
               break;
           }
 
@@ -2213,6 +2210,53 @@ class CafeCommandService {
     return updateCafeByAdmin(cafeId, input);
   }
 
+  Future<ServiceResult<Cafe>> updateCafeByOwner(
+    String cafeId,
+    CafeAdminUpdateInput input,
+  ) async {
+    final payload = input.toRow()
+      ..removeWhere(
+        (key, _) => !CafeAdminUpdateInput.ownerEditableColumns.contains(key),
+      );
+    final validationCode = _validateCafePayload(payload);
+    if (validationCode != null) {
+      return ServiceResult.failure(
+        errorCode: validationCode,
+        errorType: ServiceErrorType.validation,
+      );
+    }
+
+    try {
+      final row = await _client
+          .rpc(
+            'owner_update_cafe',
+            params: <String, dynamic>{
+              'p_cafe_id': cafeId.trim(),
+              'p_updates': payload,
+            },
+          )
+          .single()
+          .timeout(NetworkTimeoutConfig.supabaseDataRequestTimeout);
+      return ServiceResult.success(data: Cafe.fromSupabaseRow(row));
+    } catch (error, stackTrace) {
+      AppLogger.error(
+        'CafeCommandService.updateCafeByOwner failed for cafeId=$cafeId',
+        error: error,
+        stackTrace: stackTrace,
+        key: 'cafe-command-owner-update-$cafeId',
+      );
+      return ServiceResult.failure(
+        message: error.toString(),
+        errorCode: _errorCodeForSupabaseError(
+          error,
+          fallback: AppErrorCode.cafeUpdateFailed,
+        ),
+        error: error,
+        errorType: classifyServiceError(error),
+      );
+    }
+  }
+
   Future<ServiceResult<Cafe>> restoreCafe({
     required String cafeId,
   }) async {
@@ -2515,6 +2559,12 @@ class CafesService {
   ) =>
       command.updateCafeByAdmin(cafeId, input);
 
+  Future<ServiceResult<Cafe>> updateCafeByOwner(
+    String cafeId,
+    CafeAdminUpdateInput input,
+  ) =>
+      command.updateCafeByOwner(cafeId, input);
+
   Future<ServiceResult<Cafe>> restoreCafe({required String cafeId}) =>
       command.restoreCafe(cafeId: cafeId);
 
@@ -2602,6 +2652,8 @@ class CafeOwnerClaimsService {
     required String userId,
     required String cafeId,
     required String businessName,
+    String? businessEmail,
+    String? evidenceUrl,
     String? phone,
     String? note,
   }) async {
@@ -2643,6 +2695,10 @@ class CafeOwnerClaimsService {
             'user_id': normalizedUserId,
             'cafe_id': normalizedCafeId,
             'business_name': normalizedBusinessName,
+            'business_email': _nullableSanitized(businessEmail),
+            'business_phone': _nullableSanitized(phone),
+            'evidence_url': _nullableSanitized(evidenceUrl),
+            'message': _nullableSanitized(note),
             'phone': _nullableSanitized(phone),
             'note': _nullableSanitized(note),
             'status': CafeOwnerClaimStatus.pending.value,
@@ -2682,11 +2738,13 @@ class CafeOwnerClaimsService {
   Future<ServiceResult<CafeOwnerClaim>> rejectClaim({
     required String claimId,
     required String reviewedBy,
+    String? reason,
   }) {
     return _reviewClaim(
       claimId: claimId,
       reviewedBy: reviewedBy,
       nextStatus: CafeOwnerClaimStatus.rejected,
+      reason: reason,
     );
   }
 
@@ -2694,6 +2752,7 @@ class CafeOwnerClaimsService {
     required String claimId,
     required String reviewedBy,
     required CafeOwnerClaimStatus nextStatus,
+    String? reason,
   }) async {
     final normalizedClaimId = claimId.trim();
     final normalizedReviewer = reviewedBy.trim();
@@ -2706,50 +2765,19 @@ class CafeOwnerClaimsService {
     }
 
     try {
-      final existing = await _client
-          .from('cafe_owner_claims')
-          .select('*')
-          .eq('id', normalizedClaimId)
-          .single()
-          .timeout(NetworkTimeoutConfig.supabaseDataRequestTimeout);
-      final claim =
-          CafeOwnerClaim.fromJson(Map<String, dynamic>.from(existing));
-      if (!claim.isPending) {
-        return ServiceResult.failure(
-          message: 'Only pending claims can be reviewed.',
-          errorCode: AppErrorCode.validationFailed,
-          errorType: ServiceErrorType.validation,
-        );
-      }
-
-      final now = DateTime.now().toUtc().toIso8601String();
       final reviewedRow = await _client
-          .from('cafe_owner_claims')
-          .update(<String, dynamic>{
-            'status': nextStatus.value,
-            'reviewed_at': now,
-            'reviewed_by': normalizedReviewer,
-          })
-          .eq('id', normalizedClaimId)
-          .eq('status', CafeOwnerClaimStatus.pending.value)
-          .select('*')
+          .rpc(
+            nextStatus == CafeOwnerClaimStatus.approved
+                ? 'admin_approve_cafe_owner_claim'
+                : 'admin_reject_cafe_owner_claim',
+            params: <String, dynamic>{
+              'p_claim_id': normalizedClaimId,
+              if (nextStatus == CafeOwnerClaimStatus.rejected)
+                'p_reason': _nullableSanitized(reason),
+            },
+          )
           .single()
           .timeout(NetworkTimeoutConfig.supabaseDataRequestTimeout);
-
-      if (nextStatus == CafeOwnerClaimStatus.approved) {
-        await _client
-            .from('cafes')
-            .update(<String, dynamic>{'owner_user_id': claim.userId})
-            .eq('id', claim.cafeId)
-            .timeout(NetworkTimeoutConfig.supabaseDataRequestTimeout);
-
-        await _client
-            .from('profiles')
-            .update(<String, dynamic>{'role': ProfileRole.cafeOwner.value})
-            .eq('id', claim.userId)
-            .neq('role', ProfileRole.admin.value)
-            .timeout(NetworkTimeoutConfig.supabaseDataRequestTimeout);
-      }
 
       return ServiceResult.success(
         data: CafeOwnerClaim.fromJson(Map<String, dynamic>.from(reviewedRow)),

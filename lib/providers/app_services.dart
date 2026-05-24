@@ -255,6 +255,8 @@ class CafeOwnerClaimController
   Future<ServiceResult<CafeOwnerClaim>> createClaim({
     required String cafeId,
     required String businessName,
+    String? businessEmail,
+    String? evidenceUrl,
     String? phone,
     String? note,
   }) async {
@@ -288,6 +290,8 @@ class CafeOwnerClaimController
       userId: user.id,
       cafeId: cafeId,
       businessName: businessName,
+      businessEmail: businessEmail,
+      evidenceUrl: evidenceUrl,
       phone: phone,
       note: note,
     );
@@ -1683,12 +1687,12 @@ class CafeAdminMutationController
             outdoorSeating: input.outdoorSeating,
             smokingPolicy: input.smokingPolicy,
             openingHours: input.openingHours,
-            images: input.images,
-            clearImages: input.clearImages,
             menuHighlights: input.menuHighlights,
           );
 
-    final result = await service.updateCafe(cafeId, effectiveInput);
+    final result = isAdminUpdate
+        ? await service.updateCafeByAdmin(cafeId, effectiveInput)
+        : await service.updateCafeByOwner(cafeId, effectiveInput);
 
     if (!mounted) {
       return result;
@@ -1719,7 +1723,7 @@ class CafeAdminMutationController
       _ref.invalidate(adminCafeDetailsProvider(cafeId));
       _ref.read(cafeProvider.notifier).upsertCafe(
             updatedCafe,
-            preserveExistingMedia: !input.clearImages,
+            preserveExistingMedia: !effectiveInput.clearImages,
           );
       await _refreshCanonicalCafeStateAfterMutation(
         refreshCafes: featuredVisibilityChanged,

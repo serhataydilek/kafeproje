@@ -957,6 +957,26 @@ class CafeAdminUpdateInput {
     this.featuredLabel,
   });
 
+  static const Set<String> ownerEditableColumns = <String>{
+    'name',
+    'category',
+    'district',
+    'neighborhood',
+    'address',
+    'description',
+    'price_level',
+    'tags',
+    'wifi_quality',
+    'outlet_availability',
+    'quietness_level',
+    'study_friendly',
+    'pet_friendly',
+    'outdoor_seating',
+    'smoking_policy',
+    'opening_hours',
+    'menu_highlights',
+  };
+
   final String? name;
   final String? category;
   final String? district;

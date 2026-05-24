@@ -231,9 +231,6 @@ class _FakeCafeQueryService extends CafeQueryService {
       if (status == 'deleted' && !cafe.isDeleted) {
         return false;
       }
-      if (status == 'all' && cafe.isDeleted) {
-        return false;
-      }
       return true;
     }).toList(growable: false);
 
@@ -374,6 +371,14 @@ class _FakeCafeCommandService extends CafeCommandService {
     );
     _cafesById[resolvedKey] = updated;
     return ServiceResult.success(data: updated);
+  }
+
+  @override
+  Future<ServiceResult<Cafe>> updateCafeByOwner(
+    String cafeId,
+    CafeAdminUpdateInput input,
+  ) {
+    return updateCafeByAdmin(cafeId, input);
   }
 
   @override
@@ -676,10 +681,8 @@ void main() {
                   Duration? requestTimeout,
                   RequestCancellationToken? cancellationToken,
                 }) async {
-                  final page = allCafes
-                      .skip(offset)
-                      .take(limit)
-                      .toList(growable: false);
+                  final page =
+                      allCafes.skip(offset).take(limit).toList(growable: false);
                   final hasMore = offset + page.length < allCafes.length;
                   return ServiceResult.success(
                     data: AdminCafePage(
@@ -3005,10 +3008,10 @@ void main() {
         expect(queryService.fetchDiscoverableCallCount, 0);
         expect(queryService.fetchAdminCallCount, greaterThanOrEqualTo(1));
         final allRows = container.read(adminCafeListControllerProvider).cafes;
-        expect(allRows, hasLength(2));
+        expect(allRows, hasLength(3));
         expect(allRows.map((cafe) => cafe.id), contains('cafe-visible'));
         expect(allRows.map((cafe) => cafe.id), contains('cafe-hidden'));
-        expect(allRows.map((cafe) => cafe.id), isNot(contains('cafe-deleted')));
+        expect(allRows.map((cafe) => cafe.id), contains('cafe-deleted'));
 
         await notifier.setStatusFilter('hidden');
         final hiddenRows =
