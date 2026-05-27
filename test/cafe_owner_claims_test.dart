@@ -151,6 +151,41 @@ void main() {
       expect(container.read(canManageCafeProvider(cafe)), isFalse);
     });
 
+    test('normal user assigned as owner_user_id still cannot manage cafe',
+        () async {
+      final assigned = buildTestCafe(id: 'assigned', name: 'Assigned').copyWith(
+        ownerUserId: () => testUser.id,
+      );
+      final service = _FakeCafeCommandService({'assigned': assigned});
+      final container = createTestContainer(
+        state: buildTestAppShellState(
+          currentUser: testUser,
+          cafes: [assigned],
+        ),
+        overrides: [
+          cafeCommandServiceProvider.overrideWithValue(service),
+          cafeQueryServiceProvider.overrideWithValue(
+            _FakeCafeQueryService([assigned]),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      expect(container.read(canManageCafeProvider(assigned)), isFalse);
+
+      final result = await container
+          .read(cafeAdminMutationControllerProvider.notifier)
+          .updateCafe(
+            'assigned',
+            const CafeAdminUpdateInput(name: 'Blocked'),
+          );
+
+      expect(result.ok, isFalse);
+      expect(result.errorType, ServiceErrorType.auth);
+      expect(service.ownerUpdateCalls, 0);
+      expect(service.adminUpdateCalls, 0);
+    });
+
     test('cafe owner can edit owned cafe allowed fields', () async {
       final owner = testUser.copyWith(role: ProfileRole.cafeOwner);
       final owned = buildTestCafe(id: 'owned', name: 'Owned').copyWith(
@@ -286,6 +321,23 @@ void main() {
           sql,
           contains(
               'DROP POLICY IF EXISTS "Cafe owners can update owned cafes"'));
+    });
+
+    test('invite hardening requires cafe_owner role for owner updates', () {
+      final sql = File(
+        'supabase/migrations/20260525_001_cafe_owner_invite_hardening.sql',
+      ).readAsStringSync();
+      final edgeFunction = File(
+        'supabase/functions/invite-cafe-owner/index.ts',
+      ).readAsStringSync();
+
+      expect(sql, contains("lower(coalesce(p.role, '')) = 'cafe_owner'"));
+      expect(sql, contains('owner_user_id = auth.uid()'));
+      expect(sql, isNot(contains("'owner_user_id'")));
+      expect(edgeFunction, contains('SUPABASE_SERVICE_ROLE_KEY'));
+      expect(edgeFunction, contains('inviteUserByEmail'));
+      expect(edgeFunction, contains('Admin privileges are required'));
+      expect(edgeFunction, contains('role: "cafe_owner"'));
     });
   });
 }

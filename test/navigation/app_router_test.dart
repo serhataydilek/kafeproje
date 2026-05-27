@@ -60,13 +60,12 @@ void main() {
       const user = CurrentUser(
           id: '1', email: 'test@test.com', name: 'Test', isAdmin: false);
       final state = buildState('/admin');
-      const shellState =
-          AppShellState(
-            isAuthReady: true,
-            currentUser: user,
-            isAdmin: false,
-            isAdminRoleResolved: true,
-          );
+      const shellState = AppShellState(
+        isAuthReady: true,
+        currentUser: user,
+        isAdmin: false,
+        isAdminRoleResolved: true,
+      );
 
       final result = appRouteGuardRedirect(shellState, state);
       expect(result, '/profile');
@@ -78,34 +77,31 @@ void main() {
       const user = CurrentUser(
           id: '1', email: 'test@test.com', name: 'Test', isAdmin: false);
       final state = buildState('/cafe-add');
-      const shellState =
-          AppShellState(
-            isAuthReady: true,
-            currentUser: user,
-            isAdmin: false,
-            isAdminRoleResolved: true,
-          );
+      const shellState = AppShellState(
+        isAuthReady: true,
+        currentUser: user,
+        isAdmin: false,
+        isAdminRoleResolved: true,
+      );
 
       final result = appRouteGuardRedirect(shellState, state);
       expect(result, '/profile');
     });
 
-    test(
-        'Authenticated normal user accessing /cafe-edit/123 -> Redirects to /profile',
+    test('Authenticated normal user accessing /cafe-edit/123 -> route allowed',
         () {
       const user = CurrentUser(
           id: '1', email: 'test@test.com', name: 'Test', isAdmin: false);
       final state = buildState('/cafe-edit/123');
-      const shellState =
-          AppShellState(
-            isAuthReady: true,
-            currentUser: user,
-            isAdmin: false,
-            isAdminRoleResolved: true,
-          );
+      const shellState = AppShellState(
+        isAuthReady: true,
+        currentUser: user,
+        isAdmin: false,
+        isAdminRoleResolved: true,
+      );
 
       final result = appRouteGuardRedirect(shellState, state);
-      expect(result, '/profile');
+      expect(result, isNull);
     });
 
     test('Unresolved admin role on /admin does not force redirect', () {

@@ -427,6 +427,24 @@ class AdminOwnerClaimsSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    const claimsEnabled = bool.fromEnvironment('ENABLE_OWNER_CLAIMS');
+    if (!claimsEnabled) {
+      return EmptyStateView(
+        colors: colors,
+        icon: Icons.assignment_ind_rounded,
+        title: _trEn(
+          context,
+          'Sahiplik talepleri kapali',
+          'Ownership claims are disabled',
+        ),
+        message: _trEn(
+          context,
+          'Kafe sahiplerini Saved Cafes > Edit ekranindaki Kafe Sahibi bolumunden e-posta ile davet edip atayin.',
+          'Invite and assign cafe owners by email from Saved Cafes > Edit > Cafe owner.',
+        ),
+      );
+    }
+
     final claimsAsync = ref.watch(pendingCafeOwnerClaimsProvider);
     if (claimsAsync.isLoading) {
       return LoadingStateView(colors: colors);
@@ -684,7 +702,7 @@ class _AdminUserDirectorySectionState extends State<AdminUserDirectorySection> {
                         crossAxisCount: 2,
                         crossAxisSpacing: AppSpacing.sm,
                         mainAxisSpacing: AppSpacing.sm,
-                        mainAxisExtent: 112,
+                        mainAxisExtent: 150,
                       ),
                       itemBuilder: (_, index) {
                         return AdminMetadataSection(
@@ -890,6 +908,11 @@ class AdminMetadataSection extends StatelessWidget {
           Text(
             user.email,
             style: TextStyle(color: colors.mutedText),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          SelectableText(
+            'ID: ${user.id}',
+            style: TextStyle(color: colors.mutedText, fontSize: 12),
           ),
         ],
       ),

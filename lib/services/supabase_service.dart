@@ -28,6 +28,18 @@ class AvatarUploadResult {
   final String path;
 }
 
+class CafeOwnerInviteResult {
+  const CafeOwnerInviteResult({
+    required this.owner,
+    required this.cafe,
+    required this.invited,
+  });
+
+  final UserProfile owner;
+  final Cafe cafe;
+  final bool invited;
+}
+
 class AdminCafePage {
   const AdminCafePage({
     required this.cafes,
@@ -2791,6 +2803,94 @@ class CafeOwnerClaimsService {
       );
       return ServiceResult.failure(
         message: error.toString(),
+        error: error,
+        errorType: classifyServiceError(error),
+      );
+    }
+  }
+}
+
+class CafeOwnerInviteService {
+  CafeOwnerInviteService(this._client);
+
+  final SupabaseClient _client;
+
+  Future<ServiceResult<CafeOwnerInviteResult>> inviteAndAssign({
+    required String cafeId,
+    required String email,
+    String? firstName,
+    String? lastName,
+    String? fullName,
+  }) async {
+    final normalizedCafeId = cafeId.trim();
+    final normalizedEmail = email.trim().toLowerCase();
+    if (normalizedCafeId.isEmpty || normalizedEmail.isEmpty) {
+      return ServiceResult.failure(
+        message: 'Cafe id and owner email are required.',
+        errorCode: AppErrorCode.validationFailed,
+        errorType: ServiceErrorType.validation,
+      );
+    }
+
+    try {
+      final response = await _client.functions
+          .invoke(
+            'invite-cafe-owner',
+            body: <String, dynamic>{
+              'cafe_id': normalizedCafeId,
+              'email': normalizedEmail,
+              if (firstName?.trim().isNotEmpty == true)
+                'first_name': sanitizeInput(firstName!),
+              if (lastName?.trim().isNotEmpty == true)
+                'last_name': sanitizeInput(lastName!),
+              if (fullName?.trim().isNotEmpty == true)
+                'full_name': sanitizeInput(fullName!),
+            },
+          )
+          .timeout(NetworkTimeoutConfig.supabaseDataRequestTimeout);
+
+      final payload = response.data;
+      if (payload is! Map) {
+        return ServiceResult.failure(
+          message: 'Unexpected cafe owner invite response.',
+          errorCode: AppErrorCode.parseFailed,
+          errorType: ServiceErrorType.parse,
+        );
+      }
+      final ownerPayload = payload['owner'];
+      final cafePayload = payload['cafe'];
+      if (ownerPayload is! Map || cafePayload is! Map) {
+        return ServiceResult.failure(
+          message: 'Cafe owner invite response is missing owner or cafe data.',
+          errorCode: AppErrorCode.parseFailed,
+          errorType: ServiceErrorType.parse,
+        );
+      }
+
+      return ServiceResult.success(
+        data: CafeOwnerInviteResult(
+          owner: UserProfile.fromJson(
+            Map<String, dynamic>.from(ownerPayload),
+          ),
+          cafe: Cafe.fromSupabaseRow(
+            Map<String, dynamic>.from(cafePayload),
+          ),
+          invited: payload['invited'] == true,
+        ),
+      );
+    } catch (error, stackTrace) {
+      AppLogger.error(
+        'CafeOwnerInviteService.inviteAndAssign failed for cafeId=$cafeId',
+        error: error,
+        stackTrace: stackTrace,
+        key: 'cafe-owner-invite-$cafeId',
+      );
+      return ServiceResult.failure(
+        message: error.toString(),
+        errorCode: _errorCodeForSupabaseError(
+          error,
+          fallback: AppErrorCode.validationFailed,
+        ),
         error: error,
         errorType: classifyServiceError(error),
       );

@@ -294,8 +294,12 @@ class CafeOwnershipClaimSection extends ConsumerWidget {
     final user = ref.watch(currentUserProvider);
     final isAdmin = ref.watch(isAdminProvider);
     final canManage = ref.watch(canManageCafeProvider(cafe));
-    final claim = ref.watch(cafeOwnerClaimForCafeProvider(cafe.id));
-    final claimsLoading = ref.watch(currentUserOwnerClaimsProvider).isLoading;
+    const ownerClaimsEnabled = bool.fromEnvironment('ENABLE_OWNER_CLAIMS');
+    final claim = ownerClaimsEnabled
+        ? ref.watch(cafeOwnerClaimForCafeProvider(cafe.id))
+        : null;
+    final claimsLoading = ownerClaimsEnabled &&
+        ref.watch(currentUserOwnerClaimsProvider).isLoading;
 
     final title = _trEn(
       context,
@@ -328,6 +332,19 @@ class CafeOwnershipClaimSection extends ConsumerWidget {
         onPressed: () => context.push('/cafe-edit/${cafe.id}'),
         icon: const Icon(Icons.storefront_rounded),
         label: Text(_trEn(context, 'Kafeyi yonet', 'Manage cafe')),
+      );
+    } else if (!ownerClaimsEnabled) {
+      body = _trEn(
+        context,
+        'Kafe yonetimi sadece yonetici tarafindan atanmis cafe_owner hesaplarina aciktir.',
+        'Cafe management is available only to cafe_owner accounts assigned by an admin.',
+      );
+      action = OutlinedButton.icon(
+        key: ValueKey('cafe-owner-claim-disabled-${cafe.id}'),
+        onPressed: null,
+        icon: const Icon(Icons.lock_outline_rounded),
+        label: Text(_trEn(
+            context, 'Yonetici atamasi gerekli', 'Admin assignment required')),
       );
     } else if (claim?.isPending == true) {
       body = _trEn(
