@@ -3064,6 +3064,64 @@ void main() {
     );
 
     test(
+      'controller update patches public detail state immediately',
+      () async {
+        final cafe = buildTestCafe(id: 'cafe-1', name: 'Brew Lab');
+        final cafes = [cafe];
+        final cafesById = {for (final item in cafes) item.id: item};
+        final commandService = _FakeCafeCommandService(
+          cafesById,
+          (_, __) {},
+        );
+
+        final container = createTestContainer(
+          state: buildTestAppShellState(
+            isAdmin: true,
+            isAdminRoleResolved: true,
+            cafes: cafes,
+            currentUser: testUser,
+          ),
+          overrides: [
+            cafeQueryServiceProvider.overrideWithValue(
+              _FakeCafeQueryService(cafes),
+            ),
+            cafeCommandServiceProvider.overrideWithValue(commandService),
+            securityReadinessProvider.overrideWith(
+              (ref) async => const SecurityReadinessReport(
+                isReady: true,
+                checkAvailable: true,
+                rlsEnabled: true,
+                hasAdminInsertPolicy: true,
+                hasAdminUpdatePolicy: true,
+                message: 'ok',
+              ),
+            ),
+          ],
+        );
+        addTearDown(() => _disposeTestContainer(container));
+
+        expect(container.read(cafeByIdProvider('cafe-1'))?.name, 'Brew Lab');
+
+        final notifier =
+            container.read(cafeAdminMutationControllerProvider.notifier);
+        final result = await notifier.updateCafe(
+          'cafe-1',
+          const CafeAdminUpdateInput(name: 'Brew Lab Updated'),
+        );
+
+        expect(result.ok, isTrue);
+        expect(
+          container.read(cafeByIdProvider('cafe-1'))?.name,
+          'Brew Lab Updated',
+        );
+        expect(
+          container.read(exploreCafeResultsProvider).map((cafe) => cafe.name),
+          contains('Brew Lab Updated'),
+        );
+      },
+    );
+
+    test(
       'controller fails delete safely when target has no exact id or place id match',
       () async {
         final cafes = [
@@ -3169,6 +3227,95 @@ void main() {
         expect(second.message, contains('already in progress'));
         expect(commandService.restoreCallCount, 1);
         expect(container.read(adminCafeMutationPendingIdsProvider), isEmpty);
+      },
+    );
+
+    test(
+      'controller restore replaces matching visible row without duplicates',
+      () async {
+        const placeId = 'ChIJRestoreSharedPlace';
+        final visibleGoogleCafe = buildTestCafe(
+          id: 'google-restore-row',
+          name: 'Restore Cafe',
+        ).copyWith(placeId: placeId);
+        final deletedAdminCafe = buildTestCafe(
+          id: 'db-restore-row',
+          name: 'Restore Cafe',
+        ).copyWith(
+          placeId: placeId,
+          isDeleted: true,
+        );
+        final cafesById = {deletedAdminCafe.id: deletedAdminCafe};
+        final commandService = _FakeCafeCommandService(
+          cafesById,
+          (_, __) {},
+        );
+
+        final container = createTestContainer(
+          state: buildTestAppShellState(
+            isAdmin: true,
+            isAdminRoleResolved: true,
+            cafes: [visibleGoogleCafe],
+            homeCafes: [visibleGoogleCafe],
+            currentLocation: visibleGoogleCafe.coordinates,
+            currentUser: testUser,
+          ),
+          overrides: [
+            cafeRepositoryProvider.overrideWithValue(
+              FakeCafeRepository(
+                onFetch: (_) async => CafeRepositoryResult(
+                  cafes: cafesById.values
+                      .where((cafe) => !cafe.isDeleted)
+                      .toList(growable: false),
+                  usedRemote: true,
+                ),
+                onFetchFeaturedCafes: () async => cafesById.values
+                    .where((cafe) => cafe.isActiveFeatured)
+                    .toList(growable: false),
+              ),
+            ),
+            cafeQueryServiceProvider.overrideWithValue(
+              _FakeCafeQueryService([deletedAdminCafe, visibleGoogleCafe]),
+            ),
+            cafeCommandServiceProvider.overrideWithValue(commandService),
+            securityReadinessProvider.overrideWith(
+              (ref) async => const SecurityReadinessReport(
+                isReady: true,
+                checkAvailable: true,
+                rlsEnabled: true,
+                hasAdminInsertPolicy: true,
+                hasAdminUpdatePolicy: true,
+                message: 'ok',
+              ),
+            ),
+          ],
+        );
+        addTearDown(() => _disposeTestContainer(container));
+
+        expect(
+          container.read(exploreCafeResultsProvider).map((cafe) => cafe.id),
+          ['google-restore-row'],
+        );
+
+        final notifier =
+            container.read(cafeAdminMutationControllerProvider.notifier);
+        final result = await notifier.restoreCafe('db-restore-row');
+
+        expect(result.ok, isTrue);
+        expect(commandService.restoreCallCount, 1);
+        expect(
+          container.read(exploreCafeResultsProvider).map((cafe) => cafe.id),
+          ['db-restore-row'],
+        );
+        expect(
+          container.read(mapCafeResultsProvider).map((cafe) => cafe.id),
+          ['db-restore-row'],
+        );
+        expect(
+          container.read(homeCafesProvider).map((cafe) => cafe.id),
+          ['db-restore-row'],
+        );
+        expect(container.read(cafeByIdProvider(placeId))?.id, 'db-restore-row');
       },
     );
 
