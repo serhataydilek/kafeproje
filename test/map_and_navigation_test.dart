@@ -10,6 +10,7 @@ import 'package:kafeproje/providers/app_provider.dart';
 import 'package:kafeproje/repositories/cafe_repository.dart';
 import 'package:kafeproje/screens/cafe_detail_screen.dart';
 import 'package:kafeproje/screens/compare_screen.dart';
+import 'package:kafeproje/screens/favorites_screen.dart';
 import 'package:kafeproje/screens/home_screen.dart';
 import 'package:kafeproje/screens/map_screen.dart';
 import 'package:kafeproje/theme/app_theme.dart';
@@ -1065,6 +1066,64 @@ void main() {
         findsOneWidget,
       );
       expect(container.read(selectedCafeIdProvider), isNull);
+    });
+
+    testWidgets('tapping a favorite cafe opens the matching detail route',
+        (tester) async {
+      final cafes = [
+        buildTestCafe(
+          id: 'favorite-detail-cafe',
+          name: 'Favorite Detail Cafe',
+        ),
+      ];
+      final container = createTestContainer(
+        state: buildTestAppShellState(
+          cafes: cafes,
+          favorites: const ['favorite-detail-cafe'],
+          currentUser: testUser,
+        ),
+      );
+      addTearDown(container.dispose);
+
+      final router = GoRouter(
+        initialLocation: '/favorites',
+        routes: [
+          GoRoute(
+            path: '/favorites',
+            builder: (_, __) => const FavoritesScreen(),
+          ),
+          GoRoute(
+            path: '/cafe/:id',
+            builder: (_, state) => CafeDetailScreen(
+              cafeId: state.pathParameters['id']!,
+            ),
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(
+        buildTestRouterApp(container: container, router: router),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('favorite-cafe-favorite-detail-cafe')),
+        findsOneWidget,
+      );
+
+      await tester.tap(
+        find.byKey(const ValueKey('favorite-cafe-favorite-detail-cafe')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(CafeDetailScreen), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(CafeDetailScreen),
+          matching: find.text('Favorite Detail Cafe'),
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('show on the map opens map with the cafe selected',
