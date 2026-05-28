@@ -39,6 +39,53 @@ function isMissingColumnError(error: unknown, column: string): boolean {
     (message.includes("does not exist") || message.includes("schema cache"));
 }
 
+function isAlreadyRegisteredError(error: unknown): boolean {
+  const message = String((error as { message?: unknown })?.message ?? error)
+    .toLowerCase();
+  return message.includes("already registered") ||
+    message.includes("already been registered") ||
+    message.includes("already exists") ||
+    message.includes("user exists");
+}
+
+function metadataText(
+  metadata: Record<string, unknown>,
+  key: string,
+): string | null {
+  const value = metadata[key];
+  return typeof value === "string" && value.trim().length > 0
+    ? value.trim()
+    : null;
+}
+
+async function findAuthUserByEmail(
+  adminClient: ReturnType<typeof createClient>,
+  email: string,
+) {
+  const normalizedEmail = email.toLowerCase();
+  const perPage = 1000;
+  for (let page = 1; page <= 20; page += 1) {
+    const { data, error } = await adminClient.auth.admin.listUsers({
+      page,
+      perPage,
+    });
+    if (error) {
+      return { user: null, error };
+    }
+    const users = data?.users ?? [];
+    const user = users.find((candidate) =>
+      String(candidate.email ?? "").toLowerCase() === normalizedEmail
+    );
+    if (user) {
+      return { user, error: null };
+    }
+    if (users.length < perPage) {
+      break;
+    }
+  }
+  return { user: null, error: null };
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -170,21 +217,42 @@ serve(async (req) => {
         },
         redirectTo,
       });
-    if (inviteError || !inviteData.user) {
+    let invitedUser = inviteData.user;
+    if (inviteError && isAlreadyRegisteredError(inviteError)) {
+      const lookup = await findAuthUserByEmail(adminClient, email);
+      if (lookup.error) {
+        return jsonResponse({ error: lookup.error.message }, 500);
+      }
+      invitedUser = lookup.user;
+    } else if (inviteError || !inviteData.user) {
       return jsonResponse(
         { error: inviteError?.message ?? "Invite failed" },
         500,
       );
     }
-    invited = true;
+    if (!invitedUser) {
+      return jsonResponse(
+        {
+          error:
+            "An auth user already exists for this email, but no matching profile could be created.",
+        },
+        409,
+      );
+    }
+    invited = !inviteError;
+    const metadata = (invitedUser.user_metadata ?? {}) as Record<
+      string,
+      unknown
+    >;
     const { data: upserted, error: upsertError } = await adminClient
       .from("profiles")
       .upsert({
-        id: inviteData.user.id,
-        email,
-        first_name: firstName,
-        last_name: lastName,
-        full_name: fullName,
+        id: invitedUser.id,
+        email: invitedUser.email ?? email,
+        first_name: firstName ?? metadataText(metadata, "first_name"),
+        last_name: lastName ?? metadataText(metadata, "last_name"),
+        full_name: fullName || metadataText(metadata, "full_name") ||
+          (invitedUser.email ?? email),
         role: "cafe_owner",
       }, { onConflict: "id" })
       .select(activeProfileColumns)
@@ -217,7 +285,7 @@ serve(async (req) => {
     profile = updatedProfile;
   }
 
-  const { data: updatedCafe, error: assignError } = await adminClient
+  let { data: updatedCafe, error: assignError } = await adminClient
     .from("cafes")
     .update({
       owner_user_id: profile.id,
@@ -227,6 +295,21 @@ serve(async (req) => {
     .eq("id", cafe.id)
     .select("*")
     .single();
+  if (
+    assignError && isMissingColumnError(assignError, "google_uses_app_defaults")
+  ) {
+    const fallback = await adminClient
+      .from("cafes")
+      .update({
+        owner_user_id: profile.id,
+        owner_approval_status: "approved",
+      })
+      .eq("id", cafe.id)
+      .select("*")
+      .single();
+    updatedCafe = fallback.data;
+    assignError = fallback.error;
+  }
   if (assignError) {
     return jsonResponse({ error: assignError.message }, 500);
   }

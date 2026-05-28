@@ -54,13 +54,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonClosed => 'Closed';
 
   @override
-  String get commonUnknown => 'Unknown';
+  String get commonUnknown => 'Not available';
 
   @override
   String get cafeNoRatingsYet => 'No ratings yet';
 
   @override
-  String get commonNoData => 'No data';
+  String get commonNoData => 'Not available';
 
   @override
   String get commonCategory => 'Category';
@@ -948,7 +948,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cafeFormPrice => 'Price';
 
   @override
-  String get cafeFormPriceUnknown => 'Unknown';
+  String get cafeFormPriceUnknown => 'Not set';
 
   @override
   String get cafeFormWifi => 'Wi-Fi';

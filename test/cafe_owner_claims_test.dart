@@ -368,6 +368,10 @@ void main() {
       expect(sql, isNot(contains("'owner_user_id'")));
       expect(edgeFunction, contains('SUPABASE_SERVICE_ROLE_KEY'));
       expect(edgeFunction, contains('inviteUserByEmail'));
+      expect(edgeFunction, contains('listUsers'));
+      expect(edgeFunction, contains('isAlreadyRegisteredError'));
+      expect(edgeFunction, contains('google_uses_app_defaults'));
+      expect(edgeFunction, contains('isMissingColumnError'));
       expect(edgeFunction, contains('Admin privileges are required'));
       expect(edgeFunction, contains('role: "cafe_owner"'));
     });

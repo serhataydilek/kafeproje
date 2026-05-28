@@ -274,6 +274,7 @@ class CafeCard extends StatelessWidget {
                         // ── Open / Closed badge ───────────────────────────
 
                         Container(
+                          constraints: const BoxConstraints(maxWidth: 88),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8,
                             vertical: 3,
@@ -292,6 +293,8 @@ class CafeCard extends StatelessWidget {
                               statusLabel,
                               languageCode,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: statusColor,
                               fontWeight: FontWeight.w800,
