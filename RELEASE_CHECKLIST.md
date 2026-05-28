@@ -156,7 +156,7 @@ Firebase Analytics privacy payload check:
 | P2-004 | Copy | Placeholder or fallback text feels unfinished | Inspect missing-data cases | Copy should be clean and intentional | Rough placeholders visible | Serhat | Open |
 | P2-005 | Analyzer | Static analysis has cleanup warnings | Run `flutter analyze` | Analyzer should be clean before release | Fixed. `flutter analyze` now reports no issues. | Serhat | Closed |
 | P2-006 | Release build | Release build emits CupertinoIcons font warning | Run `flutter build apk --release` | Release build should complete without asset warnings | Build succeeds, but Flutter warns it expected CupertinoIcons fonts and found only MaterialIcons; no direct `CupertinoIcons`, `cupertino_icons`, or `packages/cupertino_icons` references found in source or lockfile | Serhat | Open |
-| P2-007 | Auth | Password field validates too early while username is being typed | Start typing the username on the auth screen before interacting with the password field | Password field should not show error styling until the password field is interacted with or form submission is attempted | Password field turns red while typing username | Serhat | Open |
+| P2-007 | Auth | Password field validates too early while username is being typed | Start typing the username on the auth screen before interacting with the password field | Password field should not show error styling until the password field is interacted with or form submission is attempted | Fixed in code: auth fields now autovalidate individually, and the untouched password field stays clean while typing the identifier. Covered by `test/auth_screen_test.dart`. | Serhat | Fixed |
 
 ## Baseline P0 Watchlist
 
@@ -190,7 +190,7 @@ Use this as a starting point while testing.
 - [x] Release APK installed on `emulator-5554` with `adb install -r`.
 - [x] Previous release-open smoke launched the pre-production package. Re-run this smoke after replacing Firebase config for `com.kafeproje.app`.
 - [x] Release-open smoke passed within observed scope: Home content was visible, the app process stayed alive, and no startup fatal crash was observed in the captured log window.
-- [ ] Auth manual flow completed. Current result: partially validated; auth mostly works, but password field turns red while typing username. Logged as P2-007.
+- [ ] Auth manual flow completed. Current result: P2-007 fixed in code and covered by widget regression; full manual release retest still pending.
 - [ ] Explore manual flow completed. Current result: partially validated; Explore loads, but the cafe list appears under-populated. Logged as P1-010.
 - [x] Map manual flow completed. Current result: passed by manual validation.
 - [ ] Cafe detail manual flow completed. Current result: awaiting Serhat manual validation.
