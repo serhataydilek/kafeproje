@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kafeproje/models/index.dart';
 import 'package:kafeproje/providers/app_provider.dart';
+import 'package:kafeproje/repositories/cafe_repository.dart';
 import 'package:kafeproje/screens/filter_modal_screen.dart';
 
 import 'test_helpers.dart';
@@ -263,6 +267,56 @@ void main() {
         findsOneWidget,
       );
       expect(find.byKey(const Key('filter-preset-row-0')), findsNothing);
+    });
+
+    testWidgets('apply dismisses immediately while district refresh continues',
+        (tester) async {
+      final refreshCompleter = Completer<CafeRepositoryResult>();
+      final container = createTestContainer(
+        state: buildTestAppShellState(),
+        overrides: [
+          cafeRepositoryProvider.overrideWithValue(
+            FakeCafeRepository(
+              onFetch: (_) => refreshCompleter.future,
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final router = GoRouter(
+        initialLocation: '/home',
+        routes: [
+          GoRoute(
+            path: '/home',
+            builder: (_, __) => const Scaffold(body: Text('Home')),
+          ),
+          GoRoute(
+            path: '/filters',
+            builder: (_, __) => const FilterModalScreen(
+              scope: FilterModalScope.explore,
+              initialFilters: Filters(district: 'Besiktas'),
+            ),
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(
+        buildTestRouterApp(container: container, router: router),
+      );
+      unawaited(router.push('/filters'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('filters-apply-button')));
+      await tester.pump();
+
+      expect(find.text('Home'), findsOneWidget);
+      expect(container.read(exploreFiltersProvider).district, 'Beşiktaş');
+
+      refreshCompleter.complete(
+        const CafeRepositoryResult(cafes: [], usedRemote: true),
+      );
+      await tester.pumpAndSettle();
     });
   });
 }

@@ -98,16 +98,18 @@ class _FilterModalScreenState extends ConsumerState<FilterModalScreen> {
     await storage.saveFilterPresets(_presetStorageScope(), presets);
   }
 
-  Future<void> _applyFiltersAndClose(Filters filters) async {
+  void _applyFiltersAndClose(Filters filters) {
     final notifier = ref.read(cafeProvider.notifier);
+    final Future<void> applyFuture;
     if (_scope == _FilterScope.map) {
-      await notifier.setMapFilters(filters);
+      applyFuture = notifier.setMapFilters(filters);
     } else {
-      await notifier.setExploreFilters(filters);
+      applyFuture = notifier.setExploreFilters(filters);
     }
     if (mounted) {
       context.pop();
     }
+    unawaited(applyFuture);
   }
 
   Future<void> _savePreset() async {
@@ -382,7 +384,7 @@ class _FilterModalScreenState extends ConsumerState<FilterModalScreen> {
                         child: FilledButton(
                           key: const Key('filters-apply-button'),
                           onPressed: () {
-                            unawaited(_applyFiltersAndClose(_draft));
+                            _applyFiltersAndClose(_draft);
                           },
                           style: FilledButton.styleFrom(
                             backgroundColor: colors.primary,
