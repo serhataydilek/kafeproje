@@ -11,9 +11,9 @@ import 'map_surface.dart';
 
 class _MapOverlayTokens {
   const _MapOverlayTokens._();
-  static const double railGap = 6;
-  static const double roundActionSize = 38;
-  static const double roundActionIconSize = 16;
+  static const double railGap = 8;
+  static const double roundActionSize = 44;
+  static const double roundActionIconSize = 18;
 }
 
 class MapBottomOverlay extends StatelessWidget {
@@ -54,6 +54,7 @@ class MapBottomOverlay extends StatelessWidget {
         AdaptiveLayoutData.fromWidth(MediaQuery.sizeOf(context).width);
     final controlsTopOffset = layout.horizontalPadding;
     final edgeInset = layout.horizontalPadding;
+    final bottomSafeInset = MediaQuery.viewPaddingOf(context).bottom;
     final previewMaxWidth = layout.isTablet ? 640.0 : 560.0;
 
     return Stack(
@@ -85,7 +86,7 @@ class MapBottomOverlay extends StatelessWidget {
                     padding: EdgeInsets.only(
                       left: edgeInset - 2,
                       right: edgeInset - 2,
-                      bottom: layout.sectionSpacing / 2 + 6,
+                      bottom: layout.sectionSpacing / 2 + 6 + bottomSafeInset,
                     ),
                     child: ConstrainedBox(
                       constraints: BoxConstraints(

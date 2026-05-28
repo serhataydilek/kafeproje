@@ -14,7 +14,9 @@ class _MapCafePreviewCardTokens {
   static const double cardRadius = MapSurfaceTokens.outerRadius + 2;
   static const double imageRadius = 20;
   static const double imageSize = 96;
-  static const double closeButtonSize = 32;
+  static const double closeButtonSize = 40;
+  static const double badgeMaxWidth = 136;
+  static const double metricMaxWidth = 126;
   static const EdgeInsets contentPadding = EdgeInsets.fromLTRB(14, 14, 14, 14);
 }
 
@@ -223,29 +225,32 @@ class MapCafePreviewCard extends StatelessWidget {
                             color: colors.text,
                             borderRadius: BorderRadius.circular(AppRadius.pill),
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 8,
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  l10n.commonDetails,
-                                  style: TextStyle(
-                                    color: colors.card,
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 11,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(minHeight: 36),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 8,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    l10n.commonDetails,
+                                    style: TextStyle(
+                                      color: colors.card,
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 11,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 4),
-                                Icon(
-                                  Icons.arrow_forward_rounded,
-                                  size: 14,
-                                  color: colors.card,
-                                ),
-                              ],
+                                  const SizedBox(width: 4),
+                                  Icon(
+                                    Icons.arrow_forward_rounded,
+                                    size: 14,
+                                    color: colors.card,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -369,12 +374,19 @@ class _MetricPill extends StatelessWidget {
           children: [
             Icon(icon, size: 14, color: iconColor),
             const SizedBox(width: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: colors.text,
-                fontWeight: FontWeight.w800,
-                fontSize: 10,
+            ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: _MapCafePreviewCardTokens.metricMaxWidth,
+              ),
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: colors.text,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 10,
+                ),
               ),
             ),
           ],
@@ -406,12 +418,19 @@ class _SoftBadge extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: textColor,
-            fontWeight: FontWeight.w800,
-            fontSize: 10,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: _MapCafePreviewCardTokens.badgeMaxWidth,
+          ),
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: textColor,
+              fontWeight: FontWeight.w800,
+              fontSize: 10,
+            ),
           ),
         ),
       ),
@@ -459,12 +478,19 @@ class _StatusBadge extends StatelessWidget {
               color: accent,
             ),
             const SizedBox(width: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: accent,
-                fontWeight: FontWeight.w800,
-                fontSize: 10,
+            ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: _MapCafePreviewCardTokens.badgeMaxWidth,
+              ),
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: accent,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 10,
+                ),
               ),
             ),
           ],

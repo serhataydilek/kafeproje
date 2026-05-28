@@ -16,6 +16,7 @@ import 'package:kafeproje/screens/map_screen.dart';
 import 'package:kafeproje/theme/app_theme.dart';
 import 'package:kafeproje/widgets/cafes/cafe_card.dart';
 import 'package:kafeproje/widgets/cafes/cafe_image_carousel.dart';
+import 'package:kafeproje/widgets/cafes/map_bottom_overlay.dart';
 import 'package:kafeproje/widgets/cafes/map_cafe_preview_card.dart';
 import 'package:kafeproje/widgets/cafes/map_radius_selector.dart';
 import 'package:kafeproje/widgets/ui/state_views.dart';
@@ -899,6 +900,93 @@ void main() {
         expect(inkWell.customBorder, isA<RoundedRectangleBorder>());
       },
     );
+
+    testWidgets('map preview card keeps long labels bounded on compact widths',
+        (tester) async {
+      final container = createTestContainer(
+        state: buildTestAppShellState(currentUser: testUser),
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        buildTestApp(
+          container: container,
+          child: Center(
+            child: SizedBox(
+              width: 320,
+              child: MapCafePreviewCard(
+                colors: lightColors,
+                cafe: buildTestCafe(
+                  id: 'long-label-cafe',
+                  name: 'Very Long Independent Workspace Coffee Roastery Name',
+                  district: 'Kadikoy',
+                  neighborhood:
+                      'Very Long Neighborhood Name With A Long Street Address',
+                  tags: const [
+                    'extremely long specialty workspace tag',
+                  ],
+                ),
+                onTap: () {},
+                onClose: () {},
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      final closeButtonSize =
+          tester.getSize(find.byKey(const Key('map-selected-close')));
+      expect(closeButtonSize.width, greaterThanOrEqualTo(40));
+      expect(closeButtonSize.height, greaterThanOrEqualTo(40));
+    });
+
+    testWidgets('map overlay controls use stable compact touch targets',
+        (tester) async {
+      final container = createTestContainer(
+        state: buildTestAppShellState(currentUser: testUser),
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        buildTestApp(
+          container: container,
+          child: SizedBox(
+            width: 360,
+            height: 640,
+            child: MapBottomOverlay(
+              colors: lightColors,
+              filtersActiveCount: 2,
+              compareCount: 1,
+              selectedCafe: null,
+              radiusPreset: MapRadiusPreset.small,
+              isRadiusEnabled: true,
+              isRadiusRefreshing: false,
+              onLocate: () {},
+              onSelectRadiusPreset: (_) {},
+              onOpenFilters: () {},
+              onOpenCompare: () {},
+              onOpenDetails: () {},
+              onCloseSelectedCafe: () {},
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      final roundActionInks = tester
+          .widgetList<Ink>(
+            find.descendant(
+              of: find.byKey(const Key('map-action-rail')),
+              matching: find.byType(Ink),
+            ),
+          )
+          .where((ink) => ink.width == 44 && ink.height == 44)
+          .toList(growable: false);
+      expect(roundActionInks, hasLength(2));
+    });
 
     testWidgets('cafe image carousel supports multiple local photos',
         (tester) async {
