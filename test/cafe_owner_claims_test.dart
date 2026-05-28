@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -91,6 +92,37 @@ void main() {
       expect(result.ok, isTrue);
       expect(result.data?.status, CafeOwnerClaimStatus.approved);
       expect(service.approvedCafeOwners['cafe-1'], 'owner-1');
+    });
+
+    test('admin approve completes if controller is disposed mid-flight',
+        () async {
+      final reviewGate = Completer<void>();
+      final service = _FakeOwnerClaimsService(
+        claims: [_claim(id: 'claim-1', userId: 'owner-1', cafeId: 'cafe-1')],
+        reviewGate: reviewGate.future,
+      );
+      final admin = testUser.copyWith(isAdmin: true, role: ProfileRole.admin);
+      final container = createTestContainer(
+        state: buildTestAppShellState(
+          currentUser: admin,
+          isAdmin: true,
+        ),
+        overrides: [
+          cafeOwnerClaimsServiceProvider.overrideWithValue(service),
+        ],
+      );
+
+      final pendingApproval = container
+          .read(cafeOwnerClaimAdminControllerProvider.notifier)
+          .approve('claim-1');
+      await Future<void>.delayed(Duration.zero);
+      container.dispose();
+      reviewGate.complete();
+
+      final result = await pendingApproval;
+
+      expect(result.ok, isTrue);
+      expect(result.data?.status, CafeOwnerClaimStatus.approved);
     });
 
     test('admin reject marks claim rejected without binding cafe', () async {
@@ -359,11 +391,14 @@ CafeOwnerClaim _claim({
 }
 
 class _FakeOwnerClaimsService implements CafeOwnerClaimsService {
-  _FakeOwnerClaimsService({List<CafeOwnerClaim> claims = const []})
-      : claims = [...claims];
+  _FakeOwnerClaimsService({
+    List<CafeOwnerClaim> claims = const [],
+    this.reviewGate,
+  }) : claims = [...claims];
 
   final List<CafeOwnerClaim> claims;
   final Map<String, String> approvedCafeOwners = {};
+  final Future<void>? reviewGate;
 
   @override
   Future<ServiceResult<CafeOwnerClaim>> approveClaim({
@@ -439,6 +474,7 @@ class _FakeOwnerClaimsService implements CafeOwnerClaimsService {
     String reviewedBy,
     CafeOwnerClaimStatus status,
   ) async {
+    await reviewGate;
     final index = claims.indexWhere((claim) => claim.id == claimId);
     if (index == -1) {
       return ServiceResult.failure(errorType: ServiceErrorType.notFound);

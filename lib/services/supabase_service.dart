@@ -2833,21 +2833,19 @@ class CafeOwnerInviteService {
     }
 
     try {
-      final response = await _client.functions
-          .invoke(
-            'invite-cafe-owner',
-            body: <String, dynamic>{
-              'cafe_id': normalizedCafeId,
-              'email': normalizedEmail,
-              if (firstName?.trim().isNotEmpty == true)
-                'first_name': sanitizeInput(firstName!),
-              if (lastName?.trim().isNotEmpty == true)
-                'last_name': sanitizeInput(lastName!),
-              if (fullName?.trim().isNotEmpty == true)
-                'full_name': sanitizeInput(fullName!),
-            },
-          )
-          .timeout(NetworkTimeoutConfig.supabaseDataRequestTimeout);
+      final response = await _client.functions.invoke(
+        'invite-cafe-owner',
+        body: <String, dynamic>{
+          'cafe_id': normalizedCafeId,
+          'email': normalizedEmail,
+          if (firstName?.trim().isNotEmpty == true)
+            'first_name': sanitizeInput(firstName!),
+          if (lastName?.trim().isNotEmpty == true)
+            'last_name': sanitizeInput(lastName!),
+          if (fullName?.trim().isNotEmpty == true)
+            'full_name': sanitizeInput(fullName!),
+        },
+      ).timeout(NetworkTimeoutConfig.supabaseDataRequestTimeout);
 
       final payload = response.data;
       if (payload is! Map) {
@@ -2855,6 +2853,14 @@ class CafeOwnerInviteService {
           message: 'Unexpected cafe owner invite response.',
           errorCode: AppErrorCode.parseFailed,
           errorType: ServiceErrorType.parse,
+        );
+      }
+      final responseError = _messageFromFunctionPayload(payload);
+      if (responseError != null) {
+        return ServiceResult.failure(
+          message: responseError,
+          errorCode: AppErrorCode.validationFailed,
+          errorType: ServiceErrorType.validation,
         );
       }
       final ownerPayload = payload['owner'];
@@ -2886,7 +2892,7 @@ class CafeOwnerInviteService {
         key: 'cafe-owner-invite-$cafeId',
       );
       return ServiceResult.failure(
-        message: error.toString(),
+        message: _messageFromFunctionException(error) ?? error.toString(),
         errorCode: _errorCodeForSupabaseError(
           error,
           fallback: AppErrorCode.validationFailed,
@@ -2896,6 +2902,32 @@ class CafeOwnerInviteService {
       );
     }
   }
+}
+
+String? _messageFromFunctionException(Object error) {
+  if (error is! FunctionException) {
+    return null;
+  }
+  if (error.details is Map) {
+    final message = _messageFromFunctionPayload(error.details as Map);
+    if (message != null) {
+      return message;
+    }
+  }
+  if (error.details is String && (error.details as String).trim().isNotEmpty) {
+    return (error.details as String).trim();
+  }
+  return error.reasonPhrase?.trim().isNotEmpty == true
+      ? error.reasonPhrase!.trim()
+      : 'Cafe owner invite failed.';
+}
+
+String? _messageFromFunctionPayload(Map payload) {
+  final error = payload['error'] ?? payload['message'];
+  if (error is String && error.trim().isNotEmpty) {
+    return error.trim();
+  }
+  return null;
 }
 
 String? _nullableSanitized(String? value) {

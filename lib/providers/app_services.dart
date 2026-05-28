@@ -474,6 +474,9 @@ class CafeOwnerClaimAdminController
     final result = approve
         ? await service.approveClaim(claimId: claimId, reviewedBy: user.id)
         : await service.rejectClaim(claimId: claimId, reviewedBy: user.id);
+    if (!mounted) {
+      return result;
+    }
     state = result.ok
         ? const async_result.AsyncData(null)
         : async_result.AsyncError<void>(
@@ -482,11 +485,20 @@ class CafeOwnerClaimAdminController
             originalError: result.error,
           );
     if (result.ok) {
-      _ref.invalidate(pendingCafeOwnerClaimsProvider);
-      _ref.invalidate(currentUserOwnerClaimsProvider);
-      _ref.invalidate(adminCafeListControllerProvider);
-      await _ref.read(adminCafeListControllerProvider.notifier).refresh();
-      await _ref.read(cafeRepositoryProvider).clearCache();
+      try {
+        _ref.invalidate(pendingCafeOwnerClaimsProvider);
+        _ref.invalidate(currentUserOwnerClaimsProvider);
+        _ref.invalidate(adminCafeListControllerProvider);
+        await _ref.read(adminCafeListControllerProvider.notifier).refresh();
+        await _ref.read(cafeRepositoryProvider).clearCache();
+      } catch (error, stackTrace) {
+        AppLogger.error(
+          'Cafe owner claim review succeeded but follow-up refresh failed',
+          error: error,
+          stackTrace: stackTrace,
+          key: 'cafe-owner-claim-review-refresh-$claimId',
+        );
+      }
     }
     return result;
   }

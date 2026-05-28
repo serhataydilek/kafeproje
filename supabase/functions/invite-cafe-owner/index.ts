@@ -32,6 +32,13 @@ function cleanText(value: unknown): string | null {
   return trimmed.length === 0 ? null : trimmed.slice(0, 160);
 }
 
+function isMissingColumnError(error: unknown, column: string): boolean {
+  const message = String((error as { message?: unknown })?.message ?? error)
+    .toLowerCase();
+  return message.includes(column.toLowerCase()) &&
+    (message.includes("does not exist") || message.includes("schema cache"));
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -68,11 +75,20 @@ serve(async (req) => {
     return jsonResponse({ error: "Invalid session" }, 401);
   }
 
-  const { data: callerProfile, error: callerError } = await adminClient
+  let { data: callerProfile, error: callerError } = await adminClient
     .from("profiles")
     .select("id, role, is_admin")
     .eq("id", authData.user.id)
     .maybeSingle();
+  if (callerError && isMissingColumnError(callerError, "is_admin")) {
+    const fallback = await adminClient
+      .from("profiles")
+      .select("id, role")
+      .eq("id", authData.user.id)
+      .maybeSingle();
+    callerProfile = fallback.data;
+    callerError = fallback.error;
+  }
   const callerIsAdmin = callerProfile?.is_admin === true ||
     String(callerProfile?.role ?? "").toLowerCase() === "admin";
   if (callerError || !callerIsAdmin) {
@@ -115,11 +131,28 @@ serve(async (req) => {
 
   const profileColumns =
     "id, email, first_name, last_name, full_name, username, role, is_admin, created_at, avatar_url";
+  const profileColumnsFallback =
+    "id, email, first_name, last_name, full_name, username, role, created_at";
+  let activeProfileColumns = profileColumns;
   let { data: profile, error: profileError } = await adminClient
     .from("profiles")
-    .select(profileColumns)
+    .select(activeProfileColumns)
     .ilike("email", email)
     .maybeSingle();
+  if (
+    profileError &&
+    (isMissingColumnError(profileError, "is_admin") ||
+      isMissingColumnError(profileError, "avatar_url"))
+  ) {
+    activeProfileColumns = profileColumnsFallback;
+    const fallback = await adminClient
+      .from("profiles")
+      .select(activeProfileColumns)
+      .ilike("email", email)
+      .maybeSingle();
+    profile = fallback.data;
+    profileError = fallback.error;
+  }
   if (profileError) {
     return jsonResponse({ error: profileError.message }, 500);
   }
@@ -154,7 +187,7 @@ serve(async (req) => {
         full_name: fullName,
         role: "cafe_owner",
       }, { onConflict: "id" })
-      .select(profileColumns)
+      .select(activeProfileColumns)
       .single();
     if (upsertError) {
       return jsonResponse({ error: upsertError.message }, 500);
@@ -176,7 +209,7 @@ serve(async (req) => {
       .from("profiles")
       .update(updatePayload)
       .eq("id", profile.id)
-      .select(profileColumns)
+      .select(activeProfileColumns)
       .single();
     if (updateError) {
       return jsonResponse({ error: updateError.message }, 500);

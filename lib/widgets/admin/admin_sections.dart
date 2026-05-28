@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../l10n/l10n.dart';
+import '../../models/async_result.dart' as async_result;
 import '../../models/index.dart';
 import '../../providers/app_provider.dart';
 import '../../theme/app_theme.dart';
@@ -482,6 +483,8 @@ class AdminOwnerClaimsSection extends ConsumerWidget {
       );
     }
 
+    final reviewState = ref.watch(cafeOwnerClaimAdminControllerProvider);
+    final isReviewingClaim = reviewState is async_result.AsyncLoading<void>;
     final claims = claimsAsync.valueOrNull ?? const <CafeOwnerClaim>[];
     if (claims.isEmpty) {
       return EmptyStateView(
@@ -566,14 +569,18 @@ class AdminOwnerClaimsSection extends ConsumerWidget {
                 children: [
                   FilledButton.icon(
                     key: ValueKey('admin-owner-claim-approve-${claim.id}'),
-                    onPressed: () => _review(context, ref, claim, true),
+                    onPressed: isReviewingClaim
+                        ? null
+                        : () => _review(context, ref, claim, true),
                     icon: const Icon(Icons.check_rounded),
                     label: Text(_trEn(context, 'Onayla', 'Approve')),
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   OutlinedButton.icon(
                     key: ValueKey('admin-owner-claim-reject-${claim.id}'),
-                    onPressed: () => _review(context, ref, claim, false),
+                    onPressed: isReviewingClaim
+                        ? null
+                        : () => _review(context, ref, claim, false),
                     icon: const Icon(Icons.close_rounded),
                     label: Text(_trEn(context, 'Reddet', 'Reject')),
                   ),
