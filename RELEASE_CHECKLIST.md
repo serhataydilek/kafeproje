@@ -135,7 +135,7 @@ Firebase Analytics privacy payload check:
 | ID | Flow | Issue | Repro Steps | Expected | Actual | Owner | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | P1-001 | Explore | Too few cafes shown due to merge or filter issues | Open Explore in an expected populated area | Real cafes should appear consistently | List is obviously under-populated | Serhat | Open |
-| P1-002 | Explore / Map | Non-cafe places slip into results | Load venues in mixed districts | Only real cafes should appear | Pide, borek, pizza, or similar places appear | Serhat | Open |
+| P1-002 | Explore / Map | Non-cafe places slip into results | Load venues in mixed districts | Only real cafes should appear | Fixed in code: discovery classifier and merge filters reject pide/borek/pizza/restaurant/bakery/market-style false positives unless there is a strong cafe signal or admin override. Covered by `test/cafe_discovery_classifier_test.dart`, `test/places_service_test.dart`, `test/cafe_repository_test.dart`, and `test/cafe_merge_policy_test.dart`. | Serhat | Fixed |
 | P1-003 | Map | Marker tap behavior is wrong | Tap map marker repeatedly | Marker should center and select cleanly | Fixed in code: marker taps select the latest cafe, place-id selections resolve correctly, stale selection clears on first open, and selected sheet actions remain usable on narrow layouts. Covered by `test/map_and_navigation_test.dart`. | Serhat | Fixed |
 | P1-004 | Compare | Compare table layout is hard to use | Add multiple cafes and compare on mobile | Table should remain readable and actionable | Fixed in code: compare table uses an attribute-left matrix, compact icon-only feature column, stable slot/header sizing, and narrow-screen overflow coverage. Covered by `test/compare_flow_test.dart`. | Serhat | Fixed |
 | P1-005 | Admin | Delete or restore buttons can be triggered multiple times | Tap destructive action repeatedly on slow network | Action should lock during request | Fixed in code: delete/restore actions are keyed by cafe id, disabled while pending, and duplicate controller calls are suppressed. Covered by `test/admin_screen_test.dart`. | Serhat | Fixed |
@@ -150,7 +150,7 @@ Firebase Analytics privacy payload check:
 
 | ID | Flow | Issue | Repro Steps | Expected | Actual | Owner | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| P2-001 | Logging | Debug logs are noisy in normal app use | Navigate through app during test | Logs should be quiet enough for useful debugging | Excess router or flogger noise | Serhat | Open |
+| P2-001 | Logging | Debug logs are noisy in normal app use | Navigate through app during test | Logs should be quiet enough for useful debugging | Fixed in code: `AppLogger.debug` returns immediately outside debug builds, while production warning/error reporting remains routed through Crashlytics where configured. Verified by source inspection in `lib/utils/app_logger.dart`. | Serhat | Fixed |
 | P2-002 | UI polish | Map preview or buttons feel visually rough | Open screens using map preview components | UI should feel consistent and polished | Corners, spacing, or controls feel unfinished | Serhat | Open |
 | P2-003 | Performance | Filter or refresh feels slower than desired | Change district, radius, and open filters repeatedly | Fast refresh | Noticeable lag but still usable | Serhat | Open |
 | P2-004 | Copy | Placeholder or fallback text feels unfinished | Inspect missing-data cases | Copy should be clean and intentional | Rough placeholders visible | Serhat | Open |
