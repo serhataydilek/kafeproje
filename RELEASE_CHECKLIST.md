@@ -142,7 +142,7 @@ Firebase Analytics privacy payload check:
 | P1-006 | Images | Cafe images missing or incomplete | Open several cafe details with photos | Images should load consistently | Missing image, single-image stuck state, or flicker | Serhat | Open |
 | P1-007 | Filters | Empty-state handling is poor | Apply strict filters with no results | Clean empty state should show | Confusing or broken screen state | Serhat | Open |
 | P1-008 | Home / Favorites / Featured | Filter state leaks across sections | Change filters in one section, inspect another | Screen-local state should stay isolated | Cross-screen contamination happens | Serhat | Open |
-| P1-009 | Compare | Compare opens blank from cafe detail | From a cafe detail screen, tap Compare and open the compare screen | Compare screen should show selected cafe state or comparison content | Blank Compare screen opens with only the title visible | Serhat | Open |
+| P1-009 | Compare | Compare opens blank from cafe detail | From a cafe detail screen, tap Compare and open the compare screen | Compare screen should show selected cafe state or comparison content | Fixed in code: detail Compare now adds the cafe and opens Compare with the selected cafe visible. Covered by `test/compare_flow_test.dart`. | Serhat | Fixed |
 | P1-010 | Explore | Explore appears to show too few cafes | Open Explore after cafe data loads | Explore should show the expected populated cafe list | Cafe list appears under-populated | Serhat | Open |
 | P1-011 | Admin Add | Cafe add flow fails | Open admin add flow, fill the form, submit | Cafe is added successfully, or the UI clearly shows which required fields are missing | Submission failed with "cafe could not be added"; likely missing insert id fixed in code, pending manual backend retest | Serhat | Pending retest |
 
@@ -195,7 +195,7 @@ Use this as a starting point while testing.
 - [x] Map manual flow completed. Current result: passed by manual validation.
 - [ ] Cafe detail manual flow completed. Current result: awaiting Serhat manual validation.
 - [x] Favorites manual flow completed. Current result: passed by manual validation.
-- [ ] Compare manual flow completed. Current result: failed; from cafe detail, tapping compare opens a blank Compare screen with only the title visible. Logged as P1-009.
+- [ ] Compare manual flow completed. Current result: P1-009 fixed in code and covered by widget regression; full manual release retest still pending.
 - [ ] Admin add/edit/delete/restore manual flow completed. Current result: add flow is a confirmed bug; submission failed with "cafe could not be added". Missing insert id fixed in code and required-field feedback made reachable; manual backend retest and admin listing visibility validation still needed. Logged as P1-011.
 - [x] Settings manual flow completed. Current result: passed by manual validation.
 - [ ] Notification permission and scheduling smoke test completed. Current result: no Android notification permission prompt appears, but notifications are not confirmed release scope. Treat as out of release scope; do not implement during release freeze.
