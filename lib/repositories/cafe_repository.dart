@@ -1283,6 +1283,8 @@ class CafeRepository {
 
     final shouldFetchDiscoverableBaseline =
         district != null || googleCafes.isEmpty || _cafeOverlaySource != null;
+    final includeDiscoverableBaseline =
+        district != null && district.trim().isNotEmpty;
     var discoverableRows = const <Cafe>[];
     var activeFeaturedRows = const <Cafe>[];
     var discoverableFetchFailed = false;
@@ -1343,7 +1345,7 @@ class CafeRepository {
           CafeMergePolicy.mergeGooglePlacesWithSupabase(
         googleCafes,
         _mergeSupabaseRowsByIdentity(
-          discoverableRows,
+          includeDiscoverableBaseline ? discoverableRows : const <Cafe>[],
           _featuredRowsWithinGoogleDiscovery(
             activeFeaturedRows,
             googleCafes,
@@ -1371,7 +1373,7 @@ class CafeRepository {
           CafeMergePolicy.mergeGooglePlacesWithSupabase(
         googleCafes,
         _mergeSupabaseRowsByIdentity(
-          discoverableRows,
+          includeDiscoverableBaseline ? discoverableRows : const <Cafe>[],
           _featuredRowsWithinGoogleDiscovery(
             activeFeaturedRows,
             googleCafes,
@@ -1391,8 +1393,9 @@ class CafeRepository {
       overlayRows,
     );
     final combinedSupabaseByIdentity = <String, Cafe>{
-      for (final cafe in discoverableRows)
-        CafeMergePolicy.canonicalIdentityFor(cafe): cafe,
+      if (includeDiscoverableBaseline)
+        for (final cafe in discoverableRows)
+          CafeMergePolicy.canonicalIdentityFor(cafe): cafe,
       for (final cafe in featuredDiscoveryRows)
         CafeMergePolicy.canonicalIdentityFor(cafe): cafe,
     };
@@ -1408,9 +1411,16 @@ class CafeRepository {
       for (final cafe in featuredDiscoveryRows)
         CafeMergePolicy.canonicalIdentityFor(cafe),
     };
+    final discoverableBaselineIdentities = {
+      if (includeDiscoverableBaseline)
+        for (final cafe in discoverableRows)
+          CafeMergePolicy.canonicalIdentityFor(cafe),
+    };
     final combinedSupabaseRows = combinedSupabaseByIdentity.values
         .where((cafe) =>
             overlayIdentities
+                .contains(CafeMergePolicy.canonicalIdentityFor(cafe)) ||
+            discoverableBaselineIdentities
                 .contains(CafeMergePolicy.canonicalIdentityFor(cafe)) ||
             featuredDiscoveryIdentities
                 .contains(CafeMergePolicy.canonicalIdentityFor(cafe)))

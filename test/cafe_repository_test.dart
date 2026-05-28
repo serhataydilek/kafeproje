@@ -256,6 +256,78 @@ void main() {
       expect(overlay.lastActiveFeaturedDistrict, isNull);
     });
 
+    test(
+        'includes district Supabase discoverable rows alongside Google results',
+        () async {
+      final googleCafe = buildTestCafe(
+        id: 'google-district-cafe',
+        name: 'Google District Cafe',
+        district: 'Kadikoy',
+      ).copyWith(placeId: 'google-district-place-1');
+      final savedCafe = buildTestCafe(
+        id: 'saved-district-cafe',
+        name: 'Saved District Cafe',
+        district: 'Kadikoy',
+      ).copyWith(placeId: 'saved-district-place-1');
+      final overlay = _FakeCafeOverlaySource(
+        cafesByIds: const <Cafe>[],
+        cafesByPlaceIds: const <Cafe>[],
+        discoverableCafes: [savedCafe],
+      );
+      final repository = CafeRepository(
+        _FakePlacesService([googleCafe]),
+        overlay,
+      );
+
+      final result = await repository.fetchDiscoverableCafes(
+        district: 'Kadikoy',
+        bypassRateLimit: true,
+      );
+
+      expect(result.ok, isTrue);
+      expect(
+        result.cafes.map((cafe) => cafe.id),
+        containsAllInOrder(['google-district-cafe', 'saved-district-cafe']),
+      );
+    });
+
+    test('does not add broad Supabase rows to coordinate discovery', () async {
+      final googleCafe = buildTestCafe(
+        id: 'google-nearby-cafe',
+        name: 'Google Nearby Cafe',
+      ).copyWith(placeId: 'google-nearby-place-1');
+      final unrelatedSavedCafe = buildTestCafe(
+        id: 'saved-citywide-cafe',
+        name: 'Saved Citywide Cafe',
+      ).copyWith(placeId: 'saved-citywide-place-1');
+      final overlay = _FakeCafeOverlaySource(
+        cafesByIds: const <Cafe>[],
+        cafesByPlaceIds: const <Cafe>[],
+        discoverableCafes: [unrelatedSavedCafe],
+      );
+      final repository = CafeRepository(
+        _FakePlacesService([googleCafe]),
+        overlay,
+      );
+
+      final result = await repository.fetchDiscoverableCafes(
+        lat: 41.0,
+        lng: 29.0,
+        radius: 1000,
+        bypassRateLimit: true,
+      );
+
+      expect(result.ok, isTrue);
+      expect(
+        result.cafes.map((cafe) => cafe.id),
+        contains('google-nearby-cafe'),
+      );
+      expect(
+        result.cafes.map((cafe) => cafe.id),
+        isNot(contains('saved-citywide-cafe')),
+      );
+    });
+
     test('uses separate radius-independent source for featured cafes',
         () async {
       final featuredCafe = buildTestCafe(
