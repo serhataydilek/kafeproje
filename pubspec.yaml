@@ -30,6 +30,7 @@ dependencies:
   http: ^1.1.0
   
   # UI & Icons
+  cupertino_icons: ^1.0.8
   material_design_icons_flutter: ^7.0.7000
   google_maps_flutter: ^2.5.0
   

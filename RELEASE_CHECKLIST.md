@@ -74,7 +74,7 @@ Run these flows end to end and add every observed issue to the bug list below.
 Run this manually against the release Firebase project. Do not add automated live Firebase tests for this release.
 
 - [x] Android Firebase config readiness: `applicationId`, `android/app/google-services.json` package name, and Google Services Gradle plugin all use `com.kafeproje.app`.
-- [x] Android release APK build: `flutter build apk --release` passed and produced `build/app/outputs/flutter-apk/app-release.apk`.
+- [x] Android release APK build: `flutter build apk --release --dart-define=GOOGLE_MAPS_API_KEY=codex-release-build-validation-key` passed with temporary env-var signing and produced `build/app/outputs/flutter-apk/app-release.apk`.
 - [ ] Android manual Firebase DebugView/Realtime smoke is pending.
 - [x] iOS Firebase config readiness: Runner bundle ID, `ios/Runner/GoogleService-Info.plist` `BUNDLE_ID`, and Runner target resources all use `com.kafeproje.app`.
 - [ ] iOS macOS/Xcode build/signing is pending.
@@ -144,7 +144,7 @@ Firebase Analytics privacy payload check:
 | P1-008 | Home / Favorites / Featured | Filter state leaks across sections | Change filters in one section, inspect another | Screen-local state should stay isolated | Fixed in code: Explore/Map filter changes do not narrow Home, Favorites, Compare, or Featured pools. Covered by `test/filter_context_isolation_test.dart`. | Serhat | Fixed |
 | P1-009 | Compare | Compare opens blank from cafe detail | From a cafe detail screen, tap Compare and open the compare screen | Compare screen should show selected cafe state or comparison content | Fixed in code: detail Compare now adds the cafe and opens Compare with the selected cafe visible. Covered by `test/compare_flow_test.dart`. | Serhat | Fixed |
 | P1-010 | Explore | Explore appears to show too few cafes | Open Explore after cafe data loads | Explore should show the expected populated cafe list | Duplicate of P1-001; fixed by including district Supabase discoverable rows in the Explore merge. Covered by `test/cafe_repository_test.dart`, with classifier/Places regressions guarding result quality. | Serhat | Fixed |
-| P1-011 | Admin Add | Cafe add flow fails | Open admin add flow, fill the form, submit | Cafe is added successfully, or the UI clearly shows which required fields are missing | Submission failed with "cafe could not be added"; likely missing insert id fixed in code, pending manual backend retest | Serhat | Pending retest |
+| P1-011 | Admin Add | Cafe add flow fails | Open admin add flow, fill the form, submit | Cafe is added successfully, or the UI clearly shows which required fields are missing | Fixed in code: admin add now generates a UUID before insert, returns the inserted cafe id, and the admin import path moves the new cafe into the admin list. Covered by `flutter test test/supabase_service_test.dart --plain-name "addCafe generates an id before insert"` and `flutter test test/admin_screen_test.dart --plain-name "admin imports discovered cafe once and moves it to admin cafes"`. Live Supabase manual retest still pending. | Serhat | Fixed in code |
 
 ## P2 Bugs
 
@@ -155,7 +155,7 @@ Firebase Analytics privacy payload check:
 | P2-003 | Performance | Filter or refresh feels slower than desired | Filter apply with pending district refresh | Fast refresh | Fixed in code: filter apply now dismisses the filter sheet immediately after synchronously updating filter state, while district discovery refresh continues in the background. Covered by `test/filter_modal_screen_test.dart`. | Serhat | Fixed |
 | P2-004 | Copy | Placeholder or fallback text feels unfinished | Missing-data detail/card tests, l10n fallback review | Copy uses intentional localized fallback labels and cards handle longer labels without overflow | Fixed | Serhat | Fixed in `flutter test test/cafe_detail_screen_test.dart test/compare_flow_test.dart test/home_sponsored_cafes_test.dart test/map_and_navigation_test.dart` |
 | P2-005 | Analyzer | Static analysis has cleanup warnings | Run `flutter analyze` | Analyzer should be clean before release | Fixed. `flutter analyze` now reports no issues. | Serhat | Closed |
-| P2-006 | Release build | Release build emits CupertinoIcons font warning | Run `flutter build apk --release` | Release build should complete without asset warnings | Current run cannot reach asset warning validation because release signing is intentionally required and no key config is present in this workspace. Command fails with: release signing is not configured. | Serhat | Blocked pending signing config |
+| P2-006 | Release build | Release build emits CupertinoIcons font warning | Run `flutter build apk --release` | Release build should complete without asset warnings | Fixed: `cupertino_icons` is declared so the Cupertino icon font is bundled, and a temporary env-var signed release APK builds without the missing Cupertino font warning. Verified with `flutter build apk --release --dart-define=GOOGLE_MAPS_API_KEY=codex-release-build-validation-key` using an ignored local test keystore. Real Play Store signing remains a release-ops requirement. | Serhat | Fixed |
 | P2-007 | Auth | Password field validates too early while username is being typed | Start typing the username on the auth screen before interacting with the password field | Password field should not show error styling until the password field is interacted with or form submission is attempted | Fixed in code: auth fields now autovalidate individually, and the untouched password field stays clean while typing the identifier. Covered by `test/auth_screen_test.dart`. | Serhat | Fixed |
 
 ## Baseline P0 Watchlist
@@ -196,7 +196,7 @@ Use this as a starting point while testing.
 - [ ] Cafe detail manual flow completed. Current result: awaiting Serhat manual validation.
 - [x] Favorites manual flow completed. Current result: passed by manual validation.
 - [ ] Compare manual flow completed. Current result: P1-009 fixed in code and covered by widget regression; full manual release retest still pending.
-- [ ] Admin add/edit/delete/restore manual flow completed. Current result: add flow is a confirmed bug; submission failed with "cafe could not be added". Missing insert id fixed in code and required-field feedback made reachable; manual backend retest and admin listing visibility validation still needed. Logged as P1-011.
+- [ ] Admin add/edit/delete/restore manual flow completed. Current result: add flow failure is fixed in code and covered by service/admin widget regressions; live Supabase manual backend retest and full edit/delete/restore validation still pending. Logged as P1-011.
 - [x] Settings manual flow completed. Current result: passed by manual validation.
 - [ ] Notification permission and scheduling smoke test completed. Current result: no Android notification permission prompt appears, but notifications are not confirmed release scope. Treat as out of release scope; do not implement during release freeze.
 
@@ -211,9 +211,9 @@ Use this as a starting point while testing.
 | --- | --- | --- |
 | P0-008 | Ship with known issue | Release-open smoke did not reproduce a startup crash; broader manual flows remain pending. Reopen as P0 if Serhat reproduces startup crash, freeze, blank screen, or wrong entry route. |
 | Notifications | Out of release scope | Repo evidence shows no notification dependency, permission, service, UI entry point, or request path; the checklist only allowed notification prep conditionally. Do not implement notification permission/scheduling during release freeze. |
-| P1-011 | Fix before release unless admin add is cut from release scope | Admin add now has a confirmed submission failure. Escalate to P0 only if release depends on adding cafes through Admin before ship. |
+| P1-011 | Fixed in code; live backend retest pending | Admin add now generates an insert id before Supabase insert and the admin import path is covered by regression tests. Escalate only if the live backend retest still fails. |
 | P2-005 | Fix before release | Fixed: analyzer is clean. |
-| P2-006 | Blocked pending signing config | Current release build cannot reach asset-warning validation without `android/key.properties` or the `ANDROID_KEYSTORE_*` environment variables. Re-run `flutter build apk --release` after signing config is available. |
+| P2-006 | Fixed; signing ops still required | Temporary env-var signing validated the release APK path and the Cupertino font warning is gone after adding `cupertino_icons`. Real release signing credentials are still required outside this workspace. |
 
 ## Day 1 Test Order
 
