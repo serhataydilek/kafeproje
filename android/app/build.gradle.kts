@@ -92,9 +92,19 @@ android {
             dartDefine("GOOGLE_MAPS_API_KEY")
                 ?: System.getenv("GOOGLE_MAPS_API_KEY")
                 ?: "YOUR_GOOGLE_MAPS_API_KEY"
+        val googlePlacesApiKey =
+            dartDefine("GOOGLE_PLACES_API_KEY")
+                ?: System.getenv("GOOGLE_PLACES_API_KEY")
+                ?: "YOUR_GOOGLE_PLACES_API_KEY"
         if (requestedReleaseBuild && googleMapsApiKey == "YOUR_GOOGLE_MAPS_API_KEY") {
             throw GradleException(
                 "GOOGLE_MAPS_API_KEY is required for release builds. " +
+                    "Pass it with --dart-define, --dart-define-from-file, or CI env."
+            )
+        }
+        if (requestedReleaseBuild && googlePlacesApiKey == "YOUR_GOOGLE_PLACES_API_KEY") {
+            throw GradleException(
+                "GOOGLE_PLACES_API_KEY is required for release builds so cafe photos can load. " +
                     "Pass it with --dart-define, --dart-define-from-file, or CI env."
             )
         }

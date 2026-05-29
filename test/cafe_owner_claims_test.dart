@@ -374,6 +374,10 @@ void main() {
       expect(edgeFunction, contains('isMissingColumnError'));
       expect(edgeFunction, contains('Admin privileges are required'));
       expect(edgeFunction, contains('role: "cafe_owner"'));
+      expect(edgeFunction, contains('inviteErrorResponse'));
+      expect(edgeFunction, contains('"assign_cafe"'));
+      expect(edgeFunction, contains('"cafe_assignment_failed"'));
+      expect(edgeFunction, contains('"profile_upsert_failed"'));
     });
   });
 }

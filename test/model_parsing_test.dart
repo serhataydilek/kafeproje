@@ -40,6 +40,23 @@ Map<String, dynamic> _baseSupabaseRow({
 }
 
 void main() {
+  group('Cafe image ordering', () {
+    test('direct image URLs are preferred before generated Google media', () {
+      final cafe = buildTestCafe(
+        id: 'image-priority',
+        name: 'Image Priority',
+        images: const [
+          'places/PLACE_ID/photos/GENERATED_RESOURCE',
+          'https://example.com/direct.jpg',
+        ],
+      );
+
+      expect(cafe.photoUrls, hasLength(2));
+      expect(cafe.photoUrls.first, 'https://example.com/direct.jpg');
+      expect(cafe.photoUrls.last, contains('places.googleapis.com'));
+    });
+  });
+
   group('Cafe row parsing', () {
     test('fromSupabaseRow maps google_place_id into placeId', () {
       final cafe = Cafe.fromSupabaseRow(

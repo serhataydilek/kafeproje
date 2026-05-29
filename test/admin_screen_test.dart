@@ -501,6 +501,7 @@ class _FakeCafeOwnerInviteService extends CafeOwnerInviteService {
     required this.cafesById,
     required this.owner,
     this.invited = true,
+    this.failureMessage,
   }) : super(
           SupabaseClient(
             'https://example.com',
@@ -512,6 +513,7 @@ class _FakeCafeOwnerInviteService extends CafeOwnerInviteService {
   final Map<String, Cafe> cafesById;
   final UserProfile owner;
   final bool invited;
+  final String? failureMessage;
   String? lastCafeId;
   String? lastEmail;
 
@@ -525,7 +527,16 @@ class _FakeCafeOwnerInviteService extends CafeOwnerInviteService {
   }) async {
     lastCafeId = cafeId;
     lastEmail = email;
-    final current = cafesById[cafeId] ?? buildTestCafe(id: cafeId, name: cafeId);
+    final failure = failureMessage;
+    if (failure != null) {
+      return ServiceResult.failure(
+        message: failure,
+        errorCode: AppErrorCode.validationFailed,
+        errorType: ServiceErrorType.validation,
+      );
+    }
+    final current =
+        cafesById[cafeId] ?? buildTestCafe(id: cafeId, name: cafeId);
     final updated = current.copyWith(ownerUserId: () => owner.id);
     cafesById[cafeId] = updated;
     return ServiceResult.success(
@@ -1612,8 +1623,10 @@ void main() {
           tester,
           find.byKey(const Key('admin-owner-email-input')),
         );
-        expect(find.byKey(const Key('admin-owner-email-input')), findsOneWidget);
-        expect(find.byKey(const Key('admin-owner-user-id-input')), findsNothing);
+        expect(
+            find.byKey(const Key('admin-owner-email-input')), findsOneWidget);
+        expect(
+            find.byKey(const Key('admin-owner-user-id-input')), findsNothing);
 
         await tester.enterText(
           _textFieldIn(const Key('admin-owner-email-input')),
@@ -1642,6 +1655,96 @@ void main() {
 
         expect(updatedInput?.ownerUserId, '');
         expect(find.textContaining('No owner assigned'), findsWidgets);
+      },
+    );
+
+    testWidgets(
+      'cafe edit owner invite surfaces backend failure message',
+      (tester) async {
+        const admin = UserProfile(
+          id: 'admin-1',
+          username: 'admin',
+          firstName: 'Admin',
+          lastName: 'User',
+          fullName: 'Admin User',
+          email: 'admin@example.com',
+          role: ProfileRole.admin,
+          createdAt: '2024-01-01T00:00:00Z',
+        );
+        const owner = UserProfile(
+          id: 'owner-1',
+          username: 'owner',
+          firstName: 'Cafe',
+          lastName: 'Owner',
+          fullName: 'Cafe Owner',
+          email: 'owner@example.com',
+          role: ProfileRole.cafeOwner,
+          createdAt: '2024-01-01T00:00:00Z',
+        );
+        final cafe = buildTestCafe(id: 'cafe-1', name: 'Brew Lab');
+        final cafesById = {'cafe-1': cafe};
+        final inviteService = _FakeCafeOwnerInviteService(
+          cafesById: cafesById,
+          owner: owner,
+          failureMessage: 'Cafe assignment failed: owner_user_id is missing.',
+        );
+
+        final container = createTestContainer(
+          state: buildTestAppShellState(
+            isAdmin: true,
+            cafes: [cafe],
+          ),
+          overrides: [
+            profilesServiceProvider.overrideWithValue(
+              _FakeProfilesService([admin, owner]),
+            ),
+            cafeQueryServiceProvider.overrideWithValue(
+              _FakeCafeQueryService(cafesById.values.toList()),
+            ),
+            cafeOwnerInviteServiceProvider.overrideWithValue(inviteService),
+          ],
+        );
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
+
+        final router = GoRouter(
+          initialLocation: '/cafe-edit/cafe-1',
+          routes: [
+            GoRoute(
+              path: '/cafe-edit/:id',
+              builder: (_, state) => CafeEditScreen(
+                cafeId: state.pathParameters['id']!,
+              ),
+            ),
+          ],
+        );
+
+        await tester.pumpWidget(
+          buildTestRouterApp(container: container, router: router),
+        );
+        await tester.pumpAndSettle();
+
+        await _scrollEditFormUntilFound(
+          tester,
+          find.byKey(const Key('admin-owner-email-input')),
+        );
+        await tester.enterText(
+          _textFieldIn(const Key('admin-owner-email-input')),
+          'owner@example.com',
+        );
+        await tester.ensureVisible(
+          find.byKey(const Key('admin-owner-invite-button')),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const Key('admin-owner-invite-button')));
+        await tester.pumpAndSettle();
+
+        expect(inviteService.lastCafeId, 'cafe-1');
+        expect(inviteService.lastEmail, 'owner@example.com');
+        expect(
+          find.text('Cafe assignment failed: owner_user_id is missing.'),
+          findsOneWidget,
+        );
+        expect(cafesById['cafe-1']?.ownerUserId, isNull);
       },
     );
 

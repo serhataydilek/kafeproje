@@ -205,7 +205,7 @@ class Cafe {
     this.featuredLabel,
     this.googlePlaceData,
   })  : images = List<String>.unmodifiable(
-          normalizeCafeImageUrls(images),
+          normalizeCafeImageUrlsByPriority(images),
         ),
         priceLevel = priceLevel is PriceLevel
             ? priceLevel

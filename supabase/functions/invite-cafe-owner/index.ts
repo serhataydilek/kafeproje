@@ -26,6 +26,19 @@ function jsonResponse(body: unknown, status = 200) {
   });
 }
 
+function inviteErrorResponse(
+  stage: string,
+  code: string,
+  message: string,
+  status = 500,
+) {
+  return jsonResponse({
+    error: message,
+    code,
+    stage,
+  }, status);
+}
+
 function cleanText(value: unknown): string | null {
   if (typeof value !== "string") return null;
   const trimmed = value.trim();
@@ -98,13 +111,23 @@ serve(async (req) => {
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!supabaseUrl || !anonKey || !serviceRoleKey) {
-    return jsonResponse({ error: "Supabase function is not configured" }, 500);
+    return inviteErrorResponse(
+      "configuration",
+      "function_not_configured",
+      "Cafe owner invite service is not configured.",
+      500,
+    );
   }
 
   const authHeader = req.headers.get("Authorization") ?? "";
   const token = authHeader.replace(/^Bearer\s+/i, "").trim();
   if (!token) {
-    return jsonResponse({ error: "Authentication required" }, 401);
+    return inviteErrorResponse(
+      "authentication",
+      "missing_session",
+      "Authentication is required to invite cafe owners.",
+      401,
+    );
   }
 
   const userClient = createClient(supabaseUrl, anonKey, {
@@ -119,7 +142,12 @@ serve(async (req) => {
     token,
   );
   if (authError || !authData.user) {
-    return jsonResponse({ error: "Invalid session" }, 401);
+    return inviteErrorResponse(
+      "authentication",
+      "invalid_session",
+      "Your admin session is no longer valid. Sign in again.",
+      401,
+    );
   }
 
   let { data: callerProfile, error: callerError } = await adminClient
@@ -139,14 +167,24 @@ serve(async (req) => {
   const callerIsAdmin = callerProfile?.is_admin === true ||
     String(callerProfile?.role ?? "").toLowerCase() === "admin";
   if (callerError || !callerIsAdmin) {
-    return jsonResponse({ error: "Admin privileges are required" }, 403);
+    return inviteErrorResponse(
+      "authorization",
+      "admin_required",
+      "Admin privileges are required to invite cafe owners.",
+      403,
+    );
   }
 
   let body: InviteBody;
   try {
     body = await req.json();
   } catch (_) {
-    return jsonResponse({ error: "Invalid JSON body" }, 400);
+    return inviteErrorResponse(
+      "validation",
+      "invalid_json",
+      "Invalid owner invite request.",
+      400,
+    );
   }
 
   const cafeId = cleanText(body.cafe_id);
@@ -161,7 +199,12 @@ serve(async (req) => {
     ? nameFromParts
     : email);
   if (!cafeId || !email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-    return jsonResponse({ error: "Cafe id and valid email are required" }, 400);
+    return inviteErrorResponse(
+      "validation",
+      "invalid_request",
+      "Cafe id and a valid owner email are required.",
+      400,
+    );
   }
 
   const { data: cafe, error: cafeError } = await adminClient
@@ -170,10 +213,20 @@ serve(async (req) => {
     .eq("id", cafeId)
     .maybeSingle();
   if (cafeError) {
-    return jsonResponse({ error: cafeError.message }, 500);
+    return inviteErrorResponse(
+      "load_cafe",
+      "cafe_lookup_failed",
+      cafeError.message,
+      500,
+    );
   }
   if (!cafe) {
-    return jsonResponse({ error: "Cafe not found" }, 404);
+    return inviteErrorResponse(
+      "load_cafe",
+      "cafe_not_found",
+      "Cafe not found.",
+      404,
+    );
   }
 
   const profileColumns =
@@ -201,7 +254,12 @@ serve(async (req) => {
     profileError = fallback.error;
   }
   if (profileError) {
-    return jsonResponse({ error: profileError.message }, 500);
+    return inviteErrorResponse(
+      "load_profile",
+      "profile_lookup_failed",
+      profileError.message,
+      500,
+    );
   }
 
   let invited = false;
@@ -221,21 +279,27 @@ serve(async (req) => {
     if (inviteError && isAlreadyRegisteredError(inviteError)) {
       const lookup = await findAuthUserByEmail(adminClient, email);
       if (lookup.error) {
-        return jsonResponse({ error: lookup.error.message }, 500);
+        return inviteErrorResponse(
+          "lookup_auth_user",
+          "auth_user_lookup_failed",
+          lookup.error.message,
+          500,
+        );
       }
       invitedUser = lookup.user;
     } else if (inviteError || !inviteData.user) {
-      return jsonResponse(
-        { error: inviteError?.message ?? "Invite failed" },
+      return inviteErrorResponse(
+        "send_invite",
+        "invite_failed",
+        inviteError?.message ?? "Owner invite failed.",
         500,
       );
     }
     if (!invitedUser) {
-      return jsonResponse(
-        {
-          error:
-            "An auth user already exists for this email, but no matching profile could be created.",
-        },
+      return inviteErrorResponse(
+        "lookup_auth_user",
+        "auth_user_missing_profile",
+        "An auth user already exists for this email, but no matching profile could be created.",
         409,
       );
     }
@@ -258,7 +322,12 @@ serve(async (req) => {
       .select(activeProfileColumns)
       .single();
     if (upsertError) {
-      return jsonResponse({ error: upsertError.message }, 500);
+      return inviteErrorResponse(
+        "upsert_profile",
+        "profile_upsert_failed",
+        upsertError.message,
+        500,
+      );
     }
     profile = upserted;
   } else {
@@ -280,7 +349,12 @@ serve(async (req) => {
       .select(activeProfileColumns)
       .single();
     if (updateError) {
-      return jsonResponse({ error: updateError.message }, 500);
+      return inviteErrorResponse(
+        "update_profile",
+        "profile_update_failed",
+        updateError.message,
+        500,
+      );
     }
     profile = updatedProfile;
   }
@@ -311,7 +385,12 @@ serve(async (req) => {
     assignError = fallback.error;
   }
   if (assignError) {
-    return jsonResponse({ error: assignError.message }, 500);
+    return inviteErrorResponse(
+      "assign_cafe",
+      "cafe_assignment_failed",
+      assignError.message,
+      500,
+    );
   }
 
   return jsonResponse({
