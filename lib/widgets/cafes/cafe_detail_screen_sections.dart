@@ -220,13 +220,16 @@ class CafeDetailPhotoSection extends ConsumerWidget {
     final l10n = context.l10n;
     final layout =
         AdaptiveLayoutData.fromWidth(MediaQuery.sizeOf(context).width);
-    final firstUrl =
-        cafe.photoUrls.isNotEmpty ? redactUrlForLog(cafe.photoUrls.first) : '';
-    AppLogger.debug(
-      '[CAFE_DIAG_PHOTO_UI] surface=detail cafeId=${cafe.id} cafeName="${cafe.name}" listLength=${cafe.photoUrls.length} firstUrl=$firstUrl',
-      key: 'cafe-diag-photo-ui-detail-${cafe.id}',
-      throttle: Duration.zero,
-    );
+    if (kVerboseCafeDiagnostics) {
+      final firstUrl = cafe.photoUrls.isNotEmpty
+          ? redactUrlForLog(cafe.photoUrls.first)
+          : '';
+      AppLogger.debug(
+        '[CAFE_DIAG_PHOTO_UI] surface=detail cafeId=${cafe.id} cafeName="${cafe.name}" listLength=${cafe.photoUrls.length} firstUrl=$firstUrl',
+        key: 'cafe-diag-photo-ui-detail-${cafe.id}',
+        throttle: Duration.zero,
+      );
+    }
 
     return SliverAppBar(
       expandedHeight: layout.detailExpandedHeight(),
@@ -291,8 +294,12 @@ class CafeOwnershipClaimSection extends ConsumerWidget {
     final user = ref.watch(currentUserProvider);
     final isAdmin = ref.watch(isAdminProvider);
     final canManage = ref.watch(canManageCafeProvider(cafe));
-    final claim = ref.watch(cafeOwnerClaimForCafeProvider(cafe.id));
-    final claimsLoading = ref.watch(currentUserOwnerClaimsProvider).isLoading;
+    const ownerClaimsEnabled = bool.fromEnvironment('ENABLE_OWNER_CLAIMS');
+    final claim = ownerClaimsEnabled
+        ? ref.watch(cafeOwnerClaimForCafeProvider(cafe.id))
+        : null;
+    final claimsLoading = ownerClaimsEnabled &&
+        ref.watch(currentUserOwnerClaimsProvider).isLoading;
 
     final title = _trEn(
       context,
@@ -325,6 +332,19 @@ class CafeOwnershipClaimSection extends ConsumerWidget {
         onPressed: () => context.push('/cafe-edit/${cafe.id}'),
         icon: const Icon(Icons.storefront_rounded),
         label: Text(_trEn(context, 'Kafeyi yonet', 'Manage cafe')),
+      );
+    } else if (!ownerClaimsEnabled) {
+      body = _trEn(
+        context,
+        'Kafe yonetimi sadece yonetici tarafindan atanmis cafe_owner hesaplarina aciktir.',
+        'Cafe management is available only to cafe_owner accounts assigned by an admin.',
+      );
+      action = OutlinedButton.icon(
+        key: ValueKey('cafe-owner-claim-disabled-${cafe.id}'),
+        onPressed: null,
+        icon: const Icon(Icons.lock_outline_rounded),
+        label: Text(_trEn(
+            context, 'Yonetici atamasi gerekli', 'Admin assignment required')),
       );
     } else if (claim?.isPending == true) {
       body = _trEn(
@@ -416,7 +436,9 @@ class CafeOwnershipClaimSection extends ConsumerWidget {
     }
 
     final businessCtrl = TextEditingController(text: cafe.name);
+    final emailCtrl = TextEditingController(text: user.email);
     final phoneCtrl = TextEditingController();
+    final evidenceCtrl = TextEditingController();
     final noteCtrl = TextEditingController();
     final result = await showDialog<bool>(
       context: context,
@@ -438,10 +460,26 @@ class CafeOwnershipClaimSection extends ConsumerWidget {
                 ),
               ),
               TextField(
+                key: const Key('owner-claim-email-input'),
+                controller: emailCtrl,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  labelText: _trEn(context, 'Is e-postasi', 'Business email'),
+                ),
+              ),
+              TextField(
                 key: const Key('owner-claim-phone-input'),
                 controller: phoneCtrl,
                 decoration: InputDecoration(
                   labelText: _trEn(context, 'Telefon', 'Phone'),
+                ),
+              ),
+              TextField(
+                key: const Key('owner-claim-evidence-input'),
+                controller: evidenceCtrl,
+                keyboardType: TextInputType.url,
+                decoration: InputDecoration(
+                  labelText: _trEn(context, 'Kanıt linki', 'Evidence URL'),
                 ),
               ),
               TextField(
@@ -471,7 +509,9 @@ class CafeOwnershipClaimSection extends ConsumerWidget {
 
     if (result != true || !context.mounted) {
       businessCtrl.dispose();
+      emailCtrl.dispose();
       phoneCtrl.dispose();
+      evidenceCtrl.dispose();
       noteCtrl.dispose();
       return;
     }
@@ -480,11 +520,15 @@ class CafeOwnershipClaimSection extends ConsumerWidget {
         await ref.read(cafeOwnerClaimControllerProvider.notifier).createClaim(
               cafeId: cafe.id,
               businessName: businessCtrl.text,
+              businessEmail: emailCtrl.text,
+              evidenceUrl: evidenceCtrl.text,
               phone: phoneCtrl.text,
               note: noteCtrl.text,
             );
     businessCtrl.dispose();
+    emailCtrl.dispose();
     phoneCtrl.dispose();
+    evidenceCtrl.dispose();
     noteCtrl.dispose();
 
     if (!context.mounted) {

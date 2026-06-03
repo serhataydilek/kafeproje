@@ -26,6 +26,20 @@ void main() {
     });
   });
 
+  group('Android release config', () {
+    test('requires a Places API key for release image loading', () {
+      final gradle = File('android/app/build.gradle.kts').readAsStringSync();
+
+      expect(gradle, contains('GOOGLE_PLACES_API_KEY'));
+      expect(
+        gradle,
+        contains(
+          'GOOGLE_PLACES_API_KEY is required for release builds so cafe photos can load.',
+        ),
+      );
+    });
+  });
+
   group('Env.collectGoogleApiConfigurationWarnings', () {
     test('warns when maps key looks malformed', () {
       final warnings = Env.collectGoogleApiConfigurationWarnings(

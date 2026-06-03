@@ -205,7 +205,7 @@ class Cafe {
     this.featuredLabel,
     this.googlePlaceData,
   })  : images = List<String>.unmodifiable(
-          normalizeCafeImageUrls(images),
+          normalizeCafeImageUrlsByPriority(images),
         ),
         priceLevel = priceLevel is PriceLevel
             ? priceLevel
@@ -445,6 +445,7 @@ class Cafe {
         _asNullableBool(place['open_now']);
     final images = _extractGooglePhotoUrls(
       place['photos'],
+      placeId: id,
       maxImageCount: maxImageCount,
     );
     _logModelPhotoNormalization(
@@ -957,6 +958,26 @@ class CafeAdminUpdateInput {
     this.featuredLabel,
   });
 
+  static const Set<String> ownerEditableColumns = <String>{
+    'name',
+    'category',
+    'district',
+    'neighborhood',
+    'address',
+    'description',
+    'price_level',
+    'tags',
+    'wifi_quality',
+    'outlet_availability',
+    'quietness_level',
+    'study_friendly',
+    'pet_friendly',
+    'outdoor_seating',
+    'smoking_policy',
+    'opening_hours',
+    'menu_highlights',
+  };
+
   final String? name;
   final String? category;
   final String? district;
@@ -1227,6 +1248,9 @@ List<String> _extractPhotoUrls(Map<String, dynamic> row) {
     for (final nested in nestedCollections) {
       addFromRawValue(nested);
     }
+    for (final value in map.values) {
+      addFromRawValue(value);
+    }
   }
 
   addFromRawValue = (Object? raw) {
@@ -1290,6 +1314,7 @@ String? _normalizeRemoteImageUrl(String? value) => resolveCafeImageUrl(value);
 
 List<String> _extractGooglePhotoUrls(
   Object? rawPhotos, {
+  required String placeId,
   required int maxImageCount,
 }) {
   if (maxImageCount <= 0) {
@@ -1298,7 +1323,7 @@ List<String> _extractGooglePhotoUrls(
 
   final urls = _extractPhotoUrls(
     <String, dynamic>{
-      'photos': rawPhotos,
+      'photos': _withGooglePlacePhotoContext(rawPhotos, placeId),
     },
   );
   if (urls.length <= maxImageCount) {
@@ -1308,6 +1333,34 @@ List<String> _extractGooglePhotoUrls(
   return List<String>.unmodifiable(
     urls.take(maxImageCount.clamp(0, 8)),
   );
+}
+
+Object? _withGooglePlacePhotoContext(Object? raw, String placeId) {
+  final normalizedPlaceId = placeId.trim();
+  if (normalizedPlaceId.isEmpty) {
+    return raw;
+  }
+  if (raw is String) {
+    final trimmed = raw.trim();
+    if (trimmed.startsWith('photos/')) {
+      return 'places/$normalizedPlaceId/$trimmed';
+    }
+    return raw;
+  }
+  if (raw is List) {
+    return raw
+        .map((value) => _withGooglePlacePhotoContext(value, normalizedPlaceId))
+        .toList(growable: false);
+  }
+  if (raw is Map) {
+    return raw.map((key, value) {
+      return MapEntry(
+        key,
+        _withGooglePlacePhotoContext(value, normalizedPlaceId),
+      );
+    });
+  }
+  return raw;
 }
 
 String? _firstNonEmptyString(Map<dynamic, dynamic> map, List<String> keys) {
@@ -1387,7 +1440,7 @@ void _logModelPhotoNormalization({
   _photoModelLoggedKeys.add(sampleKey);
   _photoModelSampleCounts[source] = currentCount + 1;
   AppLogger.debug(
-    '[CAFE_DIAG_PHOTO_MODEL] source=$source id=$cafeId name="$cafeName" presentFieldCount=${presentFields.length}/${presence.length} presentFields=$presentFields storedPhotoUrls=${breakdown.storedPhotoUrls.length} generatedPhotoUrls=${breakdown.generatedPhotoUrls.length} resolvedDisplayUrls=${normalizedPhotoUrls.length} hasFirstPhoto=${normalizedPhotoUrls.isNotEmpty}',
+    '[CAFE_DIAG_PHOTO_MODEL] source=$source id=$cafeId name="$cafeName" presentFieldCount=${presentFields.length}/${presence.length} presentFields=$presentFields storedPhotoUrls=${breakdown.storedPhotoUrls.length} generatedPhotoUrls=${breakdown.generatedPhotoUrls.length} normalizedCount=${normalizedPhotoUrls.length} resolvedDisplayUrls=${normalizedPhotoUrls.length} hasFirstPhoto=${normalizedPhotoUrls.isNotEmpty}',
     key: 'cafe-diag-photo-model-$source',
     throttle: const Duration(seconds: 1),
   );

@@ -36,6 +36,9 @@ class _CafeEditScreenState extends ConsumerState<CafeEditScreen>
   late final _descriptionCtrl = useTextController();
   late final _tagsCtrl = useTextController();
   late final _photosCtrl = useTextController();
+  late final _ownerEmailCtrl = useTextController();
+  late final _ownerFirstNameCtrl = useTextController();
+  late final _ownerLastNameCtrl = useTextController();
   late final _featuredPriorityCtrl = useTextController(text: '0');
   late final _featuredUntilCtrl = useTextController();
   late final _featuredLabelCtrl = useTextController();
@@ -55,6 +58,7 @@ class _CafeEditScreenState extends ConsumerState<CafeEditScreen>
   bool _isLoading = true;
   bool _navigatedAfterDelete = false;
   bool _shouldLogPostDeleteVerify = false;
+  Cafe? _editingCafe;
   bool _showValidation = false;
   String? _nameError;
   String? _neighborhoodError;
@@ -63,6 +67,7 @@ class _CafeEditScreenState extends ConsumerState<CafeEditScreen>
   String? _photosError;
   String? _featuredPriorityError;
   String? _featuredUntilError;
+  UserProfile? _ownerOverride;
 
   Cafe _buildEditableFallbackCafe() {
     return Cafe.empty(id: widget.cafeId).copyWith(
@@ -162,6 +167,7 @@ class _CafeEditScreenState extends ConsumerState<CafeEditScreen>
   }
 
   void _applyCafe(Cafe cafe) {
+    _editingCafe = cafe;
     final districtOptions = ref.read(districtOptionsWithUnknownProvider);
     _nameCtrl.text = cafe.name;
     _neighborhoodCtrl.text = cafe.neighborhood;
@@ -383,6 +389,179 @@ class _CafeEditScreenState extends ConsumerState<CafeEditScreen>
     }
   }
 
+  Future<void> _inviteOwner() async {
+    final email = _ownerEmailCtrl.text.trim();
+    if (email.isEmpty || !email.contains('@')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(_trEn(
+            'Gecerli bir sahip e-postasi gir.',
+            'Enter a valid owner email.',
+          )),
+        ),
+      );
+      return;
+    }
+
+    if (isSubmitting) {
+      return;
+    }
+    setState(() {
+      isSubmitting = true;
+      formError = null;
+    });
+
+    try {
+      final result = await ref
+          .read(cafeOwnerInviteControllerProvider.notifier)
+          .inviteAndAssign(
+            cafeId: widget.cafeId,
+            email: email,
+            firstName: _ownerFirstNameCtrl.text,
+            lastName: _ownerLastNameCtrl.text,
+            fullName: [
+              _ownerFirstNameCtrl.text.trim(),
+              _ownerLastNameCtrl.text.trim(),
+            ].where((part) => part.isNotEmpty).join(' '),
+          );
+      if (!mounted) {
+        return;
+      }
+      if (result.ok && result.data != null) {
+        setState(() {
+          _ownerEmailCtrl.clear();
+          _ownerFirstNameCtrl.clear();
+          _ownerLastNameCtrl.clear();
+          _ownerOverride = result.data!.owner;
+          _applyCafe(result.data!.cafe);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result.data!.invited
+                ? _trEn(
+                    'Sahip daveti gonderildi ve kafe atandi.',
+                    'Owner invite sent and cafe assigned.',
+                  )
+                : _trEn(
+                    'Mevcut kullanici kafe sahibi olarak atandi.',
+                    'Existing user assigned as cafe owner.',
+                  )),
+          ),
+        );
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.message ??
+              _trEn('Sahip daveti basarisiz oldu.', 'Owner invite failed.')),
+        ),
+      );
+    } catch (error, stackTrace) {
+      AppLogger.error(
+        'Cafe owner invite action failed',
+        error: error,
+        stackTrace: stackTrace,
+        key: 'cafe-owner-invite-action-${widget.cafeId}',
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_trEn(
+              'Sahip daveti basarisiz oldu.',
+              'Owner invite failed.',
+            )),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => isSubmitting = false);
+      }
+    }
+  }
+
+  Future<void> _unassignOwner() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(_trEn('Sahibi kaldir', 'Unassign owner')),
+        content: Text(_trEn(
+          'Bu kafe icin atanmis sahip erisimini kaldirmak istiyor musun?',
+          'Remove the assigned owner access for this cafe?',
+        )),
+        actions: [
+          TextButton(
+            onPressed: () => ctx.pop(false),
+            child: Text(_trEn('Iptal', 'Cancel')),
+          ),
+          TextButton(
+            onPressed: () => ctx.pop(true),
+            child: Text(_trEn('Kaldir', 'Unassign')),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || isSubmitting) {
+      return;
+    }
+
+    setState(() {
+      isSubmitting = true;
+      formError = null;
+    });
+    try {
+      final result = await ref
+          .read(cafeOwnerInviteControllerProvider.notifier)
+          .unassignOwner(widget.cafeId);
+      if (!mounted) {
+        return;
+      }
+      if (result.ok && result.data != null) {
+        setState(() {
+          _ownerOverride = null;
+          _applyCafe(result.data!);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_trEn(
+              'Kafe sahibi atamasi kaldirildi.',
+              'Cafe owner assignment removed.',
+            )),
+          ),
+        );
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.message ??
+              _trEn('Sahip kaldirilamadi.', 'Owner unassign failed.')),
+        ),
+      );
+    } catch (error, stackTrace) {
+      AppLogger.error(
+        'Cafe owner unassign action failed',
+        error: error,
+        stackTrace: stackTrace,
+        key: 'cafe-owner-unassign-action-${widget.cafeId}',
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_trEn(
+              'Sahip kaldirilamadi.',
+              'Owner unassign failed.',
+            )),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => isSubmitting = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeModeProvider);
@@ -393,10 +572,14 @@ class _CafeEditScreenState extends ConsumerState<CafeEditScreen>
       MediaQuery.platformBrightnessOf(context),
     );
     final l10n = context.l10n;
-    final cafe = cafeAsync.valueOrNull;
+    final providerCafe = cafeAsync.valueOrNull;
+    final cafe = _editingCafe ?? providerCafe;
     final isAdmin = ref.watch(isAdminProvider);
     final canManageCafe =
         cafe == null ? false : ref.watch(canManageCafeProvider(cafe));
+    final adminUsers =
+        isAdmin ? ref.watch(adminUsersProvider).valueOrNull : null;
+    final assignedOwner = _assignedOwner(cafe, adminUsers);
     final isUnavailable =
         !cafeAsync.isLoading && (cafe == null || cafe.isDeleted);
     final isForbidden = !cafeAsync.isLoading && cafe != null && !canManageCafe;
@@ -626,6 +809,18 @@ class _CafeEditScreenState extends ConsumerState<CafeEditScreen>
                                 if (isAdmin)
                                   _sectionCard(
                                     colors,
+                                    _trEn('Kafe Sahibi', 'Cafe owner'),
+                                    [
+                                      _ownerAssignmentPanel(
+                                        colors,
+                                        cafe,
+                                        assignedOwner,
+                                      ),
+                                    ],
+                                  ),
+                                if (isAdmin)
+                                  _sectionCard(
+                                    colors,
                                     _trEn('Öne Çıkan Yerleşimi',
                                         'Featured placement'),
                                     [
@@ -758,6 +953,132 @@ class _CafeEditScreenState extends ConsumerState<CafeEditScreen>
           ],
         ),
       ),
+    );
+  }
+
+  UserProfile? _assignedOwner(Cafe? cafe, List<UserProfile>? users) {
+    final ownerId = cafe?.ownerUserId?.trim();
+    if (ownerId == null || ownerId.isEmpty) {
+      return null;
+    }
+    if (_ownerOverride?.id == ownerId) {
+      return _ownerOverride;
+    }
+    if (users == null) {
+      return null;
+    }
+    for (final user in users) {
+      if (user.id == ownerId) {
+        return user;
+      }
+    }
+    return null;
+  }
+
+  Widget _ownerAssignmentPanel(
+    AppColors colors,
+    Cafe? cafe,
+    UserProfile? owner,
+  ) {
+    final ownerId = cafe?.ownerUserId?.trim();
+    final hasOwner = ownerId != null && ownerId.isNotEmpty;
+    final ownerName = owner?.fullName.trim();
+    final ownerEmail = owner?.email.trim();
+    final ownerUsername = owner?.username?.trim();
+    final ownerLabel = owner == null
+        ? ownerId
+        : [
+            ownerName != null && ownerName.isNotEmpty ? ownerName : null,
+            ownerEmail != null && ownerEmail.isNotEmpty ? ownerEmail : null,
+            ownerUsername != null && ownerUsername.isNotEmpty
+                ? '@$ownerUsername'
+                : null,
+            owner.role.value,
+          ].whereType<String>().join('\n');
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(AppSpacing.sm),
+          decoration: BoxDecoration(
+            color: colors.chip,
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            border: Border.all(color: colors.border),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                _trEn('Atanmis sahip', 'Assigned owner'),
+                style: TextStyle(
+                  color: colors.text,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              SelectableText(
+                key: const Key('admin-owner-assigned-info'),
+                hasOwner
+                    ? ownerLabel ?? ownerId
+                    : _trEn('Henuz sahip atanmadi.', 'No owner assigned yet.'),
+                style: TextStyle(color: colors.mutedText, fontSize: 13),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        if (hasOwner) ...[
+          OutlinedButton.icon(
+            key: const Key('admin-owner-unassign-button'),
+            onPressed: isSubmitting ? null : _unassignOwner,
+            icon: const Icon(Icons.person_remove_outlined),
+            label: Text(_trEn('Sahibi kaldir', 'Unassign owner')),
+          ),
+          AppFormHelperText(
+            colors: colors,
+            text: _trEn(
+              'Yeni sahip atamak icin once mevcut sahibi kaldir.',
+              'Unassign the current owner before inviting a new one.',
+            ),
+          ),
+        ] else ...[
+          _input(
+            colors,
+            _ownerEmailCtrl,
+            _trEn('Sahip e-postasi', 'Owner email'),
+            key: const Key('admin-owner-email-input'),
+            keyboardType: TextInputType.emailAddress,
+          ),
+          _input(
+            colors,
+            _ownerFirstNameCtrl,
+            _trEn('Sahip adi', 'Owner first name'),
+            key: const Key('admin-owner-first-name-input'),
+          ),
+          _input(
+            colors,
+            _ownerLastNameCtrl,
+            _trEn('Sahip soyadi', 'Owner last name'),
+            key: const Key('admin-owner-last-name-input'),
+          ),
+          AppFormHelperText(
+            colors: colors,
+            text: _trEn(
+              'Yeni e-postaya Supabase daveti gonderilir. Mevcut kullanici otomatik cafe_owner yapilip bu kafeye atanir.',
+              'New emails receive a Supabase invite. Existing users are promoted to cafe_owner and assigned to this cafe.',
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          FilledButton.icon(
+            key: const Key('admin-owner-invite-button'),
+            onPressed: isSubmitting ? null : _inviteOwner,
+            icon: const Icon(Icons.mail_outline),
+            label: Text(_trEn('Davet et ve ata', 'Invite and assign')),
+          ),
+        ],
+      ],
     );
   }
 

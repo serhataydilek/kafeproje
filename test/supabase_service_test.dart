@@ -31,6 +31,54 @@ final _tinyPngBytes = Uint8List.fromList(const <int>[
 ]);
 
 void main() {
+  group('CafeOwnerInviteService', () {
+    test('maps missing edge function responses to deployment guidance', () {
+      final message = cafeOwnerInviteFailureMessage(
+        const FunctionException(
+          status: 404,
+          details: {'message': 'Function not found'},
+          reasonPhrase: 'Not Found',
+        ),
+      );
+
+      expect(
+        message,
+        'Cafe owner invite function is not deployed. Deploy the Supabase Edge Function invite-cafe-owner and try again.',
+      );
+    });
+
+    test('adds structured function stage and code to backend errors', () {
+      final message = cafeOwnerInviteFailureMessage(
+        const FunctionException(
+          status: 500,
+          details: {
+            'error': 'Cafe assignment failed.',
+            'stage': 'assign_cafe',
+            'code': 'cafe_assignment_failed',
+          },
+        ),
+      );
+
+      expect(
+        message,
+        'Cafe assignment failed. (stage=assign_cafe, code=cafe_assignment_failed)',
+      );
+    });
+
+    test(
+        'returns plain function response details when no structured payload exists',
+        () {
+      final message = cafeOwnerInviteFailureMessage(
+        const FunctionException(
+          status: 500,
+          details: 'Unexpected function runtime error',
+        ),
+      );
+
+      expect(message, 'Unexpected function runtime error');
+    });
+  });
+
   group('log URL redaction', () {
     test('signed Supabase URL token is removed from summaries', () {
       final summary = log_sanitizer.summarizeUrlForLog(

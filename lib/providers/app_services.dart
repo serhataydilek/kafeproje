@@ -42,6 +42,14 @@ final cafeOwnerClaimsServiceProvider = Provider<CafeOwnerClaimsService?>((ref) {
   return CafeOwnerClaimsService(client);
 });
 
+final cafeOwnerInviteServiceProvider = Provider<CafeOwnerInviteService?>((ref) {
+  final client = ref.watch(supabaseClientProvider);
+  if (client == null) {
+    return null;
+  }
+  return CafeOwnerInviteService(client);
+});
+
 final securityReadinessServiceProvider =
     Provider<SecurityReadinessService?>((ref) {
   final client = ref.watch(supabaseClientProvider);
@@ -236,9 +244,127 @@ final canManageCafeProvider =
   if (ref.watch(isAdminProvider)) {
     return true;
   }
+  if (user.role != ProfileRole.cafeOwner) {
+    return false;
+  }
   final ownerId = cafe.ownerUserId?.trim();
   return ownerId != null && ownerId.isNotEmpty && ownerId == user.id;
 });
+
+final cafeOwnerInviteControllerProvider = StateNotifierProvider.autoDispose<
+    CafeOwnerInviteController, async_result.AsyncResult<void>>((ref) {
+  return CafeOwnerInviteController(ref);
+});
+
+class CafeOwnerInviteController
+    extends StateNotifier<async_result.AsyncResult<void>> {
+  CafeOwnerInviteController(this._ref)
+      : super(const async_result.AsyncData(null));
+
+  final Ref _ref;
+
+  Future<ServiceResult<CafeOwnerInviteResult>> inviteAndAssign({
+    required String cafeId,
+    required String email,
+    String? firstName,
+    String? lastName,
+    String? fullName,
+  }) async {
+    if (!_ref.read(isAdminProvider)) {
+      return ServiceResult.failure(
+        message: 'Admin privileges are required to invite cafe owners.',
+        errorCode: AppErrorCode.permissionDenied,
+        errorType: ServiceErrorType.auth,
+      );
+    }
+
+    final service = _ref.read(cafeOwnerInviteServiceProvider);
+    if (service == null) {
+      return ServiceResult.failure(
+        message: 'Cafe owner invite service is unavailable.',
+        errorCode: AppErrorCode.serviceUnavailable,
+        errorType: ServiceErrorType.unavailable,
+      );
+    }
+
+    state = const async_result.AsyncLoading();
+    final result = await service.inviteAndAssign(
+      cafeId: cafeId,
+      email: email,
+      firstName: firstName,
+      lastName: lastName,
+      fullName: fullName,
+    );
+    if (!mounted) {
+      return result;
+    }
+    state = result.ok
+        ? const async_result.AsyncData(null)
+        : async_result.AsyncError<void>(
+            result.errorCode ?? AppErrorCode.validationFailed,
+            debugMessage: result.message,
+            originalError: result.error,
+          );
+    if (result.ok && result.data != null) {
+      _ref.read(cafeProvider.notifier).upsertCafe(result.data!.cafe);
+      try {
+        _ref.invalidate(adminCafeDetailsProvider(cafeId));
+        _ref.invalidate(adminUsersProvider);
+        await _ref.read(adminCafeListControllerProvider.notifier).refresh();
+        await _ref.read(cafeRepositoryProvider).clearCache();
+      } catch (error, stackTrace) {
+        AppLogger.error(
+          'Cafe owner invite succeeded but follow-up refresh failed',
+          error: error,
+          stackTrace: stackTrace,
+          key: 'cafe-owner-invite-refresh-$cafeId',
+        );
+      }
+    }
+    return result;
+  }
+
+  Future<ServiceResult<Cafe>> unassignOwner(String cafeId) async {
+    if (!_ref.read(isAdminProvider)) {
+      return ServiceResult.failure(
+        message: 'Admin privileges are required to unassign cafe owners.',
+        errorCode: AppErrorCode.permissionDenied,
+        errorType: ServiceErrorType.auth,
+      );
+    }
+
+    final mutation = _ref.read(cafeAdminMutationControllerProvider.notifier);
+    state = const async_result.AsyncLoading();
+    final result = await mutation.updateCafe(
+      cafeId,
+      const CafeAdminUpdateInput(ownerUserId: ''),
+    );
+    if (!mounted) {
+      return result;
+    }
+    state = result.ok
+        ? const async_result.AsyncData(null)
+        : async_result.AsyncError<void>(
+            result.errorCode ?? AppErrorCode.cafeUpdateFailed,
+            debugMessage: result.message,
+            originalError: result.error,
+          );
+    if (result.ok) {
+      try {
+        _ref.invalidate(adminCafeDetailsProvider(cafeId));
+        await _ref.read(cafeRepositoryProvider).clearCache();
+      } catch (error, stackTrace) {
+        AppLogger.error(
+          'Cafe owner unassign succeeded but follow-up refresh failed',
+          error: error,
+          stackTrace: stackTrace,
+          key: 'cafe-owner-unassign-refresh-$cafeId',
+        );
+      }
+    }
+    return result;
+  }
+}
 
 final cafeOwnerClaimControllerProvider = StateNotifierProvider.autoDispose<
     CafeOwnerClaimController, async_result.AsyncResult<void>>((ref) {
@@ -255,6 +381,8 @@ class CafeOwnerClaimController
   Future<ServiceResult<CafeOwnerClaim>> createClaim({
     required String cafeId,
     required String businessName,
+    String? businessEmail,
+    String? evidenceUrl,
     String? phone,
     String? note,
   }) async {
@@ -288,6 +416,8 @@ class CafeOwnerClaimController
       userId: user.id,
       cafeId: cafeId,
       businessName: businessName,
+      businessEmail: businessEmail,
+      evidenceUrl: evidenceUrl,
       phone: phone,
       note: note,
     );
@@ -350,6 +480,9 @@ class CafeOwnerClaimAdminController
     final result = approve
         ? await service.approveClaim(claimId: claimId, reviewedBy: user.id)
         : await service.rejectClaim(claimId: claimId, reviewedBy: user.id);
+    if (!mounted) {
+      return result;
+    }
     state = result.ok
         ? const async_result.AsyncData(null)
         : async_result.AsyncError<void>(
@@ -358,11 +491,20 @@ class CafeOwnerClaimAdminController
             originalError: result.error,
           );
     if (result.ok) {
-      _ref.invalidate(pendingCafeOwnerClaimsProvider);
-      _ref.invalidate(currentUserOwnerClaimsProvider);
-      _ref.invalidate(adminCafeListControllerProvider);
-      await _ref.read(adminCafeListControllerProvider.notifier).refresh();
-      await _ref.read(cafeRepositoryProvider).clearCache();
+      try {
+        _ref.invalidate(pendingCafeOwnerClaimsProvider);
+        _ref.invalidate(currentUserOwnerClaimsProvider);
+        _ref.invalidate(adminCafeListControllerProvider);
+        await _ref.read(adminCafeListControllerProvider.notifier).refresh();
+        await _ref.read(cafeRepositoryProvider).clearCache();
+      } catch (error, stackTrace) {
+        AppLogger.error(
+          'Cafe owner claim review succeeded but follow-up refresh failed',
+          error: error,
+          stackTrace: stackTrace,
+          key: 'cafe-owner-claim-review-refresh-$claimId',
+        );
+      }
     }
     return result;
   }
@@ -1469,6 +1611,14 @@ class CafeAdminMutationController
       return ServiceResult.success(data: true);
     }
 
+    if (user.role != ProfileRole.cafeOwner) {
+      return ServiceResult.failure(
+        message: 'Cafe owner role is required to manage this cafe.',
+        errorCode: AppErrorCode.permissionDenied,
+        errorType: ServiceErrorType.auth,
+      );
+    }
+
     final cafe = await _ref.read(adminCafeDetailsProvider(cafeId).future) ??
         _ref.read(cafeByIdProvider(cafeId));
     final ownerId = cafe?.ownerUserId?.trim();
@@ -1683,12 +1833,12 @@ class CafeAdminMutationController
             outdoorSeating: input.outdoorSeating,
             smokingPolicy: input.smokingPolicy,
             openingHours: input.openingHours,
-            images: input.images,
-            clearImages: input.clearImages,
             menuHighlights: input.menuHighlights,
           );
 
-    final result = await service.updateCafe(cafeId, effectiveInput);
+    final result = isAdminUpdate
+        ? await service.updateCafeByAdmin(cafeId, effectiveInput)
+        : await service.updateCafeByOwner(cafeId, effectiveInput);
 
     if (!mounted) {
       return result;
@@ -1719,7 +1869,7 @@ class CafeAdminMutationController
       _ref.invalidate(adminCafeDetailsProvider(cafeId));
       _ref.read(cafeProvider.notifier).upsertCafe(
             updatedCafe,
-            preserveExistingMedia: !input.clearImages,
+            preserveExistingMedia: !effectiveInput.clearImages,
           );
       await _refreshCanonicalCafeStateAfterMutation(
         refreshCafes: featuredVisibilityChanged,

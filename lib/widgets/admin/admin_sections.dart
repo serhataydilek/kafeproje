@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../l10n/l10n.dart';
+import '../../models/async_result.dart' as async_result;
 import '../../models/index.dart';
 import '../../providers/app_provider.dart';
 import '../../theme/app_theme.dart';
@@ -427,6 +428,24 @@ class AdminOwnerClaimsSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    const claimsEnabled = bool.fromEnvironment('ENABLE_OWNER_CLAIMS');
+    if (!claimsEnabled) {
+      return EmptyStateView(
+        colors: colors,
+        icon: Icons.assignment_ind_rounded,
+        title: _trEn(
+          context,
+          'Sahiplik talepleri kapali',
+          'Ownership claims are disabled',
+        ),
+        message: _trEn(
+          context,
+          'Kafe sahiplerini Saved Cafes > Edit ekranindaki Kafe Sahibi bolumunden e-posta ile davet edip atayin.',
+          'Invite and assign cafe owners by email from Saved Cafes > Edit > Cafe owner.',
+        ),
+      );
+    }
+
     final claimsAsync = ref.watch(pendingCafeOwnerClaimsProvider);
     if (claimsAsync.isLoading) {
       return LoadingStateView(colors: colors);
@@ -464,6 +483,8 @@ class AdminOwnerClaimsSection extends ConsumerWidget {
       );
     }
 
+    final reviewState = ref.watch(cafeOwnerClaimAdminControllerProvider);
+    final isReviewingClaim = reviewState is async_result.AsyncLoading<void>;
     final claims = claimsAsync.valueOrNull ?? const <CafeOwnerClaim>[];
     if (claims.isEmpty) {
       return EmptyStateView(
@@ -509,8 +530,25 @@ class AdminOwnerClaimsSection extends ConsumerWidget {
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
-                '${claim.businessName} - ${claim.phone ?? claim.userId}',
+                'Cafe: ${cafe?.name ?? claim.cafeId} (${claim.cafeId})',
+                style: TextStyle(color: colors.mutedText, fontSize: 12),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                <String?>[
+                  claim.businessName,
+                  claim.businessEmail,
+                  claim.businessPhone ?? claim.phone,
+                  claim.userId,
+                ]
+                    .whereType<String>()
+                    .where((item) => item.isNotEmpty)
+                    .join(' - '),
                 style: TextStyle(color: colors.mutedText),
+              ),
+              Text(
+                claim.createdAt.toLocal().toString(),
+                style: TextStyle(color: colors.mutedText, fontSize: 12),
               ),
               if (claim.note?.isNotEmpty == true) ...[
                 const SizedBox(height: AppSpacing.xs),
@@ -519,19 +557,30 @@ class AdminOwnerClaimsSection extends ConsumerWidget {
                   style: TextStyle(color: colors.text),
                 ),
               ],
+              if (claim.evidenceUrl?.isNotEmpty == true) ...[
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  claim.evidenceUrl!,
+                  style: TextStyle(color: colors.text),
+                ),
+              ],
               const SizedBox(height: AppSpacing.sm),
               Row(
                 children: [
                   FilledButton.icon(
                     key: ValueKey('admin-owner-claim-approve-${claim.id}'),
-                    onPressed: () => _review(context, ref, claim, true),
+                    onPressed: isReviewingClaim
+                        ? null
+                        : () => _review(context, ref, claim, true),
                     icon: const Icon(Icons.check_rounded),
                     label: Text(_trEn(context, 'Onayla', 'Approve')),
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   OutlinedButton.icon(
                     key: ValueKey('admin-owner-claim-reject-${claim.id}'),
-                    onPressed: () => _review(context, ref, claim, false),
+                    onPressed: isReviewingClaim
+                        ? null
+                        : () => _review(context, ref, claim, false),
                     icon: const Icon(Icons.close_rounded),
                     label: Text(_trEn(context, 'Reddet', 'Reject')),
                   ),
@@ -660,7 +709,7 @@ class _AdminUserDirectorySectionState extends State<AdminUserDirectorySection> {
                         crossAxisCount: 2,
                         crossAxisSpacing: AppSpacing.sm,
                         mainAxisSpacing: AppSpacing.sm,
-                        mainAxisExtent: 112,
+                        mainAxisExtent: 150,
                       ),
                       itemBuilder: (_, index) {
                         return AdminMetadataSection(
@@ -866,6 +915,11 @@ class AdminMetadataSection extends StatelessWidget {
           Text(
             user.email,
             style: TextStyle(color: colors.mutedText),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          SelectableText(
+            'ID: ${user.id}',
+            style: TextStyle(color: colors.mutedText, fontSize: 12),
           ),
         ],
       ),
@@ -1586,6 +1640,12 @@ class AdminPhotoManagementSection extends ConsumerWidget {
                 Text(
                   '${districtLabel(l10n, cafe.district)} / ${cafe.neighborhood}',
                   style: TextStyle(color: colors.mutedText),
+                ),
+                Text(
+                  cafe.ownerUserId?.trim().isNotEmpty == true
+                      ? 'Owner: ${cafe.ownerUserId!.trim()}'
+                      : 'Owner: Unassigned',
+                  style: TextStyle(color: colors.mutedText, fontSize: 12),
                 ),
                 const SizedBox(height: 6),
                 Wrap(

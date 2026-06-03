@@ -54,13 +54,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get commonClosed => 'Kapalı';
 
   @override
-  String get commonUnknown => 'Bilinmiyor';
+  String get commonUnknown => 'Belirtilmemiş';
 
   @override
   String get cafeNoRatingsYet => 'Henuz puan yok';
 
   @override
-  String get commonNoData => 'Veri yok';
+  String get commonNoData => 'Belirtilmemiş';
 
   @override
   String get commonCategory => 'Kategori';
@@ -950,7 +950,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get cafeFormPrice => 'Fiyat';
 
   @override
-  String get cafeFormPriceUnknown => 'Bilinmiyor';
+  String get cafeFormPriceUnknown => 'Belirtilmemiş';
 
   @override
   String get cafeFormWifi => 'Wi‑Fi';

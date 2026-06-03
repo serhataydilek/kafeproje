@@ -45,6 +45,28 @@ Future<void> _scrollEditFormUntilFound(
   }
 }
 
+Future<void> _disposeTestContainer(dynamic container) async {
+  await Future<void>.delayed(Duration.zero);
+  await Future<void>.delayed(Duration.zero);
+  container.dispose();
+  await Future<void>.delayed(Duration.zero);
+}
+
+Future<void> _disposeWidgetTestContainer(
+  WidgetTester tester,
+  dynamic container,
+) async {
+  await tester.pumpWidget(const SizedBox.shrink());
+  await tester.pump();
+  await _disposeTestContainer(container);
+}
+
+Future<void> _closeTestSubscription(dynamic subscription) async {
+  await Future<void>.delayed(Duration.zero);
+  subscription.close();
+  await Future<void>.delayed(Duration.zero);
+}
+
 class _FakeProfilesService extends ProfilesService {
   _FakeProfilesService(this._profiles)
       : super(
@@ -231,9 +253,6 @@ class _FakeCafeQueryService extends CafeQueryService {
       if (status == 'deleted' && !cafe.isDeleted) {
         return false;
       }
-      if (status == 'all' && cafe.isDeleted) {
-        return false;
-      }
       return true;
     }).toList(growable: false);
 
@@ -359,6 +378,12 @@ class _FakeCafeCommandService extends CafeCommandService {
       outdoorSeating: input.outdoorSeating,
       smokingPolicy: input.smokingPolicy,
       openingHours: input.openingHours,
+      ownerUserId: input.ownerUserId == null
+          ? null
+          : () {
+              final normalized = input.ownerUserId!.trim();
+              return normalized.isEmpty ? null : normalized;
+            },
       isFeatured: input.isFeatured,
       featuredPriority: input.featuredPriority,
       featuredUntil: input.clearFeaturedUntil
@@ -374,6 +399,14 @@ class _FakeCafeCommandService extends CafeCommandService {
     );
     _cafesById[resolvedKey] = updated;
     return ServiceResult.success(data: updated);
+  }
+
+  @override
+  Future<ServiceResult<Cafe>> updateCafeByOwner(
+    String cafeId,
+    CafeAdminUpdateInput input,
+  ) {
+    return updateCafeByAdmin(cafeId, input);
   }
 
   @override
@@ -463,6 +496,59 @@ class _FakeCafeCommandService extends CafeCommandService {
   }
 }
 
+class _FakeCafeOwnerInviteService extends CafeOwnerInviteService {
+  _FakeCafeOwnerInviteService({
+    required this.cafesById,
+    required this.owner,
+    this.invited = true,
+    this.failureMessage,
+  }) : super(
+          SupabaseClient(
+            'https://example.com',
+            'anon-key',
+            authOptions: const AuthClientOptions(autoRefreshToken: false),
+          ),
+        );
+
+  final Map<String, Cafe> cafesById;
+  final UserProfile owner;
+  final bool invited;
+  final String? failureMessage;
+  String? lastCafeId;
+  String? lastEmail;
+
+  @override
+  Future<ServiceResult<CafeOwnerInviteResult>> inviteAndAssign({
+    required String cafeId,
+    required String email,
+    String? firstName,
+    String? lastName,
+    String? fullName,
+  }) async {
+    lastCafeId = cafeId;
+    lastEmail = email;
+    final failure = failureMessage;
+    if (failure != null) {
+      return ServiceResult.failure(
+        message: failure,
+        errorCode: AppErrorCode.validationFailed,
+        errorType: ServiceErrorType.validation,
+      );
+    }
+    final current =
+        cafesById[cafeId] ?? buildTestCafe(id: cafeId, name: cafeId);
+    final updated = current.copyWith(ownerUserId: () => owner.id);
+    cafesById[cafeId] = updated;
+    return ServiceResult.success(
+      data: CafeOwnerInviteResult(
+        owner: owner,
+        cafe: updated,
+        invited: invited,
+      ),
+    );
+  }
+}
+
 void main() {
   group('admin screen', () {
     testWidgets(
@@ -471,7 +557,7 @@ void main() {
         final container = createTestContainer(
           state: buildTestAppShellState(isAdmin: false),
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
 
         await tester.pumpWidget(
           buildTestApp(
@@ -515,7 +601,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
 
         await tester.pumpWidget(
           buildTestApp(
@@ -558,7 +644,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
 
         await tester.pumpWidget(
           buildTestApp(
@@ -609,7 +695,7 @@ void main() {
             cafeCommandServiceProvider.overrideWithValue(commandService),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
 
         await tester.pumpWidget(
           buildTestApp(
@@ -676,10 +762,8 @@ void main() {
                   Duration? requestTimeout,
                   RequestCancellationToken? cancellationToken,
                 }) async {
-                  final page = allCafes
-                      .skip(offset)
-                      .take(limit)
-                      .toList(growable: false);
+                  final page =
+                      allCafes.skip(offset).take(limit).toList(growable: false);
                   final hasMore = offset + page.length < allCafes.length;
                   return ServiceResult.success(
                     data: AdminCafePage(
@@ -694,7 +778,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeTestContainer(container));
 
         await tester.pumpWidget(
           buildTestApp(
@@ -706,10 +790,15 @@ void main() {
 
         expect(find.text('Admin Cafe 0'), findsOneWidget);
         expect(find.text('Admin Cafe 64'), findsNothing);
-        expect(find.text('Load more'), findsOneWidget);
-
-        await tester.tap(find.text('Load more'));
+        await container
+            .read(adminCafeListControllerProvider.notifier)
+            .loadMore();
         await tester.pumpAndSettle();
+        await tester.scrollUntilVisible(
+          find.text('Admin Cafe 64'),
+          300,
+          scrollable: find.byType(Scrollable).last,
+        );
 
         expect(find.text('Admin Cafe 64'), findsOneWidget);
       },
@@ -753,7 +842,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeTestContainer(container));
 
         await tester.pumpWidget(
           buildTestApp(
@@ -794,7 +883,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeTestContainer(container));
 
         final result = await container
             .read(cafeAdminMutationControllerProvider.notifier)
@@ -840,7 +929,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
 
         await tester.pumpWidget(
           buildTestApp(
@@ -891,7 +980,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
 
         await tester.pumpWidget(
           buildTestApp(
@@ -946,7 +1035,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
 
         await tester.pumpWidget(
           buildTestApp(
@@ -978,7 +1067,15 @@ void main() {
         expect(find.byKey(const Key('admin-cafe-edit-cafe-1')), findsOneWidget);
         expect(find.byKey(const Key('admin-supabase-managed-label')),
             findsOneWidget);
-        expect(find.text('Saved Cafes (1)'), findsOneWidget);
+        expect(
+          find.byWidgetPredicate(
+            (widget) =>
+                widget is Text &&
+                widget.key == const Key('admin-supabase-managed-label') &&
+                widget.data == 'Saved Cafes (1)',
+          ),
+          findsOneWidget,
+        );
       },
     );
 
@@ -1009,7 +1106,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
 
         final router = GoRouter(
           initialLocation: '/admin',
@@ -1066,7 +1163,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
 
         await tester.pumpWidget(
           buildTestApp(
@@ -1127,7 +1224,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
 
         final router = GoRouter(
           initialLocation: '/admin',
@@ -1148,6 +1245,10 @@ void main() {
         );
         await tester.pumpAndSettle();
 
+        await tester.ensureVisible(
+          find.byKey(const Key('admin-cafe-action-delete-cafe')),
+        );
+        await tester.pumpAndSettle();
         await tester
             .tap(find.byKey(const Key('admin-cafe-action-delete-cafe')));
         await tester.pump();
@@ -1192,7 +1293,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
 
         await tester.pumpWidget(
           buildTestApp(
@@ -1255,7 +1356,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
 
         final router = GoRouter(
           initialLocation: '/admin',
@@ -1315,6 +1416,10 @@ void main() {
         expect(find.byKey(const Key('admin-cafe-edit-cafe-1')), findsOneWidget);
         expect(find.byKey(const Key('admin-cafe-edit-cafe-2')), findsNothing);
 
+        await tester.ensureVisible(
+          find.byKey(const Key('admin-cafe-edit-cafe-1')),
+        );
+        await tester.pumpAndSettle();
         await tester.tap(find.byKey(const Key('admin-cafe-edit-cafe-1')));
         await tester.pumpAndSettle();
 
@@ -1380,7 +1485,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
 
         final router = GoRouter(
           initialLocation: '/admin',
@@ -1431,12 +1536,241 @@ void main() {
           find.byKey(const Key('admin-save-action')),
         );
 
+        await tester.ensureVisible(find.byKey(const Key('admin-save-action')));
+        await tester.pumpAndSettle();
         await tester.tap(find.byKey(const Key('admin-save-action')));
         await tester.pumpAndSettle();
 
         expect(updatedInput, isNotNull);
         expect(updatedInput?.description, '');
         expect(find.byType(AdminScreen), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'cafe edit invites and unassigns cafe owner without raw UUID entry',
+      (tester) async {
+        const admin = UserProfile(
+          id: 'admin-1',
+          username: 'admin',
+          firstName: 'Admin',
+          lastName: 'User',
+          fullName: 'Admin User',
+          email: 'admin@example.com',
+          role: ProfileRole.admin,
+          createdAt: '2024-01-01T00:00:00Z',
+        );
+        const owner = UserProfile(
+          id: 'owner-1',
+          username: 'owner',
+          firstName: 'Cafe',
+          lastName: 'Owner',
+          fullName: 'Cafe Owner',
+          email: 'owner@example.com',
+          role: ProfileRole.cafeOwner,
+          createdAt: '2024-01-01T00:00:00Z',
+        );
+        final cafe = buildTestCafe(id: 'cafe-1', name: 'Brew Lab');
+        final cafesById = {'cafe-1': cafe};
+        CafeAdminUpdateInput? updatedInput;
+        final inviteService = _FakeCafeOwnerInviteService(
+          cafesById: cafesById,
+          owner: owner,
+          invited: false,
+        );
+
+        final container = createTestContainer(
+          state: buildTestAppShellState(
+            isAdmin: true,
+            cafes: [cafe],
+          ),
+          overrides: [
+            profilesServiceProvider.overrideWithValue(
+              _FakeProfilesService([admin, owner]),
+            ),
+            cafeQueryServiceProvider.overrideWithValue(
+              _FakeCafeQueryService(cafesById.values.toList()),
+            ),
+            cafeCommandServiceProvider.overrideWithValue(
+              _FakeCafeCommandService(
+                cafesById,
+                (_, input) => updatedInput = input,
+              ),
+            ),
+            cafeOwnerInviteServiceProvider.overrideWithValue(inviteService),
+          ],
+        );
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
+
+        final router = GoRouter(
+          initialLocation: '/cafe-edit/cafe-1',
+          routes: [
+            GoRoute(
+              path: '/cafe-edit/:id',
+              builder: (_, state) => CafeEditScreen(
+                cafeId: state.pathParameters['id']!,
+              ),
+            ),
+          ],
+        );
+
+        await tester.pumpWidget(
+          buildTestRouterApp(container: container, router: router),
+        );
+        await tester.pumpAndSettle();
+
+        await _scrollEditFormUntilFound(
+          tester,
+          find.byKey(const Key('admin-owner-email-input')),
+        );
+        expect(
+            find.byKey(const Key('admin-owner-email-input')), findsOneWidget);
+        expect(
+            find.byKey(const Key('admin-owner-user-id-input')), findsNothing);
+
+        await tester.enterText(
+          _textFieldIn(const Key('admin-owner-email-input')),
+          'owner@example.com',
+        );
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(
+          find.byKey(const Key('admin-owner-invite-button')),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const Key('admin-owner-invite-button')));
+        await tester.pumpAndSettle();
+
+        expect(inviteService.lastCafeId, 'cafe-1');
+        expect(inviteService.lastEmail, 'owner@example.com');
+        expect(cafesById['cafe-1']?.ownerUserId, 'owner-1');
+        expect(
+          find.byKey(const Key('admin-owner-email-input')),
+          findsNothing,
+        );
+        expect(
+          find.byKey(const Key('admin-owner-first-name-input')),
+          findsNothing,
+        );
+        expect(
+          find.byKey(const Key('admin-owner-last-name-input')),
+          findsNothing,
+        );
+        await tester.ensureVisible(find.byKey(
+          const Key('admin-owner-unassign-button'),
+          skipOffstage: false,
+        ));
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(
+            const Key('admin-owner-unassign-button'),
+            skipOffstage: false,
+          ),
+          findsOneWidget,
+        );
+
+        await tester.tap(find.byKey(
+          const Key('admin-owner-unassign-button'),
+        ));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Unassign').last);
+        await tester.pumpAndSettle();
+
+        expect(updatedInput?.ownerUserId, '');
+        expect(find.textContaining('No owner assigned'), findsWidgets);
+        expect(
+          find.byKey(const Key('admin-owner-email-input')),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'cafe edit owner invite surfaces backend failure message',
+      (tester) async {
+        const admin = UserProfile(
+          id: 'admin-1',
+          username: 'admin',
+          firstName: 'Admin',
+          lastName: 'User',
+          fullName: 'Admin User',
+          email: 'admin@example.com',
+          role: ProfileRole.admin,
+          createdAt: '2024-01-01T00:00:00Z',
+        );
+        const owner = UserProfile(
+          id: 'owner-1',
+          username: 'owner',
+          firstName: 'Cafe',
+          lastName: 'Owner',
+          fullName: 'Cafe Owner',
+          email: 'owner@example.com',
+          role: ProfileRole.cafeOwner,
+          createdAt: '2024-01-01T00:00:00Z',
+        );
+        final cafe = buildTestCafe(id: 'cafe-1', name: 'Brew Lab');
+        final cafesById = {'cafe-1': cafe};
+        final inviteService = _FakeCafeOwnerInviteService(
+          cafesById: cafesById,
+          owner: owner,
+          failureMessage: 'Cafe assignment failed: owner_user_id is missing.',
+        );
+
+        final container = createTestContainer(
+          state: buildTestAppShellState(
+            isAdmin: true,
+            cafes: [cafe],
+          ),
+          overrides: [
+            profilesServiceProvider.overrideWithValue(
+              _FakeProfilesService([admin, owner]),
+            ),
+            cafeQueryServiceProvider.overrideWithValue(
+              _FakeCafeQueryService(cafesById.values.toList()),
+            ),
+            cafeOwnerInviteServiceProvider.overrideWithValue(inviteService),
+          ],
+        );
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
+
+        final router = GoRouter(
+          initialLocation: '/cafe-edit/cafe-1',
+          routes: [
+            GoRoute(
+              path: '/cafe-edit/:id',
+              builder: (_, state) => CafeEditScreen(
+                cafeId: state.pathParameters['id']!,
+              ),
+            ),
+          ],
+        );
+
+        await tester.pumpWidget(
+          buildTestRouterApp(container: container, router: router),
+        );
+        await tester.pumpAndSettle();
+
+        await _scrollEditFormUntilFound(
+          tester,
+          find.byKey(const Key('admin-owner-email-input')),
+        );
+        await tester.enterText(
+          _textFieldIn(const Key('admin-owner-email-input')),
+          'owner@example.com',
+        );
+        await tester.ensureVisible(
+          find.byKey(const Key('admin-owner-invite-button')),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const Key('admin-owner-invite-button')));
+        await tester.pumpAndSettle();
+
+        expect(inviteService.lastCafeId, 'cafe-1');
+        expect(inviteService.lastEmail, 'owner@example.com');
+        expect(
+          find.text('Cafe assignment failed: owner_user_id is missing.'),
+          findsOneWidget,
+        );
+        expect(cafesById['cafe-1']?.ownerUserId, isNull);
       },
     );
 
@@ -1490,7 +1824,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
 
         final router = GoRouter(
           initialLocation: '/admin',
@@ -1612,7 +1946,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
 
         final router = GoRouter(
           initialLocation: '/admin',
@@ -1755,7 +2089,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
 
         final router = GoRouter(
           initialLocation: '/admin',
@@ -1911,7 +2245,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
 
         final router = GoRouter(
           initialLocation: '/admin',
@@ -2031,7 +2365,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
 
         await tester.pumpWidget(
           buildTestApp(
@@ -2044,6 +2378,10 @@ void main() {
         await tester.tap(find.byKey(const Key('admin-tab-cafes')));
         await tester.pumpAndSettle();
 
+        await tester.ensureVisible(
+          find.byKey(const Key('admin-cafe-action-cafe-1')),
+        );
+        await tester.pumpAndSettle();
         await tester.tap(find.byKey(const Key('admin-cafe-action-cafe-1')));
         await tester.pumpAndSettle();
 
@@ -2095,7 +2433,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeTestContainer(container));
 
         final notifier =
             container.read(cafeAdminMutationControllerProvider.notifier);
@@ -2169,7 +2507,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
 
         await tester.pumpWidget(
           buildTestApp(
@@ -2182,6 +2520,10 @@ void main() {
         await tester.tap(find.byKey(const Key('admin-tab-cafes')));
         await tester.pumpAndSettle();
 
+        await tester.ensureVisible(
+          find.byKey(const Key('admin-cafe-action-cafe-1')),
+        );
+        await tester.pumpAndSettle();
         await tester.tap(find.byKey(const Key('admin-cafe-action-cafe-1')));
         await tester.pump();
 
@@ -2254,14 +2596,14 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeTestContainer(container));
 
         final controllerSub = container.listen<async_result.AsyncResult<void>>(
           cafeAdminMutationControllerProvider,
           (_, __) {},
           fireImmediately: true,
         );
-        addTearDown(controllerSub.close);
+        addTearDown(() => _closeTestSubscription(controllerSub));
 
         final notifier =
             container.read(cafeAdminMutationControllerProvider.notifier);
@@ -2314,7 +2656,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeTestContainer(container));
 
         final notifier =
             container.read(cafeAdminMutationControllerProvider.notifier);
@@ -2365,7 +2707,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeTestContainer(container));
 
         final notifier =
             container.read(cafeAdminMutationControllerProvider.notifier);
@@ -2437,7 +2779,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeTestContainer(container));
 
         final notifier =
             container.read(cafeAdminMutationControllerProvider.notifier);
@@ -2505,7 +2847,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeTestContainer(container));
 
         expect(
           container.read(homeSponsoredCafesProvider).map((cafe) => cafe.id),
@@ -2627,7 +2969,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeWidgetTestContainer(tester, container));
 
         await tester.pumpWidget(
           buildTestApp(
@@ -2645,6 +2987,10 @@ void main() {
           findsOneWidget,
         );
 
+        await tester.ensureVisible(
+          find.byKey(const Key('admin-cafe-action-place_short_123')),
+        );
+        await tester.pumpAndSettle();
         await tester
             .tap(find.byKey(const Key('admin-cafe-action-place_short_123')));
         await tester.pumpAndSettle();
@@ -2700,7 +3046,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeTestContainer(container));
 
         final notifier =
             container.read(cafeAdminMutationControllerProvider.notifier);
@@ -2755,7 +3101,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeTestContainer(container));
 
         final notifier =
             container.read(cafeAdminMutationControllerProvider.notifier);
@@ -2821,7 +3167,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeTestContainer(container));
 
         final notifier =
             container.read(cafeAdminMutationControllerProvider.notifier);
@@ -2843,6 +3189,64 @@ void main() {
         await container.read(cafeProvider.notifier).refreshCafes();
         final sponsored = container.read(homeSponsoredCafesProvider);
         expect(sponsored.map((cafe) => cafe.id), contains('cafe-1'));
+      },
+    );
+
+    test(
+      'controller update patches public detail state immediately',
+      () async {
+        final cafe = buildTestCafe(id: 'cafe-1', name: 'Brew Lab');
+        final cafes = [cafe];
+        final cafesById = {for (final item in cafes) item.id: item};
+        final commandService = _FakeCafeCommandService(
+          cafesById,
+          (_, __) {},
+        );
+
+        final container = createTestContainer(
+          state: buildTestAppShellState(
+            isAdmin: true,
+            isAdminRoleResolved: true,
+            cafes: cafes,
+            currentUser: testUser,
+          ),
+          overrides: [
+            cafeQueryServiceProvider.overrideWithValue(
+              _FakeCafeQueryService(cafes),
+            ),
+            cafeCommandServiceProvider.overrideWithValue(commandService),
+            securityReadinessProvider.overrideWith(
+              (ref) async => const SecurityReadinessReport(
+                isReady: true,
+                checkAvailable: true,
+                rlsEnabled: true,
+                hasAdminInsertPolicy: true,
+                hasAdminUpdatePolicy: true,
+                message: 'ok',
+              ),
+            ),
+          ],
+        );
+        addTearDown(() => _disposeTestContainer(container));
+
+        expect(container.read(cafeByIdProvider('cafe-1'))?.name, 'Brew Lab');
+
+        final notifier =
+            container.read(cafeAdminMutationControllerProvider.notifier);
+        final result = await notifier.updateCafe(
+          'cafe-1',
+          const CafeAdminUpdateInput(name: 'Brew Lab Updated'),
+        );
+
+        expect(result.ok, isTrue);
+        expect(
+          container.read(cafeByIdProvider('cafe-1'))?.name,
+          'Brew Lab Updated',
+        );
+        expect(
+          container.read(exploreCafeResultsProvider).map((cafe) => cafe.name),
+          contains('Brew Lab Updated'),
+        );
       },
     );
 
@@ -2880,7 +3284,7 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeTestContainer(container));
 
         final notifier =
             container.read(cafeAdminMutationControllerProvider.notifier);
@@ -2931,14 +3335,14 @@ void main() {
             ),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeTestContainer(container));
 
         final controllerSub = container.listen<async_result.AsyncResult<void>>(
           cafeAdminMutationControllerProvider,
           (_, __) {},
           fireImmediately: true,
         );
-        addTearDown(controllerSub.close);
+        addTearDown(() => _closeTestSubscription(controllerSub));
 
         final notifier =
             container.read(cafeAdminMutationControllerProvider.notifier);
@@ -2952,6 +3356,95 @@ void main() {
         expect(second.message, contains('already in progress'));
         expect(commandService.restoreCallCount, 1);
         expect(container.read(adminCafeMutationPendingIdsProvider), isEmpty);
+      },
+    );
+
+    test(
+      'controller restore replaces matching visible row without duplicates',
+      () async {
+        const placeId = 'ChIJRestoreSharedPlace';
+        final visibleGoogleCafe = buildTestCafe(
+          id: 'google-restore-row',
+          name: 'Restore Cafe',
+        ).copyWith(placeId: placeId);
+        final deletedAdminCafe = buildTestCafe(
+          id: 'db-restore-row',
+          name: 'Restore Cafe',
+        ).copyWith(
+          placeId: placeId,
+          isDeleted: true,
+        );
+        final cafesById = {deletedAdminCafe.id: deletedAdminCafe};
+        final commandService = _FakeCafeCommandService(
+          cafesById,
+          (_, __) {},
+        );
+
+        final container = createTestContainer(
+          state: buildTestAppShellState(
+            isAdmin: true,
+            isAdminRoleResolved: true,
+            cafes: [visibleGoogleCafe],
+            homeCafes: [visibleGoogleCafe],
+            currentLocation: visibleGoogleCafe.coordinates,
+            currentUser: testUser,
+          ),
+          overrides: [
+            cafeRepositoryProvider.overrideWithValue(
+              FakeCafeRepository(
+                onFetch: (_) async => CafeRepositoryResult(
+                  cafes: cafesById.values
+                      .where((cafe) => !cafe.isDeleted)
+                      .toList(growable: false),
+                  usedRemote: true,
+                ),
+                onFetchFeaturedCafes: () async => cafesById.values
+                    .where((cafe) => cafe.isActiveFeatured)
+                    .toList(growable: false),
+              ),
+            ),
+            cafeQueryServiceProvider.overrideWithValue(
+              _FakeCafeQueryService([deletedAdminCafe, visibleGoogleCafe]),
+            ),
+            cafeCommandServiceProvider.overrideWithValue(commandService),
+            securityReadinessProvider.overrideWith(
+              (ref) async => const SecurityReadinessReport(
+                isReady: true,
+                checkAvailable: true,
+                rlsEnabled: true,
+                hasAdminInsertPolicy: true,
+                hasAdminUpdatePolicy: true,
+                message: 'ok',
+              ),
+            ),
+          ],
+        );
+        addTearDown(() => _disposeTestContainer(container));
+
+        expect(
+          container.read(exploreCafeResultsProvider).map((cafe) => cafe.id),
+          ['google-restore-row'],
+        );
+
+        final notifier =
+            container.read(cafeAdminMutationControllerProvider.notifier);
+        final result = await notifier.restoreCafe('db-restore-row');
+
+        expect(result.ok, isTrue);
+        expect(commandService.restoreCallCount, 1);
+        expect(
+          container.read(exploreCafeResultsProvider).map((cafe) => cafe.id),
+          ['db-restore-row'],
+        );
+        expect(
+          container.read(mapCafeResultsProvider).map((cafe) => cafe.id),
+          ['db-restore-row'],
+        );
+        expect(
+          container.read(homeCafesProvider).map((cafe) => cafe.id),
+          ['db-restore-row'],
+        );
+        expect(container.read(cafeByIdProvider(placeId))?.id, 'db-restore-row');
       },
     );
 
@@ -2989,14 +3482,14 @@ void main() {
             cafeQueryServiceProvider.overrideWithValue(queryService),
           ],
         );
-        addTearDown(container.dispose);
+        addTearDown(() => _disposeTestContainer(container));
 
         final controllerSub = container.listen<AdminCafeListState>(
           adminCafeListControllerProvider,
           (_, __) {},
           fireImmediately: true,
         );
-        addTearDown(controllerSub.close);
+        addTearDown(() => _closeTestSubscription(controllerSub));
 
         final notifier =
             container.read(adminCafeListControllerProvider.notifier);
@@ -3005,10 +3498,10 @@ void main() {
         expect(queryService.fetchDiscoverableCallCount, 0);
         expect(queryService.fetchAdminCallCount, greaterThanOrEqualTo(1));
         final allRows = container.read(adminCafeListControllerProvider).cafes;
-        expect(allRows, hasLength(2));
+        expect(allRows, hasLength(3));
         expect(allRows.map((cafe) => cafe.id), contains('cafe-visible'));
         expect(allRows.map((cafe) => cafe.id), contains('cafe-hidden'));
-        expect(allRows.map((cafe) => cafe.id), isNot(contains('cafe-deleted')));
+        expect(allRows.map((cafe) => cafe.id), contains('cafe-deleted'));
 
         await notifier.setStatusFilter('hidden');
         final hiddenRows =
@@ -3055,7 +3548,7 @@ void main() {
           exploreFilters: const Filters(searchQuery: 'fig'),
         ),
       );
-      addTearDown(container.dispose);
+      addTearDown(() => _disposeTestContainer(container));
 
       expect(
         container.read(homeCafesProvider).map((cafe) => cafe.id),
@@ -3104,7 +3597,7 @@ void main() {
           featuredCafes: [featuredFig],
         ),
       );
-      addTearDown(container.dispose);
+      addTearDown(() => _disposeTestContainer(container));
 
       final corpus = container.read(searchableCafeCorpusProvider);
       final results = searchCafes(corpus, 'fig');
@@ -3129,7 +3622,7 @@ void main() {
           exploreFilters: const Filters(searchQuery: 'm'),
         ),
       );
-      addTearDown(container.dispose);
+      addTearDown(() => _disposeTestContainer(container));
 
       expect(container.read(homeCafesProvider).map((cafe) => cafe.id),
           isNot(contains('arabic-google')));
@@ -3155,7 +3648,7 @@ void main() {
           homeCafes: [overriddenCafe],
         ),
       );
-      addTearDown(container.dispose);
+      addTearDown(() => _disposeTestContainer(container));
 
       expect(container.read(homeCafesProvider).map((cafe) => cafe.id),
           contains('arabic-approved'));
@@ -3184,7 +3677,7 @@ void main() {
           homeCafes: [figOne, figTwo],
         ),
       );
-      addTearDown(container.dispose);
+      addTearDown(() => _disposeTestContainer(container));
 
       final removed = container
           .read(cafeProvider.notifier)
@@ -3217,7 +3710,7 @@ void main() {
           cafeQueryServiceProvider.overrideWithValue(queryService),
         ],
       );
-      addTearDown(container.dispose);
+      addTearDown(() => _disposeTestContainer(container));
 
       await container.read(adminCafeListControllerProvider.notifier).refresh();
 
@@ -3262,13 +3755,13 @@ void main() {
           cafeQueryServiceProvider.overrideWithValue(queryService),
         ],
       );
-      addTearDown(container.dispose);
+      addTearDown(() => _disposeTestContainer(container));
       final sub = container.listen<AdminCafeListState>(
         adminCafeListControllerProvider,
         (_, __) {},
         fireImmediately: true,
       );
-      addTearDown(sub.close);
+      addTearDown(() => _closeTestSubscription(sub));
       final notifier = container.read(adminCafeListControllerProvider.notifier);
       await notifier.refresh();
       requestedQueries.clear();
@@ -3313,13 +3806,13 @@ void main() {
           cafeQueryServiceProvider.overrideWithValue(queryService),
         ],
       );
-      addTearDown(container.dispose);
+      addTearDown(() => _disposeTestContainer(container));
       final sub = container.listen<AdminCafeListState>(
         adminCafeListControllerProvider,
         (_, __) {},
         fireImmediately: true,
       );
-      addTearDown(sub.close);
+      addTearDown(() => _closeTestSubscription(sub));
       final notifier = container.read(adminCafeListControllerProvider.notifier);
       await Future<void>.delayed(Duration.zero);
 
@@ -3402,13 +3895,13 @@ void main() {
           cafeQueryServiceProvider.overrideWithValue(queryService),
         ],
       );
-      addTearDown(container.dispose);
+      addTearDown(() => _disposeTestContainer(container));
       final sub = container.listen<AdminCafeListState>(
         adminCafeListControllerProvider,
         (_, __) {},
         fireImmediately: true,
       );
-      addTearDown(sub.close);
+      addTearDown(() => _closeTestSubscription(sub));
       final notifier = container.read(adminCafeListControllerProvider.notifier);
       await notifier.refresh();
       await notifier.loadMore();

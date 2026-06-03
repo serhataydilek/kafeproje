@@ -33,6 +33,179 @@ class _FakeFavoritesSyncGateway extends FavoritesSyncGateway {
 void main() {
   group('favorite ux flow', () {
     test(
+        'favorite cafe with stale images uses matching home photoUrls by google place id',
+        () async {
+      const homeImage = 'https://example.com/home-working-photo.jpg';
+      final staleFavorite = buildTestCafe(
+        id: 'favorite-stale-row',
+        name: 'Favorite Stale Row',
+      ).copyWith(
+        placeId: 'ChIJfavoriteHomeMatch',
+        images: const <String>[],
+        favoriteCount: 0,
+      );
+      final homeCafe = buildTestCafe(
+        id: 'home-fresh-row',
+        name: 'Favorite Stale Row',
+        images: const [homeImage],
+      ).copyWith(placeId: 'ChIJfavoriteHomeMatch');
+
+      final container = createTestContainer(
+        state: buildTestAppShellState(
+          cafes: [staleFavorite],
+          homeCafes: [homeCafe],
+          favorites: const ['favorite-stale-row'],
+          currentUser: testUser,
+        ),
+      );
+      addTearDown(container.dispose);
+
+      await container.read(resolvedFavoriteCafesProvider.future);
+      final favorite = container.read(favoriteCafesProvider).single;
+
+      expect(favorite.id, 'favorite-stale-row');
+      expect(favorite.photoUrls, [homeImage]);
+      expect(container.read(isCafeFavoritedProvider('favorite-stale-row')),
+          isTrue);
+      expect(favorite.favoriteCount, 1);
+    });
+
+    test(
+        'favorite cafe id can differ from home id when google place id matches',
+        () async {
+      const homeImage = 'https://example.com/home-place-match.jpg';
+      final favorite = buildTestCafe(
+        id: 'favorite-row-id',
+        name: 'Favorite Different Id',
+      ).copyWith(
+        placeId: 'ChIJsharedFavoritePlace',
+        images: const <String>[],
+        favoriteCount: 0,
+      );
+      final homeCafe = buildTestCafe(
+        id: 'home-row-id',
+        name: 'Favorite Different Id',
+        images: const [homeImage],
+      ).copyWith(placeId: 'ChIJsharedFavoritePlace');
+
+      final container = createTestContainer(
+        state: buildTestAppShellState(
+          cafes: [favorite],
+          homeCafes: [homeCafe],
+          favorites: const ['favorite-row-id'],
+          currentUser: testUser,
+        ),
+      );
+      addTearDown(container.dispose);
+
+      await container.read(resolvedFavoriteCafesProvider.future);
+      final hydrated = container.read(favoriteCafesProvider).single;
+
+      expect(hydrated.id, 'favorite-row-id');
+      expect(hydrated.photoUrls, [homeImage]);
+      expect(
+          container.read(isCafeFavoritedProvider('favorite-row-id')), isTrue);
+      expect(hydrated.favoriteCount, 1);
+    });
+
+    test('generated favorite media does not override working home images',
+        () async {
+      const generatedFavoriteImage =
+          'https://places.googleapis.com/v1/places/ChIJgenerated/photos/photoRef/media';
+      const homeImage = 'https://example.com/home-preferred-photo.jpg';
+      final favorite = buildTestCafe(
+        id: 'favorite-generated',
+        name: 'Favorite Generated',
+        images: const [generatedFavoriteImage],
+      ).copyWith(placeId: 'ChIJgeneratedFavorite', favoriteCount: 0);
+      final homeCafe = buildTestCafe(
+        id: 'home-generated',
+        name: 'Favorite Generated',
+        images: const [homeImage],
+      ).copyWith(placeId: 'ChIJgeneratedFavorite');
+
+      final container = createTestContainer(
+        state: buildTestAppShellState(
+          cafes: [favorite],
+          homeCafes: [homeCafe],
+          favorites: const ['favorite-generated'],
+          currentUser: testUser,
+        ),
+      );
+      addTearDown(container.dispose);
+
+      await container.read(resolvedFavoriteCafesProvider.future);
+      final hydrated = container.read(favoriteCafesProvider).single;
+
+      expect(hydrated.photoUrls.first, homeImage);
+      expect(hydrated.photoUrls, isNot(contains(generatedFavoriteImage)));
+      expect(hydrated.favoriteCount, 1);
+    });
+
+    test(
+        'favorite without stored image can use matching home google details image',
+        () async {
+      const homeGoogleDetailsImage =
+          'places/PLACE_ID/photos/PHOTO_RESOURCE';
+      final favorite = buildTestCafe(
+        id: 'favorite-google-details',
+        name: 'Favorite Google Details',
+      ).copyWith(
+        placeId: 'ChIJfavoriteGoogleDetails',
+        images: const <String>[],
+        favoriteCount: 0,
+      );
+      final homeCafe = buildTestCafe(
+        id: 'home-google-details',
+        name: 'Favorite Google Details',
+        images: const [homeGoogleDetailsImage],
+      ).copyWith(placeId: 'ChIJfavoriteGoogleDetails');
+
+      final container = createTestContainer(
+        state: buildTestAppShellState(
+          cafes: [favorite],
+          homeCafes: [homeCafe],
+          favorites: const ['favorite-google-details'],
+          currentUser: testUser,
+        ),
+      );
+      addTearDown(container.dispose);
+
+      await container.read(resolvedFavoriteCafesProvider.future);
+      final hydrated = container.read(favoriteCafesProvider).single;
+
+      expect(hydrated.id, 'favorite-google-details');
+      expect(hydrated.photoUrls, isNotEmpty);
+      expect(hydrated.photoUrls.first, contains('places.googleapis.com'));
+      expect(hydrated.favoriteCount, 1);
+    });
+
+    test('favorite without image match keeps empty photoUrls for card fallback',
+        () async {
+      final favorite = buildTestCafe(
+        id: 'favorite-without-match',
+        name: 'Favorite Without Match',
+      ).copyWith(images: const <String>[], favoriteCount: 0);
+
+      final container = createTestContainer(
+        state: buildTestAppShellState(
+          cafes: [favorite],
+          homeCafes: const <Cafe>[],
+          favorites: const ['favorite-without-match'],
+          currentUser: testUser,
+        ),
+      );
+      addTearDown(container.dispose);
+
+      await container.read(resolvedFavoriteCafesProvider.future);
+      final resolved = container.read(favoriteCafesProvider).single;
+
+      expect(resolved.id, 'favorite-without-match');
+      expect(resolved.photoUrls, isEmpty);
+      expect(resolved.favoriteCount, 1);
+    });
+
+    test(
         'favorite cafe stays resolvable outside current visible cafes without leaking into discovery',
         () async {
       final remoteFavorite = buildTestCafe(

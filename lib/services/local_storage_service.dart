@@ -1016,7 +1016,7 @@ class LocalStorageService {
     required String source,
     required List<Cafe> cafes,
   }) {
-    if (cafes.isEmpty) {
+    if (cafes.isEmpty || !kVerboseCafeDiagnostics) {
       return;
     }
     final sample = cafes

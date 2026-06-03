@@ -1,7 +1,8 @@
 enum CafeOwnerClaimStatus {
   pending,
   approved,
-  rejected;
+  rejected,
+  cancelled;
 
   static CafeOwnerClaimStatus fromString(String? value) {
     switch (value?.trim().toLowerCase()) {
@@ -9,6 +10,9 @@ enum CafeOwnerClaimStatus {
         return CafeOwnerClaimStatus.approved;
       case 'rejected':
         return CafeOwnerClaimStatus.rejected;
+      case 'cancelled':
+      case 'canceled':
+        return CafeOwnerClaimStatus.cancelled;
       case 'pending':
       default:
         return CafeOwnerClaimStatus.pending;
@@ -24,6 +28,9 @@ class CafeOwnerClaim {
     required this.userId,
     required this.cafeId,
     required this.businessName,
+    this.businessEmail,
+    this.businessPhone,
+    this.evidenceUrl,
     this.phone,
     this.note,
     required this.status,
@@ -38,8 +45,14 @@ class CafeOwnerClaim {
       userId: (json['user_id'] as String?)?.trim() ?? '',
       cafeId: (json['cafe_id'] as String?)?.trim() ?? '',
       businessName: (json['business_name'] as String?)?.trim() ?? '',
+      businessEmail: _normalizeOptional(json['business_email'] as String?),
+      businessPhone: _normalizeOptional(json['business_phone'] as String?),
+      evidenceUrl: _normalizeOptional(json['evidence_url'] as String?),
       phone: _normalizeOptional(json['phone'] as String?),
-      note: _normalizeOptional(json['note'] as String?),
+      note: _normalizeOptional(
+            json['message'] as String?,
+          ) ??
+          _normalizeOptional(json['note'] as String?),
       status: CafeOwnerClaimStatus.fromString(json['status'] as String?),
       createdAt: _parseDateTime(json['created_at']) ?? DateTime.now().toUtc(),
       reviewedAt: _parseDateTime(json['reviewed_at']),
@@ -51,6 +64,9 @@ class CafeOwnerClaim {
   final String userId;
   final String cafeId;
   final String businessName;
+  final String? businessEmail;
+  final String? businessPhone;
+  final String? evidenceUrl;
   final String? phone;
   final String? note;
   final CafeOwnerClaimStatus status;
@@ -61,6 +77,7 @@ class CafeOwnerClaim {
   bool get isPending => status == CafeOwnerClaimStatus.pending;
   bool get isApproved => status == CafeOwnerClaimStatus.approved;
   bool get isRejected => status == CafeOwnerClaimStatus.rejected;
+  bool get isCancelled => status == CafeOwnerClaimStatus.cancelled;
 
   CafeOwnerClaim copyWith({
     CafeOwnerClaimStatus? status,
@@ -72,6 +89,9 @@ class CafeOwnerClaim {
       userId: userId,
       cafeId: cafeId,
       businessName: businessName,
+      businessEmail: businessEmail,
+      businessPhone: businessPhone,
+      evidenceUrl: evidenceUrl,
       phone: phone,
       note: note,
       status: status ?? this.status,
@@ -86,7 +106,11 @@ class CafeOwnerClaim {
         'user_id': userId,
         'cafe_id': cafeId,
         'business_name': businessName,
+        'business_email': businessEmail,
+        'business_phone': businessPhone,
+        'evidence_url': evidenceUrl,
         'phone': phone,
+        'message': note,
         'note': note,
         'status': status.value,
         'created_at': createdAt.toUtc().toIso8601String(),

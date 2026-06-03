@@ -5,10 +5,14 @@
 .env.local
 .env.local.json
 .env.*.local
+supabase/.temp/
 
 # Firebase local config - keep local unless intentionally public
 android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
+
+# Node
+node_modules/
 
 # Flutter
 .dart_tool/
@@ -26,6 +30,7 @@ android/.gradle
 android/captures/
 android/gradlew
 android/gradlew.bat
+android/key.properties
 android/local.properties
 android/**/GeneratedPluginRegistrant.java
 
@@ -35,6 +40,7 @@ ios/.generated/
 ios/Flutter/Flutter.framework
 ios/Flutter/Flutter.podspec
 ios/Flutter/generated.xcconfig
+ios/Flutter/ReleaseSecrets.xcconfig
 ios/Podfile.lock
 
 # macOS

@@ -7,8 +7,10 @@ import 'package:kafeproje/models/index.dart';
 import 'package:kafeproje/navigation/app_router.dart';
 import 'package:kafeproje/providers/app_provider.dart';
 import 'package:kafeproje/repositories/cafe_repository.dart';
+import 'package:kafeproje/screens/cafe_detail_screen.dart';
 import 'package:kafeproje/screens/compare_screen.dart';
 import 'package:kafeproje/screens/home_screen.dart';
+import 'package:go_router/go_router.dart';
 
 import 'test_helpers.dart';
 
@@ -254,6 +256,64 @@ void main() {
         isNot(contains('noncompared-far')),
       );
     });
+
+    testWidgets(
+      'detail compare action opens compare with the selected cafe',
+      (tester) async {
+        tester.view.physicalSize = const Size(800, 1600);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+
+        final cafes = [
+          buildTestCafe(id: 'cafe-1', name: 'Cafe One'),
+          buildTestCafe(id: 'cafe-2', name: 'Cafe Two'),
+        ];
+        final container = createTestContainer(
+          state: buildTestAppShellState(
+            cafes: cafes,
+            currentUser: testUser,
+          ),
+        );
+        addTearDown(container.dispose);
+
+        final router = GoRouter(
+          initialLocation: '/cafe/cafe-1',
+          routes: [
+            GoRoute(
+              path: '/cafe/:id',
+              builder: (_, state) => CafeDetailScreen(
+                cafeId: state.pathParameters['id']!,
+              ),
+            ),
+            GoRoute(
+              path: '/compare',
+              builder: (_, __) => const CompareScreen(),
+            ),
+          ],
+        );
+
+        await tester.pumpWidget(
+          buildTestRouterApp(container: container, router: router),
+        );
+        await tester.pumpAndSettle();
+
+        final l10n = AppLocalizations.of(
+          tester.element(find.byType(CafeDetailScreen)),
+        )!;
+        await tester.ensureVisible(find.text(l10n.cafeDetailCompare).last);
+        await tester.tap(find.text(l10n.cafeDetailCompare).last);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(CompareScreen), findsOneWidget);
+        expect(find.text('Cafe One'), findsWidgets);
+        expect(find.byKey(const ValueKey('compare-remove-cafe-1')),
+            findsOneWidget);
+        expect(container.read(compareListProvider), const ['cafe-1']);
+      },
+    );
 
     testWidgets(
       'compare screen shows loading while selected IDs resolve outside visible Explore results',

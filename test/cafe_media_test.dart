@@ -198,6 +198,40 @@ void main() {
       );
     });
 
+    test('google photo urls require an API key in production-like mode', () {
+      expect(
+        resolveCafeImageUrl(
+          'places/PLACE_ID/photos/PHOTO_RESOURCE',
+          allowUnauthenticatedGooglePhotoUrls: false,
+        ),
+        isNull,
+      );
+      expect(
+        resolveCafeImageUrl(
+          'Aap_uE1b2c3d4e5f6g7h8i9j0k',
+          allowUnauthenticatedGooglePhotoUrls: false,
+        ),
+        isNull,
+      );
+    });
+
+    test('priority normalization skips failed first image and keeps fallback',
+        () {
+      clearRememberedFailedCafeImageUrls();
+      const brokenGenerated = 'places/PLACE_ID/photos/BROKEN_RESOURCE';
+      const fallbackDirect = 'https://example.com/fallback.jpg';
+      rememberFailedCafeImageUrl(resolveCafeImageUrl(brokenGenerated));
+
+      final urls = normalizeCafeImageUrlsByPriority([
+        brokenGenerated,
+        fallbackDirect,
+      ]);
+
+      expect(urls, [fallbackDirect]);
+
+      clearRememberedFailedCafeImageUrls();
+    });
+
     test('example.com stays trusted for deterministic test/dev fixtures', () {
       expect(
         isTrustedAdminImageUrl('https://example.com/admin-seed.jpg'),

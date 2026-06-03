@@ -320,8 +320,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> with FormStateMixin {
                         child: AutofillGroup(
                           child: Form(
                             key: _formKey,
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
+                            autovalidateMode: AutovalidateMode.disabled,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
@@ -775,6 +774,7 @@ class _AuthField extends StatelessWidget {
     return TextFormField(
       controller: controller,
       validator: validator,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       keyboardType: keyboardType,
       textInputAction: textInputAction,
       obscureText: obscureText,

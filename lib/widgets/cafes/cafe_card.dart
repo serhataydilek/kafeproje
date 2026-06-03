@@ -274,6 +274,7 @@ class CafeCard extends StatelessWidget {
                         // ── Open / Closed badge ───────────────────────────
 
                         Container(
+                          constraints: const BoxConstraints(maxWidth: 88),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8,
                             vertical: 3,
@@ -292,6 +293,8 @@ class CafeCard extends StatelessWidget {
                               statusLabel,
                               languageCode,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: statusColor,
                               fontWeight: FontWeight.w800,
@@ -496,7 +499,7 @@ void _logHomeSponsoredImageDiagnostics({
   required List<String> normalizedUrls,
   required double height,
 }) {
-  if (!kDebugMode || surface != 'home-sponsored') {
+  if (!kDebugMode || !kVerboseCafeDiagnostics || surface != 'home-sponsored') {
     return;
   }
   final hasResolved = normalizedUrls.isNotEmpty;
@@ -516,7 +519,7 @@ void _logImageSourceDiagnostics({
   required String surface,
   required List<String> selectedUrls,
 }) {
-  if (!kDebugMode) {
+  if (!kDebugMode || !kVerboseCafeDiagnostics) {
     return;
   }
   final selected = selectedUrls.isEmpty ? null : selectedUrls.first;

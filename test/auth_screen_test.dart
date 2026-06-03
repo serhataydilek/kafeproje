@@ -117,6 +117,29 @@ void main() {
       expect(submitBtn.onPressed, isNotNull);
     });
 
+    testWidgets('typing identifier does not validate untouched password field',
+        (tester) async {
+      final container = createTestContainer(state: buildTestAppShellState());
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        buildTestApp(
+          container: container,
+          child: const Scaffold(body: AuthScreen()),
+        ),
+      );
+
+      await tester.enterText(
+        find.byType(TextFormField).first,
+        'test@example.com',
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Enter your password.'), findsNothing);
+      expect(
+          find.text('Password must be at least 6 characters.'), findsNothing);
+    });
+
     testWidgets('shows localized invalid credentials message', (tester) async {
       late _FakeAuthNotifier notifier;
       final container = ProviderContainer(

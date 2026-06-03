@@ -97,5 +97,113 @@ void main() {
         ['cafe-besiktas', 'cafe-sisli'],
       );
     });
+
+    test('explore filters do not narrow home favorites or featured pools',
+        () async {
+      final connectivity = TestConnectivityService(initiallyOnline: true);
+      final cafes = [
+        buildTestCafe(
+          id: 'explore-kadikoy',
+          name: 'Explore Kadikoy',
+          district: 'Kadikoy',
+        ),
+        buildTestCafe(
+          id: 'explore-sisli',
+          name: 'Explore Sisli',
+          district: 'Sisli',
+        ),
+      ];
+      final homeCafes = [
+        buildTestCafe(
+          id: 'home-kadikoy',
+          name: 'Home Kadikoy',
+          district: 'Kadikoy',
+        ),
+        buildTestCafe(
+          id: 'home-sisli',
+          name: 'Home Sisli',
+          district: 'Sisli',
+        ),
+      ];
+      final featured = [
+        buildTestCafe(
+          id: 'featured-kadikoy',
+          name: 'Featured Kadikoy',
+          district: 'Kadikoy',
+        ).copyWith(isFeatured: true),
+        buildTestCafe(
+          id: 'featured-sisli',
+          name: 'Featured Sisli',
+          district: 'Sisli',
+        ).copyWith(isFeatured: true),
+      ];
+
+      final container = createTestContainer(
+        state: buildTestAppShellState(
+          cafes: cafes,
+          homeCafes: homeCafes,
+          featuredCafes: featured,
+          favorites: const ['explore-kadikoy', 'explore-sisli'],
+          exploreFilters: const Filters(district: 'Kadikoy'),
+          currentUser: testUser,
+          hasInitializedDiscovery: true,
+        ),
+        overrides: [
+          connectivityServiceProvider.overrideWithValue(connectivity),
+          cafeRepositoryProvider.overrideWithValue(
+            FakeCafeRepository(
+              onFetch: (_) async =>
+                  CafeRepositoryResult(cafes: cafes, usedRemote: false),
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      addTearDown(connectivity.dispose);
+
+      expect(
+        container
+            .read(exploreCafeResultsProvider)
+            .map((cafe) => cafe.id)
+            .toList(),
+        ['explore-kadikoy'],
+      );
+      expect(
+        container.read(homeCafesProvider).map((cafe) => cafe.id).toList(),
+        ['home-kadikoy', 'home-sisli'],
+      );
+      expect(
+        container.read(favoriteCafesProvider).map((cafe) => cafe.id).toList(),
+        ['explore-kadikoy', 'explore-sisli'],
+      );
+      expect(
+        container.read(featuredCafesProvider).map((cafe) => cafe.id).toList(),
+        ['featured-kadikoy', 'featured-sisli'],
+      );
+
+      await container
+          .read(cafeProvider.notifier)
+          .setExploreFilters(const Filters(district: 'Sisli'));
+
+      expect(
+        container
+            .read(exploreCafeResultsProvider)
+            .map((cafe) => cafe.id)
+            .toList(),
+        ['explore-sisli'],
+      );
+      expect(
+        container.read(homeCafesProvider).map((cafe) => cafe.id).toList(),
+        ['home-kadikoy', 'home-sisli'],
+      );
+      expect(
+        container.read(favoriteCafesProvider).map((cafe) => cafe.id).toList(),
+        ['explore-kadikoy', 'explore-sisli'],
+      );
+      expect(
+        container.read(featuredCafesProvider).map((cafe) => cafe.id).toList(),
+        ['featured-kadikoy', 'featured-sisli'],
+      );
+    });
   });
 }

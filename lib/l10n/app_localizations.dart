@@ -191,7 +191,7 @@ abstract class AppLocalizations {
   /// No description provided for @commonUnknown.
   ///
   /// In tr, this message translates to:
-  /// **'Bilinmiyor'**
+  /// **'Belirtilmemiş'**
   String get commonUnknown;
 
   /// No description provided for @cafeNoRatingsYet.
@@ -203,7 +203,7 @@ abstract class AppLocalizations {
   /// No description provided for @commonNoData.
   ///
   /// In tr, this message translates to:
-  /// **'Veri yok'**
+  /// **'Belirtilmemiş'**
   String get commonNoData;
 
   /// No description provided for @commonCategory.
@@ -1847,7 +1847,7 @@ abstract class AppLocalizations {
   /// No description provided for @cafeFormPriceUnknown.
   ///
   /// In tr, this message translates to:
-  /// **'Bilinmiyor'**
+  /// **'Belirtilmemiş'**
   String get cafeFormPriceUnknown;
 
   /// No description provided for @cafeFormWifi.

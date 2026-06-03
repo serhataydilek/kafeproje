@@ -38,6 +38,8 @@ const Set<String> _nonProductionTrustedAdminImageHosts = <String>{
 };
 
 const bool _allowNonProductionTrustedHosts = !kReleaseMode && !kProfileMode;
+const bool _allowUnauthenticatedGooglePhotoUrls =
+    !kReleaseMode && !kProfileMode;
 const int _maxRememberedFailedImageUrls = 80;
 
 final Set<String> _failedCafeImageUrlKeys = <String>{};
@@ -150,7 +152,7 @@ void _logMediaClassificationDiag(
   required String? rejectedReason,
   String? diagnosticSurface,
 }) {
-  if (!kDebugMode) {
+  if (!kDebugMode || !kVerboseCafeDiagnostics) {
     return;
   }
   final surface = diagnosticSurface?.trim();
@@ -301,6 +303,8 @@ Set<String> _resolvedTrustedAdminHosts({
 String? resolveCafeImageUrl(
   String? rawUrl, {
   int? maxWidthPx,
+  bool allowUnauthenticatedGooglePhotoUrls =
+      _allowUnauthenticatedGooglePhotoUrls,
 }) {
   final trimmed = rawUrl?.trim();
   if (trimmed == null || trimmed.isEmpty) {
@@ -314,6 +318,9 @@ String? resolveCafeImageUrl(
         CafeImageVariant.detailGallery.requestWidthPx;
     final apiKey = Env.optionalGooglePlacesPhotoApiKey;
     if (apiKey == null || apiKey.isEmpty) {
+      if (!allowUnauthenticatedGooglePhotoUrls) {
+        return null;
+      }
       // Without an API key, still emit a deterministic HTTPS media URL so
       // callers can keep stable image pipelines in test/dev environments.
       final uri = Uri.tryParse(protocolSafe);
@@ -340,6 +347,11 @@ String? resolveCafeImageUrl(
 
   final legacyReference = _normalizeLegacyGooglePhotoReference(protocolSafe);
   if (legacyReference != null) {
+    final apiKey = Env.optionalGooglePlacesPhotoApiKey;
+    if ((apiKey == null || apiKey.isEmpty) &&
+        !allowUnauthenticatedGooglePhotoUrls) {
+      return null;
+    }
     return _buildLegacyGooglePhotoUrl(
       legacyReference,
       maxWidthPx: maxWidthPx,

@@ -1,10 +1,13 @@
 # Local Env Run
 
-Local debug runs can use either the bundled `.env` development fallback or Dart defines. Dart defines still win when both are present.
+Local debug and release runs should use Dart defines. `.env` is ignored by git
+and is not bundled as a Flutter asset, so do not rely on plain `flutter run`
+for configured app services.
 
-## Create Local `.env`
+## Optional Local `.env`
 
-Create a local `.env` file in the project root. It is ignored by git.
+Create a local `.env` file in the project root only if you need a scratch
+source for copying values into `.env.local.json`. It is ignored by git.
 
 ```text
 SUPABASE_URL=https://your-project.supabase.co
@@ -38,14 +41,6 @@ Fill `.env.local.json` with real local values. Required keys:
 Do not commit `.env.local.json`.
 
 ## Terminal
-
-With `.env`:
-
-```powershell
-flutter run
-```
-
-With Dart defines:
 
 ```powershell
 powershell ./scripts/run_dev.ps1
@@ -85,16 +80,6 @@ Android Studio run configurations are usually local machine state. Configure it 
 
 ## Expected Logs
 
-Successful local `.env` bootstrap should include:
-
-```text
-[ENV_CONFIG] SUPABASE_URL=present source=dotenv_asset
-[ENV_CONFIG] SUPABASE_ANON_KEY=present source=dotenv_asset
-[ENV_CONFIG] GOOGLE_MAPS_API_KEY=present source=dotenv_asset
-[ENV_CONFIG] GOOGLE_PLACES_API_KEY=present source=dotenv_asset
-[SUPABASE_INIT] configured=true missingKeys=
-```
-
 Successful Dart define bootstrap should include:
 
 ```text
@@ -109,8 +94,21 @@ Successful Dart define bootstrap should include:
 
 Before release:
 
-- Remove `.env` from `pubspec.yaml` assets.
+- Keep `.env` out of `pubspec.yaml` assets.
 - Use `--dart-define`, `--dart-define-from-file`, or CI secrets instead.
 - Verify `.env` is not bundled in build artifacts.
+- Configure Android release signing with `android/key.properties` or CI
+  environment variables:
+  - `ANDROID_KEYSTORE_PATH`
+  - `ANDROID_KEYSTORE_PASSWORD`
+  - `ANDROID_KEY_ALIAS`
+  - `ANDROID_KEY_PASSWORD`
+- Keep `android/key.properties` out of git.
+- For iOS release builds, copy `ios/Flutter/ReleaseSecrets.xcconfig.example`
+  to `ios/Flutter/ReleaseSecrets.xcconfig` and set the restricted
+  `GOOGLE_MAPS_API_KEY`. The copied file is ignored by git.
 - Restrict Google API keys by package name/SHA-1, bundle ID, HTTP referrer, and API surface as appropriate.
 - Verify Supabase anon key policies and RLS before shipping.
+- Run `powershell ./scripts/validate_release_readiness.ps1` before creating
+  release candidates. Use `-RequireLocalSecrets` on the machine that performs
+  signed release builds.

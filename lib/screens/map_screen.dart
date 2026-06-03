@@ -449,7 +449,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         filterResultState == MapFilterResultState.noResultsForFilters ||
             isNearbyRadiusEmpty ||
             (filterResultState == MapFilterResultState.noData &&
-                cafeSyncState == CafeSyncState.empty &&
+                (cafeSyncState == CafeSyncState.empty ||
+                    (hasInitializedDiscovery &&
+                        filteredCafes.isEmpty &&
+                        mapVisibleCafes.isEmpty)) &&
                 !isCafesLoading);
     final diagnosticsCenter = _diagnosticQuadrantCenter(currentLocation);
     final quadrantCounts = _buildQuadrantCounts(

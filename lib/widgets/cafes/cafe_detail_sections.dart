@@ -793,6 +793,22 @@ class CafeDetailActionsSection extends ConsumerWidget {
   final Cafe cafe;
   final AppColors colors;
 
+  Future<void> _openCompare(BuildContext context, WidgetRef ref) async {
+    final normalizedCafeId = cafe.id.trim();
+    if (normalizedCafeId.isEmpty) {
+      return;
+    }
+    final isAlreadySelected = ref.read(normalizedCompareListProvider).contains(
+          normalizedCafeId,
+        );
+    if (!isAlreadySelected) {
+      await ref.read(profileProvider.notifier).toggleCompare(normalizedCafeId);
+    }
+    if (context.mounted) {
+      unawaited(context.push('/compare'));
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
@@ -828,8 +844,7 @@ class CafeDetailActionsSection extends ConsumerWidget {
         ),
         onFavorite: () =>
             ref.read(profileProvider.notifier).toggleFavorite(cafe.id),
-        onCompare: () =>
-            ref.read(profileProvider.notifier).toggleCompare(cafe.id),
+        onCompare: () => unawaited(_openCompare(context, ref)),
       ),
     );
   }

@@ -10,9 +10,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 /// Preferred release usage keeps secrets out of Flutter assets:
 /// `flutter run --dart-define-from-file=.env.local.json`
 ///
-/// During active local development, `.env` is bundled as a debug asset fallback.
-/// Remove it from `flutter.assets` before release and use Dart defines/CI
-/// secrets instead.
+/// `.env` is intentionally not bundled as an app asset for release safety. Use
+/// Dart defines or CI secrets for configured debug and release runs.
 const _supabaseUrlFromDefine = String.fromEnvironment('SUPABASE_URL');
 const _supabaseAnonKeyFromDefine = String.fromEnvironment('SUPABASE_ANON_KEY');
 const _googleMapsApiKeyFromDefine =

@@ -294,10 +294,14 @@ String _normalizeAnalyticsToken(String value) {
 
 String stableAnalyticsIdHash(String value) {
   final normalized = value.trim();
-  var hash = 0xcbf29ce484222325;
+  var hash = 0;
   for (final codeUnit in normalized.codeUnits) {
-    hash ^= codeUnit;
-    hash = (hash * 0x100000001b3) & 0x7fffffffffffffff;
+    hash = (hash + codeUnit).toUnsigned(32);
+    hash = (hash + (hash << 10)).toUnsigned(32);
+    hash ^= hash >> 6;
   }
-  return hash.toRadixString(16).padLeft(16, '0');
+  hash = (hash + (hash << 3)).toUnsigned(32);
+  hash ^= hash >> 11;
+  hash = (hash + (hash << 15)).toUnsigned(32);
+  return hash.toUnsigned(32).toRadixString(16).padLeft(8, '0');
 }

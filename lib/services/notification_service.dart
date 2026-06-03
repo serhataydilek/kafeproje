@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest_all.dart' as timezone_data;
+import 'package:timezone/timezone.dart' as timezone;
 
 import '../utils/app_logger.dart';
 
@@ -30,6 +32,8 @@ abstract class LocalNotificationGateway {
   Future<NotificationPermissionStatus> requestPermission();
 
   Future<void> show(LocalNotificationPayload payload);
+
+  Future<void> schedule(LocalNotificationPayload payload, DateTime scheduledAt);
 }
 
 class FlutterLocalNotificationGateway implements LocalNotificationGateway {
@@ -108,27 +112,47 @@ class FlutterLocalNotificationGateway implements LocalNotificationGateway {
 
   @override
   Future<void> show(LocalNotificationPayload payload) {
-    const android = AndroidNotificationDetails(
+    return _plugin.show(
+      id: payload.id,
+      title: payload.title,
+      body: payload.body,
+      notificationDetails: _notificationDetails,
+      payload: payload.payload,
+    );
+  }
+
+  @override
+  Future<void> schedule(
+    LocalNotificationPayload payload,
+    DateTime scheduledAt,
+  ) {
+    timezone_data.initializeTimeZones();
+    final scheduledDate = timezone.TZDateTime.from(
+      scheduledAt,
+      timezone.local,
+    );
+    return _plugin.zonedSchedule(
+      id: payload.id,
+      title: payload.title,
+      body: payload.body,
+      scheduledDate: scheduledDate,
+      notificationDetails: _notificationDetails,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      payload: payload.payload,
+    );
+  }
+
+  static const NotificationDetails _notificationDetails = NotificationDetails(
+    android: AndroidNotificationDetails(
       _channelId,
       _channelName,
       channelDescription: _channelDescription,
       importance: Importance.defaultImportance,
       priority: Priority.defaultPriority,
-    );
-    const details = NotificationDetails(
-      android: android,
-      iOS: DarwinNotificationDetails(),
-      macOS: DarwinNotificationDetails(),
-    );
-
-    return _plugin.show(
-      id: payload.id,
-      title: payload.title,
-      body: payload.body,
-      notificationDetails: details,
-      payload: payload.payload,
-    );
-  }
+    ),
+    iOS: DarwinNotificationDetails(),
+    macOS: DarwinNotificationDetails(),
+  );
 }
 
 class NotificationService {
@@ -190,12 +214,101 @@ class NotificationService {
     String? payload,
     bool requestPermissionIfNeeded = true,
   }) async {
-    final normalizedTitle = title.trim();
-    final normalizedBody = body.trim();
-    if (normalizedTitle.isEmpty || normalizedBody.isEmpty) {
+    final notificationPayload = _buildPayload(
+      id: id,
+      title: title,
+      body: body,
+      payload: payload,
+    );
+    if (notificationPayload == null) {
       return false;
     }
 
+    final permissionReady = await _prepareForDelivery(
+      requestPermissionIfNeeded: requestPermissionIfNeeded,
+    );
+    if (!permissionReady) {
+      return false;
+    }
+
+    try {
+      await _gateway.show(notificationPayload);
+      return true;
+    } catch (error, stackTrace) {
+      AppLogger.error(
+        'Local notification delivery failed',
+        error: error,
+        stackTrace: stackTrace,
+        key: 'local-notification-show-error',
+      );
+      return false;
+    }
+  }
+
+  Future<bool> scheduleLocalNotification({
+    required int id,
+    required String title,
+    required String body,
+    required DateTime scheduledAt,
+    String? payload,
+    bool requestPermissionIfNeeded = true,
+  }) async {
+    final notificationPayload = _buildPayload(
+      id: id,
+      title: title,
+      body: body,
+      payload: payload,
+    );
+    if (notificationPayload == null) {
+      return false;
+    }
+    if (!scheduledAt.isAfter(DateTime.now())) {
+      return false;
+    }
+
+    final permissionReady = await _prepareForDelivery(
+      requestPermissionIfNeeded: requestPermissionIfNeeded,
+    );
+    if (!permissionReady) {
+      return false;
+    }
+
+    try {
+      await _gateway.schedule(notificationPayload, scheduledAt);
+      return true;
+    } catch (error, stackTrace) {
+      AppLogger.error(
+        'Local notification scheduling failed',
+        error: error,
+        stackTrace: stackTrace,
+        key: 'local-notification-schedule-error',
+      );
+      return false;
+    }
+  }
+
+  LocalNotificationPayload? _buildPayload({
+    required int id,
+    required String title,
+    required String body,
+    String? payload,
+  }) {
+    final normalizedTitle = title.trim();
+    final normalizedBody = body.trim();
+    if (normalizedTitle.isEmpty || normalizedBody.isEmpty) {
+      return null;
+    }
+    return LocalNotificationPayload(
+      id: id,
+      title: normalizedTitle,
+      body: normalizedBody,
+      payload: payload,
+    );
+  }
+
+  Future<bool> _prepareForDelivery({
+    required bool requestPermissionIfNeeded,
+  }) async {
     final initialized = await initialize();
     if (!initialized) {
       return false;
@@ -208,24 +321,6 @@ class NotificationService {
       }
     }
 
-    try {
-      await _gateway.show(
-        LocalNotificationPayload(
-          id: id,
-          title: normalizedTitle,
-          body: normalizedBody,
-          payload: payload,
-        ),
-      );
-      return true;
-    } catch (error, stackTrace) {
-      AppLogger.error(
-        'Local notification delivery failed',
-        error: error,
-        stackTrace: stackTrace,
-        key: 'local-notification-show-error',
-      );
-      return false;
-    }
+    return true;
   }
 }

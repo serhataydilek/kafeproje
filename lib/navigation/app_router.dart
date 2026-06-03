@@ -122,7 +122,7 @@ const _safeExactPostAuthRoutePaths = <String>{
 };
 
 bool _isAdminRoutePath(String path) {
-  return _adminExactRoutePaths.contains(path) || path.startsWith('/cafe-edit/');
+  return _adminExactRoutePaths.contains(path);
 }
 
 bool _isKnownSafePostAuthPath(String path) {
