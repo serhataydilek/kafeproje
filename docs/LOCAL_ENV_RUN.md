@@ -104,5 +104,11 @@ Before release:
   - `ANDROID_KEY_ALIAS`
   - `ANDROID_KEY_PASSWORD`
 - Keep `android/key.properties` out of git.
+- For iOS release builds, copy `ios/Flutter/ReleaseSecrets.xcconfig.example`
+  to `ios/Flutter/ReleaseSecrets.xcconfig` and set the restricted
+  `GOOGLE_MAPS_API_KEY`. The copied file is ignored by git.
 - Restrict Google API keys by package name/SHA-1, bundle ID, HTTP referrer, and API surface as appropriate.
 - Verify Supabase anon key policies and RLS before shipping.
+- Run `powershell ./scripts/validate_release_readiness.ps1` before creating
+  release candidates. Use `-RequireLocalSecrets` on the machine that performs
+  signed release builds.

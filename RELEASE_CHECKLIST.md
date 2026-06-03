@@ -183,6 +183,11 @@ Use this as a starting point while testing.
 
 - [x] `flutter pub get` passed.
 - [x] `flutter test` passed: 307 tests.
+- [x] Current local verification passed on 2026-06-04: `flutter analyze` and full `flutter test` passed with 595 tests.
+- [ ] Public release runbook completed: `docs/PUBLIC_RELEASE_RUNBOOK.md`.
+- [ ] Store submission checklist completed: `docs/STORE_SUBMISSION_CHECKLIST.md`.
+- [ ] Privacy policy reviewed, published, and linked from store listings using `docs/PRIVACY_POLICY_DRAFT.md` as the source draft.
+- [ ] iOS release secrets configured through ignored `ios/Flutter/ReleaseSecrets.xcconfig`.
 - [x] `flutter build apk --release` passed before and after analyzer cleanup.
 - [x] Release APK generated: `build\app\outputs\flutter-apk\app-release.apk` at 59.6 MB.
 - [x] `flutter analyze` is clean. P2-005 is closed.

@@ -10,7 +10,7 @@ import UIKit
   ) -> Bool {
     if let apiKey = Bundle.main.object(forInfoDictionaryKey: "GoogleMapsAPIKey") as? String,
        !apiKey.isEmpty,
-       apiKey != "YOUR_GOOGLE_MAPS_API_KEY_HERE" {
+       !apiKey.contains("$(") {
       GMSServices.provideAPIKey(apiKey)
     }
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
