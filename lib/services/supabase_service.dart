@@ -2892,7 +2892,7 @@ class CafeOwnerInviteService {
         key: 'cafe-owner-invite-$cafeId',
       );
       return ServiceResult.failure(
-        message: _messageFromFunctionException(error) ?? error.toString(),
+        message: cafeOwnerInviteFailureMessage(error) ?? error.toString(),
         errorCode: _errorCodeForSupabaseError(
           error,
           fallback: AppErrorCode.validationFailed,
@@ -2904,18 +2904,26 @@ class CafeOwnerInviteService {
   }
 }
 
-String? _messageFromFunctionException(Object error) {
+String? cafeOwnerInviteFailureMessage(Object error) {
   if (error is! FunctionException) {
     return null;
   }
+  if (error.status == 404) {
+    return 'Cafe owner invite function is not deployed. Deploy the Supabase Edge Function invite-cafe-owner and try again.';
+  }
   if (error.details is Map) {
-    final message = _messageFromFunctionPayload(error.details as Map);
+    final details = error.details as Map;
+    final message = _messageFromFunctionPayload(details);
     if (message != null) {
-      return message;
+      return _functionMessageWithContext(message, details);
     }
   }
   if (error.details is String && (error.details as String).trim().isNotEmpty) {
-    return (error.details as String).trim();
+    final details = (error.details as String).trim();
+    if (_looksLikeMissingFunction(details)) {
+      return 'Cafe owner invite function is not deployed. Deploy the Supabase Edge Function invite-cafe-owner and try again.';
+    }
+    return details;
   }
   return error.reasonPhrase?.trim().isNotEmpty == true
       ? error.reasonPhrase!.trim()
@@ -2928,6 +2936,27 @@ String? _messageFromFunctionPayload(Map payload) {
     return error.trim();
   }
   return null;
+}
+
+String _functionMessageWithContext(String message, Map payload) {
+  if (_looksLikeMissingFunction(message)) {
+    return 'Cafe owner invite function is not deployed. Deploy the Supabase Edge Function invite-cafe-owner and try again.';
+  }
+
+  final code = payload['code'];
+  final stage = payload['stage'];
+  final context = [
+    if (stage is String && stage.trim().isNotEmpty) 'stage=${stage.trim()}',
+    if (code is String && code.trim().isNotEmpty) 'code=${code.trim()}',
+  ].join(', ');
+  return context.isEmpty ? message : '$message ($context)';
+}
+
+bool _looksLikeMissingFunction(String value) {
+  final normalized = value.toLowerCase();
+  return normalized.contains('function not found') ||
+      normalized.contains('functions not found') ||
+      normalized.contains('not found') && normalized.contains('function');
 }
 
 String? _nullableSanitized(String? value) {

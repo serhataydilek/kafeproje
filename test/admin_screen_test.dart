@@ -1643,18 +1643,44 @@ void main() {
         expect(inviteService.lastCafeId, 'cafe-1');
         expect(inviteService.lastEmail, 'owner@example.com');
         expect(cafesById['cafe-1']?.ownerUserId, 'owner-1');
-        await tester.ensureVisible(
-          find.byKey(const Key('admin-owner-unassign-button')),
+        expect(
+          find.byKey(const Key('admin-owner-email-input')),
+          findsNothing,
         );
+        expect(
+          find.byKey(const Key('admin-owner-first-name-input')),
+          findsNothing,
+        );
+        expect(
+          find.byKey(const Key('admin-owner-last-name-input')),
+          findsNothing,
+        );
+        await tester.ensureVisible(find.byKey(
+          const Key('admin-owner-unassign-button'),
+          skipOffstage: false,
+        ));
         await tester.pumpAndSettle();
+        expect(
+          find.byKey(
+            const Key('admin-owner-unassign-button'),
+            skipOffstage: false,
+          ),
+          findsOneWidget,
+        );
 
-        await tester.tap(find.byKey(const Key('admin-owner-unassign-button')));
+        await tester.tap(find.byKey(
+          const Key('admin-owner-unassign-button'),
+        ));
         await tester.pumpAndSettle();
         await tester.tap(find.text('Unassign').last);
         await tester.pumpAndSettle();
 
         expect(updatedInput?.ownerUserId, '');
         expect(find.textContaining('No owner assigned'), findsWidgets);
+        expect(
+          find.byKey(const Key('admin-owner-email-input')),
+          findsOneWidget,
+        );
       },
     );
 

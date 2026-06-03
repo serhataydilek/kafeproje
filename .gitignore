@@ -5,10 +5,14 @@
 .env.local
 .env.local.json
 .env.*.local
+supabase/.temp/
 
 # Firebase local config - keep local unless intentionally public
 android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
+
+# Node
+node_modules/
 
 # Flutter
 .dart_tool/

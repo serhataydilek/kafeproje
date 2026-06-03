@@ -295,6 +295,9 @@ class CafeOwnerInviteController
       lastName: lastName,
       fullName: fullName,
     );
+    if (!mounted) {
+      return result;
+    }
     state = result.ok
         ? const async_result.AsyncData(null)
         : async_result.AsyncError<void>(
@@ -336,6 +339,9 @@ class CafeOwnerInviteController
       cafeId,
       const CafeAdminUpdateInput(ownerUserId: ''),
     );
+    if (!mounted) {
+      return result;
+    }
     state = result.ok
         ? const async_result.AsyncData(null)
         : async_result.AsyncError<void>(

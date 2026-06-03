@@ -373,11 +373,54 @@ void main() {
       expect(edgeFunction, contains('google_uses_app_defaults'));
       expect(edgeFunction, contains('isMissingColumnError'));
       expect(edgeFunction, contains('Admin privileges are required'));
+      expect(edgeFunction, contains('usernameFromEmail'));
+      expect(edgeFunction, contains('preferred_username'));
+      expect(edgeFunction, contains('given_name'));
+      expect(edgeFunction, contains('family_name'));
       expect(edgeFunction, contains('role: "cafe_owner"'));
       expect(edgeFunction, contains('inviteErrorResponse'));
       expect(edgeFunction, contains('"assign_cafe"'));
       expect(edgeFunction, contains('"cafe_assignment_failed"'));
       expect(edgeFunction, contains('"profile_upsert_failed"'));
+    });
+
+    test('auth user trigger repair keeps auth inserts non-blocking', () {
+      final sql = File(
+        'supabase/migrations/20260601_001_auth_user_trigger_repair.sql',
+      ).readAsStringSync();
+
+      expect(
+          sql, contains('CREATE OR REPLACE FUNCTION public.handle_new_user'));
+      expect(sql, contains('RETURN NEW'));
+      expect(sql, contains('RAISE WARNING'));
+      expect(sql, contains('CREATE TRIGGER on_auth_user_created'));
+      expect(sql, isNot(contains('INSERT INTO public.profiles')));
+    });
+
+    test('profile role check allows cafe owner role', () {
+      final sql = File(
+        'supabase/migrations/20260601_002_profiles_role_check_cafe_owner.sql',
+      ).readAsStringSync();
+
+      expect(sql, contains('profiles_role_check'));
+      expect(sql, contains("'user'"));
+      expect(sql, contains("'admin'"));
+      expect(sql, contains("'cafe_owner'"));
+      expect(sql, contains('public.profiles'));
+      expect(sql, contains('role'));
+    });
+
+    test('owner invite landing function serves a static public page', () {
+      final source = File(
+        'supabase/functions/owner-invite/index.ts',
+      ).readAsStringSync();
+
+      expect(source, contains('Invite accepted'));
+      expect(source, contains('KafeProje mobile app'));
+      expect(source, contains('Content-Type'));
+      expect(source, contains('text/html'));
+      expect(source, isNot(contains('SUPABASE_SERVICE_ROLE_KEY')));
+      expect(source, isNot(contains('createClient')));
     });
   });
 }

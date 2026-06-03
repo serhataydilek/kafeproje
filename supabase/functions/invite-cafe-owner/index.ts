@@ -32,11 +32,15 @@ function inviteErrorResponse(
   message: string,
   status = 500,
 ) {
-  return jsonResponse({
+  const body = {
     error: message,
     code,
     stage,
-  }, status);
+  };
+  console.error(
+    `[invite-cafe-owner] stage=${stage} code=${code} status=${status} message=${message}`,
+  );
+  return jsonResponse(body, status);
 }
 
 function cleanText(value: unknown): string | null {
@@ -69,6 +73,17 @@ function metadataText(
   return typeof value === "string" && value.trim().length > 0
     ? value.trim()
     : null;
+}
+
+function usernameFromEmail(email: string): string {
+  const localPart = email.split("@")[0] ?? "owner";
+  const normalized = localPart
+    .toLowerCase()
+    .replace(/[^a-z0-9._]/g, "_")
+    .replace(/[._]{2,}/g, "_")
+    .replace(/^[._]+|[._]+$/g, "");
+  const base = normalized.length >= 3 ? normalized : `owner_${normalized}`;
+  return base.slice(0, 24);
 }
 
 async function findAuthUserByEmail(
@@ -265,12 +280,19 @@ serve(async (req) => {
   let invited = false;
   if (!profile) {
     const redirectTo = Deno.env.get("OWNER_INVITE_REDIRECT_URL") ?? undefined;
+    const username = usernameFromEmail(email);
     const { data: inviteData, error: inviteError } = await adminClient.auth.admin
       .inviteUserByEmail(email, {
         data: {
+          username,
+          preferred_username: username,
+          user_name: username,
           first_name: firstName,
+          given_name: firstName,
           last_name: lastName,
+          family_name: lastName,
           full_name: fullName,
+          name: fullName,
           role: "cafe_owner",
         },
         redirectTo,
@@ -313,6 +335,9 @@ serve(async (req) => {
       .upsert({
         id: invitedUser.id,
         email: invitedUser.email ?? email,
+        username: metadataText(metadata, "username") ??
+          metadataText(metadata, "preferred_username") ??
+          metadataText(metadata, "user_name") ?? username,
         first_name: firstName ?? metadataText(metadata, "first_name"),
         last_name: lastName ?? metadataText(metadata, "last_name"),
         full_name: fullName || metadataText(metadata, "full_name") ||

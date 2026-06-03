@@ -67,6 +67,7 @@ class _CafeEditScreenState extends ConsumerState<CafeEditScreen>
   String? _photosError;
   String? _featuredPriorityError;
   String? _featuredUntilError;
+  UserProfile? _ownerOverride;
 
   Cafe _buildEditableFallbackCafe() {
     return Cafe.empty(id: widget.cafeId).copyWith(
@@ -431,6 +432,7 @@ class _CafeEditScreenState extends ConsumerState<CafeEditScreen>
           _ownerEmailCtrl.clear();
           _ownerFirstNameCtrl.clear();
           _ownerLastNameCtrl.clear();
+          _ownerOverride = result.data!.owner;
           _applyCafe(result.data!.cafe);
         });
         ScaffoldMessenger.of(context).showSnackBar(
@@ -516,7 +518,10 @@ class _CafeEditScreenState extends ConsumerState<CafeEditScreen>
         return;
       }
       if (result.ok && result.data != null) {
-        setState(() => _applyCafe(result.data!));
+        setState(() {
+          _ownerOverride = null;
+          _applyCafe(result.data!);
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(_trEn(
@@ -953,7 +958,13 @@ class _CafeEditScreenState extends ConsumerState<CafeEditScreen>
 
   UserProfile? _assignedOwner(Cafe? cafe, List<UserProfile>? users) {
     final ownerId = cafe?.ownerUserId?.trim();
-    if (ownerId == null || ownerId.isEmpty || users == null) {
+    if (ownerId == null || ownerId.isEmpty) {
+      return null;
+    }
+    if (_ownerOverride?.id == ownerId) {
+      return _ownerOverride;
+    }
+    if (users == null) {
       return null;
     }
     for (final user in users) {
@@ -971,13 +982,19 @@ class _CafeEditScreenState extends ConsumerState<CafeEditScreen>
   ) {
     final ownerId = cafe?.ownerUserId?.trim();
     final hasOwner = ownerId != null && ownerId.isNotEmpty;
+    final ownerName = owner?.fullName.trim();
+    final ownerEmail = owner?.email.trim();
+    final ownerUsername = owner?.username?.trim();
     final ownerLabel = owner == null
         ? ownerId
         : [
-            owner.fullName.trim().isNotEmpty ? owner.fullName.trim() : null,
-            owner.email.trim().isNotEmpty ? owner.email.trim() : null,
+            ownerName != null && ownerName.isNotEmpty ? ownerName : null,
+            ownerEmail != null && ownerEmail.isNotEmpty ? ownerEmail : null,
+            ownerUsername != null && ownerUsername.isNotEmpty
+                ? '@$ownerUsername'
+                : null,
             owner.role.value,
-          ].whereType<String>().join(' - ');
+          ].whereType<String>().join('\n');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1002,6 +1019,7 @@ class _CafeEditScreenState extends ConsumerState<CafeEditScreen>
               ),
               const SizedBox(height: AppSpacing.xs),
               SelectableText(
+                key: const Key('admin-owner-assigned-info'),
                 hasOwner
                     ? ownerLabel ?? ownerId
                     : _trEn('Henuz sahip atanmadi.', 'No owner assigned yet.'),
@@ -1011,52 +1029,55 @@ class _CafeEditScreenState extends ConsumerState<CafeEditScreen>
           ),
         ),
         const SizedBox(height: AppSpacing.md),
-        _input(
-          colors,
-          _ownerEmailCtrl,
-          _trEn('Sahip e-postasi', 'Owner email'),
-          key: const Key('admin-owner-email-input'),
-          keyboardType: TextInputType.emailAddress,
-        ),
-        _input(
-          colors,
-          _ownerFirstNameCtrl,
-          _trEn('Sahip adi', 'Owner first name'),
-          key: const Key('admin-owner-first-name-input'),
-        ),
-        _input(
-          colors,
-          _ownerLastNameCtrl,
-          _trEn('Sahip soyadi', 'Owner last name'),
-          key: const Key('admin-owner-last-name-input'),
-        ),
-        AppFormHelperText(
-          colors: colors,
-          text: _trEn(
-            'Yeni e-postaya Supabase daveti gonderilir. Mevcut kullanici otomatik cafe_owner yapilip bu kafeye atanir.',
-            'New emails receive a Supabase invite. Existing users are promoted to cafe_owner and assigned to this cafe.',
+        if (hasOwner) ...[
+          OutlinedButton.icon(
+            key: const Key('admin-owner-unassign-button'),
+            onPressed: isSubmitting ? null : _unassignOwner,
+            icon: const Icon(Icons.person_remove_outlined),
+            label: Text(_trEn('Sahibi kaldir', 'Unassign owner')),
           ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Wrap(
-          spacing: AppSpacing.sm,
-          runSpacing: AppSpacing.sm,
-          children: [
-            FilledButton.icon(
-              key: const Key('admin-owner-invite-button'),
-              onPressed: isSubmitting ? null : _inviteOwner,
-              icon: const Icon(Icons.mail_outline),
-              label: Text(_trEn('Davet et ve ata', 'Invite and assign')),
+          AppFormHelperText(
+            colors: colors,
+            text: _trEn(
+              'Yeni sahip atamak icin once mevcut sahibi kaldir.',
+              'Unassign the current owner before inviting a new one.',
             ),
-            if (hasOwner)
-              OutlinedButton.icon(
-                key: const Key('admin-owner-unassign-button'),
-                onPressed: isSubmitting ? null : _unassignOwner,
-                icon: const Icon(Icons.person_remove_outlined),
-                label: Text(_trEn('Sahibi kaldir', 'Unassign owner')),
-              ),
-          ],
-        ),
+          ),
+        ] else ...[
+          _input(
+            colors,
+            _ownerEmailCtrl,
+            _trEn('Sahip e-postasi', 'Owner email'),
+            key: const Key('admin-owner-email-input'),
+            keyboardType: TextInputType.emailAddress,
+          ),
+          _input(
+            colors,
+            _ownerFirstNameCtrl,
+            _trEn('Sahip adi', 'Owner first name'),
+            key: const Key('admin-owner-first-name-input'),
+          ),
+          _input(
+            colors,
+            _ownerLastNameCtrl,
+            _trEn('Sahip soyadi', 'Owner last name'),
+            key: const Key('admin-owner-last-name-input'),
+          ),
+          AppFormHelperText(
+            colors: colors,
+            text: _trEn(
+              'Yeni e-postaya Supabase daveti gonderilir. Mevcut kullanici otomatik cafe_owner yapilip bu kafeye atanir.',
+              'New emails receive a Supabase invite. Existing users are promoted to cafe_owner and assigned to this cafe.',
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          FilledButton.icon(
+            key: const Key('admin-owner-invite-button'),
+            onPressed: isSubmitting ? null : _inviteOwner,
+            icon: const Icon(Icons.mail_outline),
+            label: Text(_trEn('Davet et ve ata', 'Invite and assign')),
+          ),
+        ],
       ],
     );
   }
