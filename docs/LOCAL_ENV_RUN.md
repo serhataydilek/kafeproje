@@ -10,7 +10,7 @@ Create a local `.env` file in the project root only if you need a scratch
 source for copying values into `.env.local.json`. It is ignored by git.
 
 ```text
-SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_URL=your_supabase_project_url
 SUPABASE_ANON_KEY=your_supabase_anon_key
 GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 GOOGLE_PLACES_API_KEY=your_google_places_api_key

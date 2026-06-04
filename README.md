@@ -1,208 +1,193 @@
 # KafeProje
 
-KafeProje is a Flutter app for discovering, comparing, saving, and reviewing cafes in Istanbul. It combines app-managed cafe data from Supabase with live Google Places discovery, map data, ratings, opening hours, and photo metadata.
+## Application Overview
 
-The app is built for mobile-first public release on Android and iOS. The codebase is release-candidate close, but public store publishing still requires production accounts, signing, restricted API keys, Supabase deployment, and real-device smoke testing.
+KafeProje is a Flutter cafe discovery app for Istanbul. It combines app-managed cafe records from Supabase with Google Maps and Google Places data so signed-in users can discover cafes, view details, save favorites, compare cafes, and submit reviews.
 
-## What The App Does
+The repository is not production-ready until the technical items in `Release To Do` are completed and verified against production-like services and real devices.
 
-- Discover cafes from Home, Explore, and Map surfaces.
-- Search, filter, and sort cafe results.
-- View cafe details with photos, ratings, opening hours, location, and review context.
-- Compare up to four cafes side by side.
-- Save favorites with offline-tolerant local state.
-- Submit and manage reviews with validation, moderation, duplicate checks, and backend rate limiting.
-- Manage profile/auth flows with Supabase Auth.
-- Support admin cafe add/edit/soft-delete/restore workflows.
-- Support cafe owner invite and assignment flows through Supabase Edge Functions.
-- Use Firebase Analytics and Crashlytics for production diagnostics.
-- Support basic local notifications.
+## User Walkthrough
 
-## Tech Stack
+1. Open the app. The initial route is the authentication screen unless an existing session is restored.
+2. Sign in with an email or username and password, create an account with username, first name, last name, email, and password, or request a password reset from the sign-in form.
+3. After authentication, use the bottom navigation to move between Home, Explore, Map, Favorites, and Profile.
+4. Browse cafe cards on Home and Explore. Use search, filter, sorting, district filtering, and radius-based discovery where those controls are available.
+5. Open the Map tab to view cafe markers and a bottom preview. Radius presets can narrow or broaden map discovery.
+6. Open a cafe detail page to inspect images, ratings, opening hours, location information, reviews, and primary actions.
+7. Add or remove cafes from Favorites. Selected favorite cafes are available from the Favorites tab.
+8. Add cafes to the comparison list and open Compare from the floating compare action to review selected cafes side by side.
+9. Submit a cafe review from the detail page. Existing review UI supports validation, loading/error states, review display, and delete actions for the review owner or admin.
+10. Use Profile to view account details, edit profile fields and avatar, open Settings, or sign out.
+11. Use Settings to change theme mode and language mode.
+12. Admin users can open the Admin panel from Profile to add, edit, soft-delete, restore, feature, and assign/invite owners for cafes. Non-admin users are routed away from admin-only routes.
 
-- Flutter / Dart
-- Riverpod state management
-- GoRouter navigation
-- Supabase Auth, Postgres, Storage, RLS, and Edge Functions
-- Google Maps and Google Places
-- Firebase Analytics and Crashlytics
-- Hive and Flutter Secure Storage for local persistence
-- Flutter Local Notifications
+Owner claim data models, migrations, backend security hardening, and admin review UI exist in the repository, but owner claim screens are feature-gated with `ENABLE_OWNER_CLAIMS` and must be verified before release.
 
-## Repository Structure
+## Main Features
 
-```text
-lib/
-  config/          Environment and release config helpers
-  constants/       App-wide constants
-  models/          Cafe, user, review, result, and cache models
-  navigation/      GoRouter setup and guards
-  providers/       Riverpod state/controllers/selectors
-  repositories/    Data orchestration and source merging
-  screens/         Route-level UI
-  services/        Supabase, Places, storage, analytics, notifications
-  utils/           Validation, cache policy, logging, filtering, retry helpers
-  widgets/         Reusable UI components
+- Supabase authentication and profile management.
+- Home, Explore, Map, Favorites, Profile, Settings, Compare, and Cafe Detail routes.
+- Cafe search, filtering, district context, radius selection, sorting, and map/list flows.
+- Google Places discovery and Google Maps display.
+- Cafe image normalization for stored, Google Places, and direct trusted image sources.
+- Favorites, compare list, local cache, offline queue, and sync status UI.
+- Review submission, review listing, moderation helpers, ownership checks, and rate-limit support.
+- Admin cafe management with route guards and Supabase RLS-backed authorization expectations.
+- Turkish and English localization.
+- Firebase Analytics and Crashlytics integration.
+- Local notifications support.
 
-supabase/
-  functions/       Edge Functions
-  migrations/      Database migrations
-  *.sql            Schema, RLS, readiness, review, and cafe support SQL
+## Technology Stack
 
-docs/
-  LOCAL_ENV_RUN.md
-  PUBLIC_RELEASE_RUNBOOK.md
-  STORE_SUBMISSION_CHECKLIST.md
-  FINAL_RELEASE_TODO.md
-  PRIVACY_POLICY_DRAFT.md
-
-release-evidence/
-security-evidence/
-  Release validation and RLS evidence templates/runbooks
-```
+- Flutter and Dart
+- Riverpod / Flutter Riverpod
+- GoRouter
+- Supabase Auth, Postgres, Storage, Row Level Security, and Edge Functions
+- Google Maps Flutter and Google Places HTTP APIs
+- Hive, Flutter Secure Storage, cached network images, and cache manager
+- Firebase Core, Analytics, and Crashlytics
+- Flutter Local Notifications and timezone
+- `flutter_dotenv` plus Dart defines for runtime configuration
 
 ## Local Setup
 
-Install Flutter, then fetch dependencies:
+Install Flutter for your target platform, then fetch dependencies:
 
 ```powershell
 flutter pub get
 ```
 
-Create local runtime config from your real development values:
+Create local runtime configuration from the placeholder example:
 
 ```powershell
 Copy-Item .env.local.json.example .env.local.json
 ```
 
-Required keys:
+Fill `.env.local.json` with local development values. Do not commit real credentials, real service URLs, signing files, or Firebase app config.
 
-```json
-{
-  "SUPABASE_URL": "https://your-project.supabase.co",
-  "SUPABASE_ANON_KEY": "your_supabase_anon_key",
-  "GOOGLE_MAPS_API_KEY": "your_google_maps_api_key",
-  "GOOGLE_PLACES_API_KEY": "your_google_places_api_key"
-}
-```
-
-Run the app:
+Run the app with Dart defines:
 
 ```powershell
 flutter run --dart-define-from-file=.env.local.json
 ```
 
-Or use the helper:
+Or use the helper script:
 
 ```powershell
 powershell ./scripts/run_dev.ps1
 ```
 
-Do not commit `.env`, `.env.local.json`, signing files, or generated local secret config.
-
-## Quality Checks
-
-Run before committing release-sensitive changes:
+Pass additional Flutter arguments through the helper when needed:
 
 ```powershell
-flutter analyze
-flutter test
-powershell ./scripts/validate_release_readiness.ps1
+powershell ./scripts/run_dev.ps1 -d chrome
 ```
 
-On the machine used for signed release builds, also require local iOS release secrets:
-
-```powershell
-powershell ./scripts/validate_release_readiness.ps1 -RequireLocalSecrets
-```
-
-## Android Release Build
-
-Android release builds require:
-
-- Production `.env.local.json`
-- Restricted Google Maps and Places keys
-- Supabase production URL and anon key
-- Android release signing through `android/key.properties` or CI environment variables:
-  - `ANDROID_KEYSTORE_PATH`
-  - `ANDROID_KEYSTORE_PASSWORD`
-  - `ANDROID_KEY_ALIAS`
-  - `ANDROID_KEY_PASSWORD`
-
-Build:
-
-```powershell
-flutter build appbundle --release --dart-define-from-file=.env.local.json
-```
-
-Expected output:
-
-```text
-build/app/outputs/bundle/release/app-release.aab
-```
-
-## iOS Release Build
-
-Copy the ignored release secrets example:
+For iOS release builds, copy the ignored release secrets example and set the restricted iOS Maps key locally:
 
 ```powershell
 Copy-Item ios/Flutter/ReleaseSecrets.xcconfig.example ios/Flutter/ReleaseSecrets.xcconfig
 ```
 
-Set `GOOGLE_MAPS_API_KEY` in `ios/Flutter/ReleaseSecrets.xcconfig` to the iOS-restricted Maps SDK key.
+## Environment Variables
 
-On macOS:
+Required runtime names:
+
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `GOOGLE_MAPS_API_KEY`
+- `GOOGLE_PLACES_API_KEY`
+
+Optional runtime name:
+
+- `GOOGLE_PLACES_PHOTO_API_KEY`
+
+Feature flag:
+
+- `ENABLE_OWNER_CLAIMS`
+
+Supabase Edge Function secret names used by owner invitation flows:
+
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `OWNER_INVITE_REDIRECT_URL`
+
+Never put real values for these names in tracked files. Keep `.env`, `.env.local.json`, `ios/Flutter/ReleaseSecrets.xcconfig`, Android signing files, and Firebase local config ignored.
+
+## Testing Instructions
+
+Run formatting, analysis, and tests:
+
+```powershell
+dart format --set-exit-if-changed .
+flutter analyze
+flutter test
+```
+
+Run the repository release-readiness validation script:
+
+```powershell
+powershell ./scripts/validate_release_readiness.ps1
+```
+
+On the machine used for signed release builds, require local release secrets:
+
+```powershell
+powershell ./scripts/validate_release_readiness.ps1 -RequireLocalSecrets
+```
+
+Build Android release output with local Dart defines:
+
+```powershell
+flutter build apk --release --dart-define-from-file=.env.local.json
+```
+
+For app store submission, use an Android App Bundle:
+
+```powershell
+flutter build appbundle --release --dart-define-from-file=.env.local.json
+```
+
+iOS release builds must be performed on macOS with signing configured in Xcode:
 
 ```bash
 flutter build ios --release --no-codesign --dart-define-from-file=.env.local.json
 ```
 
-Then open `ios/Runner.xcworkspace`, configure Apple signing, archive, export, and upload through Xcode/TestFlight.
+## Release To Do
 
-## Supabase Release Requirements
+- [ ] Re-run a complete tracked-file secret scan before publishing the repository.
+- [ ] Rotate any Supabase, Google, Firebase, webhook, or function values that were ever present in local files, logs, screenshots, generated builds, or previous commits.
+- [ ] Confirm Git history does not expose private API values or private project URLs, or rotate affected values before public launch.
+- [ ] Configure a separate production Supabase project, database, storage buckets, RLS policies, Edge Function secrets, and backups.
+- [ ] Verify the mobile app uses only the Supabase anon key and never contains the Supabase service role key.
+- [ ] Restrict production Google Maps and Google Places keys by Android package/SHA, iOS bundle ID, enabled APIs, quotas, and monitoring.
+- [ ] Create separate test accounts for normal user and admin roles; create cafe owner test accounts only if owner flows are enabled for release.
+- [ ] Test sign-up, sign-in, sign-out, password reset, session restore, and duplicate-account behavior.
+- [ ] Implement or verify an in-app account deletion flow and confirm related user data handling.
+- [ ] Verify role and permission behavior for normal user, admin, and cafe owner roles if owner flows are enabled.
+- [ ] Verify owner claim submission, duplicate claim prevention, admin approve/reject, owner assignment, and owner-only edit permissions if owner claims are enabled.
+- [ ] Test review creation, validation, ownership delete behavior, rate limits, and moderation/reporting expectations.
+- [ ] Test error, loading, empty, offline, slow-network, and sync retry states across Home, Explore, Map, Favorites, Compare, Profile, Admin, and detail screens.
+- [ ] Verify Android and iOS permissions for location, photos, notifications, network access, and Maps SDK usage.
+- [ ] Verify release build signing, version/build number configuration, ProGuard/R8 behavior, and production Dart defines.
+- [ ] Run automated tests and address all failures before tagging a release.
+- [ ] Run manual testing on at least one real Android device and on a real iPhone before iOS release.
+- [ ] Run final production smoke tests against production services using non-sensitive demo data.
 
-Before public release:
+## Security Notes
 
-- Apply all migrations.
-- Deploy Edge Functions:
-  - `invite-cafe-owner`
-  - `owner-invite`
-- Configure function secrets:
-  - `SUPABASE_URL`
-  - `SUPABASE_ANON_KEY`
-  - `SUPABASE_SERVICE_ROLE_KEY`
-  - `OWNER_INVITE_REDIRECT_URL`
-- Confirm readiness:
+- Supabase RLS is the authoritative security boundary; app route guards are UX controls only.
+- Google Maps and Places keys in mobile apps are not secret by design; release safety depends on platform restrictions, API scoping, quotas, monitoring, and rotation.
+- Analytics payloads should remain privacy-minimized and must not include email, display name, review text, raw search text, exact coordinates, full addresses, or user-identifying fields.
+- The cafe table uses `google_place_id`; do not add or query a non-existent `place_id` column for current cafe flows.
 
-```sql
-select public.app_security_readiness();
-```
+## Supporting Documentation
 
-Public release is blocked unless `is_ready = true`.
-
-Use `supabase/SECURITY_READINESS.md` and `release-evidence/LIVE_SECURITY_INTEGRITY_SMOKE_CHECK.md` for live RLS/security validation.
-
-## Release Status
-
-Automated local checks are healthy, but the app is not public-store publishable until the external release gates are complete:
-
-- Google Play and App Store Connect setup
-- Android and iOS signing
-- Restricted production API keys
-- Supabase production deployment and RLS evidence
-- Firebase Analytics/Crashlytics smoke checks
-- Real-device Android and iOS manual smoke tests
-- Privacy policy, store listing, screenshots, and data-safety/privacy forms
-
-Use [docs/FINAL_RELEASE_TODO.md](docs/FINAL_RELEASE_TODO.md) as the final release checklist.
-
-## Security And Privacy Notes
-
-- Supabase RLS is the authoritative security boundary.
-- Client route guards and validation are UX controls only.
-- Google API keys in mobile apps are not secret; production release depends on platform restrictions, API scoping, quotas, and billing alerts.
-- Analytics events are intentionally privacy-minimized and should not include email, display name, review text, raw search text, exact coordinates, or full addresses.
-- See [docs/PRIVACY_POLICY_DRAFT.md](docs/PRIVACY_POLICY_DRAFT.md) before publishing store listings.
+- Local configuration details: `docs/LOCAL_ENV_RUN.md`
+- Supabase/RLS audit guidance: `supabase/SECURITY_READINESS.md`
+- RLS evidence template: `security-evidence/rls-audit/RELEASE_EVIDENCE_TEMPLATE.md`
 
 ## License
 

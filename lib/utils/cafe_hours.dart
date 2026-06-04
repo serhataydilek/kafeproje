@@ -125,9 +125,7 @@ bool isOpenNow(List<OpeningHour> openingHours) {
 CafeOpenStatus resolveCafeOpenStatus(Cafe cafe, {DateTime? now}) {
   final explicitGoogleOpenNow = cafe.googlePlaceData?.googleOpenNow;
   if (explicitGoogleOpenNow != null) {
-    return explicitGoogleOpenNow
-        ? CafeOpenStatus.open
-        : CafeOpenStatus.closed;
+    return explicitGoogleOpenNow ? CafeOpenStatus.open : CafeOpenStatus.closed;
   }
   if (!cafe.hasWorkingHours) {
     return CafeOpenStatus.unknown;

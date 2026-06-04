@@ -26,8 +26,7 @@ class DistrictRepository {
       return memorySnapshot;
     }
 
-    final storageSnapshot =
-        await _storage?.loadDistrictCache(normalizedCity);
+    final storageSnapshot = await _storage?.loadDistrictCache(normalizedCity);
     if (storageSnapshot == null) {
       return null;
     }

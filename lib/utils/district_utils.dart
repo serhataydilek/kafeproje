@@ -23,7 +23,8 @@ District? matchDistrict(
   String city = FallbackDistrictCatalog.defaultCity,
 }) {
   final normalized = normalizedDistrictToken(value);
-  if (normalized.isEmpty || normalized == normalizedDistrictToken(District.unknown.displayName)) {
+  if (normalized.isEmpty ||
+      normalized == normalizedDistrictToken(District.unknown.displayName)) {
     return null;
   }
 
@@ -46,8 +47,7 @@ District? matchDistrict(
       if (position == -1) {
         continue;
       }
-      final isBetter =
-          position < leadingCanonicalPosition ||
+      final isBetter = position < leadingCanonicalPosition ||
           (position == leadingCanonicalPosition &&
               token.length > leadingCanonicalLength) ||
           (position == leadingCanonicalPosition &&
@@ -81,8 +81,7 @@ District? matchDistrict(
       if (position == -1) {
         continue;
       }
-      final isBetterMatch =
-          position < bestPosition ||
+      final isBetterMatch = position < bestPosition ||
           (position == bestPosition && normalizedTerm.length > bestLength) ||
           (position == bestPosition &&
               normalizedTerm.length == bestLength &&
@@ -122,7 +121,8 @@ String? canonicalDistrictName(
       normalizedDistrictToken(District.unknown.displayName)) {
     return null;
   }
-  return matchDistrict(trimmed, districts: districts, city: city)?.displayName ??
+  return matchDistrict(trimmed, districts: districts, city: city)
+          ?.displayName ??
       trimmed;
 }
 
@@ -137,7 +137,8 @@ bool districtMatches(
   final rightCanonical =
       canonicalDistrictName(right, districts: districts, city: city);
   if (leftCanonical != null && rightCanonical != null) {
-    return normalizeSearchText(leftCanonical) == normalizeSearchText(rightCanonical);
+    return normalizeSearchText(leftCanonical) ==
+        normalizeSearchText(rightCanonical);
   }
   return normalizeSearchText(left ?? '') == normalizeSearchText(right ?? '');
 }

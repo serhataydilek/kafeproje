@@ -366,10 +366,7 @@ class OfflineQueueService {
   String? _favoriteToggleKey(Map<String, dynamic> payload) {
     final userId = (payload['userId'] as String?)?.trim();
     final cafeId = (payload['cafeId'] as String?)?.trim();
-    if (userId == null ||
-        userId.isEmpty ||
-        cafeId == null ||
-        cafeId.isEmpty) {
+    if (userId == null || userId.isEmpty || cafeId == null || cafeId.isEmpty) {
       return null;
     }
     return 'favoriteToggle:$userId:$cafeId';

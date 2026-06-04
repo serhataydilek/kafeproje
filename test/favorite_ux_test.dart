@@ -145,8 +145,7 @@ void main() {
     test(
         'favorite without stored image can use matching home google details image',
         () async {
-      const homeGoogleDetailsImage =
-          'places/PLACE_ID/photos/PHOTO_RESOURCE';
+      const homeGoogleDetailsImage = 'places/PLACE_ID/photos/PHOTO_RESOURCE';
       final favorite = buildTestCafe(
         id: 'favorite-google-details',
         name: 'Favorite Google Details',

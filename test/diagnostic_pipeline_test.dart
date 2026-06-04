@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kafeproje/utils/cafe_discovery_classifier.dart';
 
-// Since we have Env variables from dotenv in the app, this is a mock proxy or we can test with standard mock response. 
-// Actually, this test will just call the actual network if the env is available or we can inject a mock JSON. 
+// Since we have Env variables from dotenv in the app, this is a mock proxy or we can test with standard mock response.
+// Actually, this test will just call the actual network if the env is available or we can inject a mock JSON.
 // But the user's prompt suggests adding logging TO THE PIPELINE and inspecting.
 
 void main() {
@@ -52,6 +52,5 @@ void main() {
       }
     }
     debugPrint('2) count after keyword/type filtering: $afterKeyword');
-
   });
 }

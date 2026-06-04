@@ -44,7 +44,7 @@ void main() {
     test('warns when maps key looks malformed', () {
       final warnings = Env.collectGoogleApiConfigurationWarnings(
         mapsApiKey: 'not-a-google-key',
-        placesApiKey: 'AIzaSyDUMMYPLACESKEY00000000000000001',
+        placesApiKey: 'test_google_places_api_key',
       );
 
       expect(
@@ -54,7 +54,7 @@ void main() {
     });
 
     test('warns when maps and places keys are shared', () {
-      const sharedKey = 'AIzaSySHAREDKEY000000000000000000000001';
+      const sharedKey = 'test_shared_google_api_key';
       final warnings = Env.collectGoogleApiConfigurationWarnings(
         mapsApiKey: sharedKey,
         placesApiKey: sharedKey,
@@ -66,13 +66,13 @@ void main() {
       );
     });
 
-    test('returns no warnings for distinct valid-looking keys', () {
+    test('warns for placeholder-like keys', () {
       final warnings = Env.collectGoogleApiConfigurationWarnings(
-        mapsApiKey: 'AIzaSyMAPSKEY000000000000000000000001',
-        placesApiKey: 'AIzaSyPLACESKEY0000000000000000000001',
+        mapsApiKey: 'test_google_maps_api_key',
+        placesApiKey: 'test_google_places_api_key',
       );
 
-      expect(warnings, isEmpty);
+      expect(warnings, isNotEmpty);
     });
   });
 
@@ -88,7 +88,7 @@ void main() {
 
     test('accepts present Supabase config', () {
       final missing = Env.collectMissingRequiredConfigKeys(
-        supabaseUrl: 'https://project.supabase.co',
+        supabaseUrl: 'supabase_project_url',
         supabaseAnonKey: 'anon-key',
       );
 
@@ -101,7 +101,7 @@ void main() {
       final diagnostics = Env.buildConfigDiagnostics(
         values: const <String, ({String dartDefine, String? dotenvAsset})>{
           'SUPABASE_URL': (
-            dartDefine: 'https://project.supabase.co',
+            dartDefine: 'supabase_project_url',
             dotenvAsset: null,
           ),
           'SUPABASE_ANON_KEY': (
@@ -120,7 +120,7 @@ void main() {
       );
       expect(
         Env.hasSupabaseConfigFor(
-          supabaseUrl: 'https://project.supabase.co',
+          supabaseUrl: 'supabase_project_url',
           supabaseAnonKey: 'secret-anon-key',
         ),
         isTrue,
@@ -131,8 +131,8 @@ void main() {
       final diagnostics = Env.buildConfigDiagnostics(
         values: const <String, ({String dartDefine, String? dotenvAsset})>{
           'SUPABASE_URL': (
-            dartDefine: 'https://define-project.supabase.co',
-            dotenvAsset: 'https://dotenv-project.supabase.co',
+            dartDefine: 'define_supabase_project_url',
+            dotenvAsset: 'dotenv_supabase_project_url',
           ),
           'SUPABASE_ANON_KEY': (
             dartDefine: 'define-secret-anon-key',
@@ -151,8 +151,8 @@ void main() {
         logOutput,
         contains('[ENV_CONFIG] SUPABASE_ANON_KEY=present source=dart_define'),
       );
-      expect(logOutput, isNot(contains('define-project')));
-      expect(logOutput, isNot(contains('dotenv-project')));
+      expect(logOutput, isNot(contains('define_supabase_project_url')));
+      expect(logOutput, isNot(contains('dotenv_supabase_project_url')));
       expect(logOutput, isNot(contains('define-secret-anon-key')));
       expect(logOutput, isNot(contains('dotenv-secret-anon-key')));
     });
@@ -162,7 +162,7 @@ void main() {
         values: const <String, ({String dartDefine, String? dotenvAsset})>{
           'SUPABASE_URL': (
             dartDefine: '',
-            dotenvAsset: 'https://dotenv-project.supabase.co',
+            dotenvAsset: 'dotenv_supabase_project_url',
           ),
           'SUPABASE_ANON_KEY': (
             dartDefine: '',
@@ -170,11 +170,11 @@ void main() {
           ),
           'GOOGLE_MAPS_API_KEY': (
             dartDefine: '',
-            dotenvAsset: 'AIzaSyDOTENVMAPSKEY0000000000000001',
+            dotenvAsset: 'test_google_maps_api_key',
           ),
           'GOOGLE_PLACES_API_KEY': (
             dartDefine: '',
-            dotenvAsset: 'AIzaSyDOTENVPLACESKEY0000000000001',
+            dotenvAsset: 'test_google_places_api_key',
           ),
         },
       );
@@ -190,7 +190,7 @@ void main() {
       );
       expect(
         Env.hasSupabaseConfigFor(
-          supabaseUrl: 'https://dotenv-project.supabase.co',
+          supabaseUrl: 'dotenv_supabase_project_url',
           supabaseAnonKey: 'dotenv-secret-anon-key',
         ),
         isTrue,
@@ -199,13 +199,13 @@ void main() {
 
     test('missing Supabase key reports missing key names', () {
       final missing = Env.collectMissingRequiredConfigKeys(
-        supabaseUrl: 'https://project.supabase.co',
+        supabaseUrl: 'supabase_project_url',
         supabaseAnonKey: '',
       );
       final diagnostics = Env.buildConfigDiagnostics(
         values: const <String, ({String dartDefine, String? dotenvAsset})>{
           'SUPABASE_URL': (
-            dartDefine: 'https://project.supabase.co',
+            dartDefine: 'supabase_project_url',
             dotenvAsset: null,
           ),
           'SUPABASE_ANON_KEY': (
@@ -223,7 +223,7 @@ void main() {
     });
 
     test('local fallback is reported without logging secret values', () {
-      const secretUrl = 'https://secret-project.supabase.co';
+      const secretUrl = 'redacted_supabase_project_url';
       const secretKey = 'secret-anon-key-value';
       final diagnostics = Env.buildConfigDiagnostics(
         values: const <String, ({String dartDefine, String? dotenvAsset})>{

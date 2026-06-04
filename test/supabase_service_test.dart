@@ -82,26 +82,26 @@ void main() {
   group('log URL redaction', () {
     test('signed Supabase URL token is removed from summaries', () {
       final summary = log_sanitizer.summarizeUrlForLog(
-        'https://example.supabase.co/storage/v1/object/sign/avatars/profiles/user/avatar.png?token=secret-token&expires=123',
+        'https://storage.example.com/storage/v1/object/sign/avatars/profiles/user/avatar.png?token=test-token&expires=123',
         presenceLabel: 'hasAvatar',
       );
 
       expect(summary, contains('hasAvatar=true'));
-      expect(summary, contains('host=example.supabase.co'));
+      expect(summary, contains('host=storage.example.com'));
       expect(summary, contains('pathHash='));
-      expect(summary, isNot(contains('secret-token')));
+      expect(summary, isNot(contains('test-token')));
       expect(summary, isNot(contains('token=')));
       expect(summary, isNot(contains('expires=')));
     });
 
     test('Google Places key query param is removed from redacted URL logs', () {
       final summary = legacy_redaction.redactUrlForLog(
-        'https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=abc&key=google-secret',
+        'https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference=abc&key=test-google-key',
       );
 
       expect(summary, contains('host=maps.googleapis.com'));
       expect(summary, contains('pathHash='));
-      expect(summary, isNot(contains('google-secret')));
+      expect(summary, isNot(contains('test-google-key')));
       expect(summary, isNot(contains('key=')));
       expect(summary, isNot(contains('photo_reference=')));
     });
@@ -1183,7 +1183,7 @@ void main() {
     test('extractAvatarObjectPath parses public avatar URLs', () {
       expect(
         service.extractAvatarObjectPath(
-          'https://example.supabase.co/storage/v1/object/public/avatars/profiles/user-1/avatar.png',
+          'https://storage.example.com/storage/v1/object/public/avatars/profiles/user-1/avatar.png',
         ),
         'profiles/user-1/avatar.png',
       );
@@ -1192,7 +1192,7 @@ void main() {
     test('extractAvatarObjectPath parses signed avatar URLs', () {
       expect(
         service.extractAvatarObjectPath(
-          'https://example.supabase.co/storage/v1/object/sign/avatars/profiles/user-1/avatar.png?token=abc',
+          'https://storage.example.com/storage/v1/object/sign/avatars/profiles/user-1/avatar.png?token=abc',
         ),
         'profiles/user-1/avatar.png',
       );
@@ -1201,7 +1201,7 @@ void main() {
     test('extractAvatarObjectPath rejects unrelated buckets', () {
       expect(
         service.extractAvatarObjectPath(
-          'https://example.supabase.co/storage/v1/object/public/cafes/profiles/user-1/avatar.png',
+          'https://storage.example.com/storage/v1/object/public/cafes/profiles/user-1/avatar.png',
         ),
         isNull,
       );

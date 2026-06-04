@@ -2,7 +2,7 @@ import 'app_logger.dart';
 import '../constants/security_config.dart';
 
 /// Logs security-related events with appropriate categorization.
-/// 
+///
 /// Uses the security configuration to determine log levels and event types.
 /// All security events should be routed through this logger for consistency.
 void logSecurityEvent(

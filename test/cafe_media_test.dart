@@ -29,7 +29,7 @@ void main() {
     test('photo name already ending in media is not double suffixed', () {
       final url = buildGooglePhotoMediaUrl(
         'places/PLACE_ID/photos/PHOTO_RESOURCE/media',
-        apiKey: 'AIzaSyPHOTOAPIKEY0000000000000000001',
+        apiKey: 'test_google_places_photo_api_key',
         maxWidthPx: CafeImageVariant.listThumbnail.requestWidthPx,
       );
 
@@ -108,7 +108,7 @@ void main() {
     test('invalid size params are replaced with a valid default', () {
       final url = buildGooglePhotoMediaUrl(
         'places/PLACE_ID/photos/PHOTO_RESOURCE',
-        apiKey: 'AIzaSyPHOTOAPIKEY0000000000000000001',
+        apiKey: 'test_google_places_photo_api_key',
         maxWidthPx: 0,
       );
 
@@ -184,7 +184,7 @@ void main() {
     test('new google photo media urls include key and width', () {
       final url = buildGooglePhotoMediaUrl(
         'places/place-1/photos/photo-1/media',
-        apiKey: 'AIzaSyPHOTOAPIKEY0000000000000000001',
+        apiKey: 'test_google_places_photo_api_key',
         maxWidthPx: CafeImageVariant.listThumbnail.requestWidthPx,
       );
 
@@ -194,7 +194,7 @@ void main() {
       expect(uri.queryParameters['maxWidthPx'], '720');
       expect(
         uri.queryParameters['key'],
-        'AIzaSyPHOTOAPIKEY0000000000000000001',
+        'test_google_places_photo_api_key',
       );
     });
 

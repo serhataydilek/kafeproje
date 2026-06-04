@@ -22,7 +22,8 @@ class PlacesQueryCatalog {
     required String cityDisplayName,
     bool fullSet = true,
   }) {
-    final templates = fullSet ? _cityWideTextTemplates : _cityWideTextTemplates.take(1);
+    final templates =
+        fullSet ? _cityWideTextTemplates : _cityWideTextTemplates.take(1);
     return templates
         .map((template) => template.replaceAll('{city}', cityDisplayName))
         .toList(growable: false);
@@ -34,8 +35,8 @@ class PlacesQueryCatalog {
   }) {
     final effectiveLocation =
         districtDisplayName == null || districtDisplayName.trim().isEmpty
-        ? cityDisplayName
-        : '${districtDisplayName.trim()} $cityDisplayName';
+            ? cityDisplayName
+            : '${districtDisplayName.trim()} $cityDisplayName';
     return _chainTemplates
         .map((template) => template.replaceAll('{city}', effectiveLocation))
         .toList(growable: false);

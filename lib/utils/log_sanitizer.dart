@@ -29,9 +29,8 @@ String _redactUrl(String rawUrl) {
   final host = (parsed != null && parsed.host.isNotEmpty)
       ? parsed.host.toLowerCase()
       : 'local';
-  final path = (parsed != null && parsed.path.isNotEmpty)
-      ? parsed.path
-      : normalized;
+  final path =
+      (parsed != null && parsed.path.isNotEmpty) ? parsed.path : normalized;
   final pathHash = _shortHash(path);
   return 'host=$host pathHash=$pathHash';
 }

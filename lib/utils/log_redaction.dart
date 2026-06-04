@@ -7,9 +7,8 @@ String redactUrlForLog(String? rawUrl) {
   }
 
   final uri = Uri.tryParse(trimmed);
-  final normalized = uri == null
-      ? trimmed
-      : uri.replace(query: '', fragment: '').toString();
+  final normalized =
+      uri == null ? trimmed : uri.replace(query: '', fragment: '').toString();
   final parsed = Uri.tryParse(normalized);
   final host = parsed != null && parsed.host.isNotEmpty
       ? parsed.host.toLowerCase()

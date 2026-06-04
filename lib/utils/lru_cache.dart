@@ -71,7 +71,8 @@ class LruCache<K, V> {
 
   Iterable<MapEntry<K, V>> get entries {
     _purgeExpired();
-    return _entries.entries.map((entry) => MapEntry(entry.key, entry.value.value));
+    return _entries.entries
+        .map((entry) => MapEntry(entry.key, entry.value.value));
   }
 
   Iterable<V> get values {

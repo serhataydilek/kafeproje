@@ -60,7 +60,8 @@ class CafeDiscoveryDebugReportRecorder {
   final Map<String, int> _denyReasonCounts = <String, int>{};
   final Map<String, int> _queryRawCounts = <String, int>{};
   final Map<String, int> _queryAcceptedCounts = <String, int>{};
-  final Map<String, _CandidateRecord> _candidates = <String, _CandidateRecord>{};
+  final Map<String, _CandidateRecord> _candidates =
+      <String, _CandidateRecord>{};
   final Map<String, _VisibleCafeRecord> _finalVisible =
       <String, _VisibleCafeRecord>{};
 
@@ -456,7 +457,7 @@ class CafeDiscoveryDebugReportRecorder {
     buffer.writeln('[Suspicious Mixed Cafe Candidates]');
     final suspicious = _candidates.values.where((record) {
       final normalized = normalizeSearchText(record.name);
-        final hasKeyword = _mixedCafeKeywords.any(normalized.contains);
+      final hasKeyword = _mixedCafeKeywords.any(normalized.contains);
       if (!hasKeyword) {
         return false;
       }
@@ -498,8 +499,10 @@ class CafeDiscoveryDebugReportRecorder {
       }
 
       final hasVisible = matches.any((record) => record.wasVisible);
-      final hasAllowed = matches.any((record) => record.classifierAllowed == true);
-      final hasDenied = matches.any((record) => record.classifierAllowed == false);
+      final hasAllowed =
+          matches.any((record) => record.classifierAllowed == true);
+      final hasDenied =
+          matches.any((record) => record.classifierAllowed == false);
 
       final status = hasVisible
           ? 'visible'
@@ -531,11 +534,11 @@ class CafeDiscoveryDebugReportRecorder {
         ..sort((left, right) => left.name.compareTo(right.name));
       final display = visible.take(_maxVisibleCafesInReport);
       for (final cafe in display) {
-        final rating =
-            cafe.appRating?.toStringAsFixed(1) ?? cafe.googleRating?.toStringAsFixed(1) ?? '-';
-        final identity = cafe.placeId?.trim().isNotEmpty == true
-            ? cafe.placeId!
-            : cafe.id;
+        final rating = cafe.appRating?.toStringAsFixed(1) ??
+            cafe.googleRating?.toStringAsFixed(1) ??
+            '-';
+        final identity =
+            cafe.placeId?.trim().isNotEmpty == true ? cafe.placeId! : cafe.id;
         buffer.writeln(
           '${cafe.name} | $identity | ${cafe.source} | $rating | ${cafe.district} / ${cafe.address}',
         );

@@ -45,10 +45,7 @@ class DistrictsService {
 
   Future<List<dynamic>> _query(String? city) {
     final normalizedCity = city?.trim();
-    var query = _client
-        .from('districts')
-        .select('*')
-        .eq('is_active', true);
+    var query = _client.from('districts').select('*').eq('is_active', true);
     if (normalizedCity != null && normalizedCity.isNotEmpty) {
       query = query.ilike('city', normalizedCity);
     }

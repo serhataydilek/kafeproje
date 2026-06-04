@@ -137,7 +137,9 @@ void main() {
 
       expect(find.byType(RemoteImage), findsNothing);
 
-      await container.read(appShellProvider.notifier).bootstrapAuthenticatedUserForTesting(
+      await container
+          .read(appShellProvider.notifier)
+          .bootstrapAuthenticatedUserForTesting(
             _buildAuthUser(
               id: 'admin-user',
               email: 'admin@example.com',

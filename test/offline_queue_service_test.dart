@@ -152,7 +152,8 @@ void main() {
 
       final queueBeforeReplay = await storage.loadOfflineQueue();
       expect(queueBeforeReplay, hasLength(1));
-      expect(queueBeforeReplay.single.action, OfflineQueueAction.favoriteToggle);
+      expect(
+          queueBeforeReplay.single.action, OfflineQueueAction.favoriteToggle);
       expect(queueBeforeReplay.single.payload['isAdding'], isFalse);
 
       connectivity.setOnline(true, notify: false);
@@ -348,8 +349,7 @@ void main() {
       await connectivity.dispose();
     });
 
-    test('failed favorite sync is queued and local favorite is kept',
-        () async {
+    test('failed favorite sync is queued and local favorite is kept', () async {
       final storage = await _openStorage(tempDir);
       final connectivity = _FakeConnectivityService(initiallyOnline: false);
       final container = createTestContainer(

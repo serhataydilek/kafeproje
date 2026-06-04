@@ -18,8 +18,9 @@ class RateLimiter {
   }) {
     final now = _clock();
     final namespacedKey = bucket == null ? key : '$bucket::$key';
-    final effectiveInterval =
-        minIntervalOverride ?? (bucket == null ? null : _bucketIntervals[bucket]) ?? minInterval;
+    final effectiveInterval = minIntervalOverride ??
+        (bucket == null ? null : _bucketIntervals[bucket]) ??
+        minInterval;
     final lastCall = _lastCallAt[namespacedKey];
     if (lastCall != null && now.difference(lastCall) < effectiveInterval) {
       return false;

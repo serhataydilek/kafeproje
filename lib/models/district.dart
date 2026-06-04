@@ -34,13 +34,13 @@ class District {
       id: (json['id'] as String?)?.trim() ?? unknown.id,
       city: (json['city'] as String?)?.trim() ?? '',
       name: (json['name'] as String?)?.trim() ?? '',
-      displayName:
-          (json['displayName'] as String?)?.trim() ??
+      displayName: (json['displayName'] as String?)?.trim() ??
           (json['display_name'] as String?)?.trim() ??
           unknown.displayName,
       latitude: _asDouble(json['latitude']) ?? 0,
       longitude: _asDouble(json['longitude']) ?? 0,
-      searchRadiusMeters: _asInt(json['searchRadiusMeters'] ?? json['search_radius_meters']),
+      searchRadiusMeters:
+          _asInt(json['searchRadiusMeters'] ?? json['search_radius_meters']),
       northeastLat: _asDouble(json['northeastLat'] ?? json['northeast_lat']),
       northeastLng: _asDouble(json['northeastLng'] ?? json['northeast_lng']),
       southwestLat: _asDouble(json['southwestLat'] ?? json['southwest_lat']),
@@ -52,8 +52,7 @@ class District {
   }
 
   static District? tryFromSupabaseRow(Map<String, dynamic> row) {
-    final displayName =
-        _trimmed(row['display_name']) ??
+    final displayName = _trimmed(row['display_name']) ??
         _trimmed(row['displayName']) ??
         _trimmed(row['name']);
     final city = _trimmed(row['city']);
@@ -69,9 +68,7 @@ class District {
     final rawName =
         _trimmed(row['name']) ?? _normalizedDistrictKey(displayName);
     return District(
-      id:
-          _trimmed(row['id']) ??
-          '${_normalizedDistrictKey(city)}:$rawName',
+      id: _trimmed(row['id']) ?? '${_normalizedDistrictKey(city)}:$rawName',
       city: city,
       name: rawName,
       displayName: displayName,
@@ -222,7 +219,9 @@ class DistrictCacheSnapshot {
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'city': city,
-      'districts': districts.map((district) => district.toJson()).toList(growable: false),
+      'districts': districts
+          .map((district) => district.toJson())
+          .toList(growable: false),
       'lastUpdated': lastUpdated.toUtc().toIso8601String(),
     };
   }

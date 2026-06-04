@@ -244,13 +244,12 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
             isAdding: isAdding,
           );
       if (!supabaseOk) {
-        queuedForReplay = await _ref
-            .read(offlineSyncProvider.notifier)
-            .enqueueFavoriteToggle(
-              userId: userId,
-              cafeId: cafeId,
-              isAdding: isAdding,
-            );
+        queuedForReplay =
+            await _ref.read(offlineSyncProvider.notifier).enqueueFavoriteToggle(
+                  userId: userId,
+                  cafeId: cafeId,
+                  isAdding: isAdding,
+                );
         supabaseOk = queuedForReplay;
       }
     }
