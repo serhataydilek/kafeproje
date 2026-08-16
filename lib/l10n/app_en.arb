@@ -221,6 +221,13 @@
       }
     }
   },
+  "filterPresetsTitle": "Presets",
+  "filterPresetNameHint": "Save current filters as a preset",
+  "filterPresetNameEmpty": "Preset name cannot be empty.",
+  "filterPresetNeedFilters": "Add at least one filter before saving a preset.",
+  "filterPresetUpdated": "Preset updated.",
+  "filterPresetSaved": "Preset saved.",
+  "filterPresetEmpty": "No presets yet. Save your current filters to reuse them.",
   "mapPreparing": "Preparing map view",
   "mapLocateMe": "Locate me",
   "mapEmptyTitle": "There are no cafes to show on the map",
@@ -283,6 +290,31 @@
   "cafeDetailCompare": "Compare",
   "cafeDetailCompared": "Added",
   "cafeDetailOpenOnMap": "Open on map",
+  "metadataJustNow": "just now",
+  "metadataMinutesAgo": "{count}m ago",
+  "@metadataMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "metadataHoursAgo": "{count}h ago",
+  "@metadataHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "metadataDaysAgo": "{count}d ago",
+  "@metadataDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "metricWifi": "Wi-Fi",
   "metricOutlet": "Outlets",
   "metricQuietness": "Quietness",
@@ -397,6 +429,17 @@
   "adminUnnamedUser": "Unnamed user",
   "adminAddCafe": "Add new cafe",
   "adminEdit": "Edit",
+  "profileEditPhoto": "Edit photo",
+  "profileRemovePhoto": "Remove photo",
+  "profilePhotoHintAdd": "Add a photo to make your profile feel more personal.",
+  "profilePhotoReady": "A new photo is ready. Save to upload it to your profile.",
+  "profileEditIntro": "You can now manage your entire profile from here.",
+  "profilePhotoSection": "Profile photo",
+  "profilePhotoPreviewReady": "Preview ready. Saving will upload the compressed photo from your gallery.",
+  "profilePhotoReplaceHint": "You can replace or remove your current photo.",
+  "profilePhotoPickHint": "Pick a photo from your gallery to preview it before saving.",
+  "profileChooseFromGallery": "Choose from gallery",
+  "profileUsernameHint": "3-24 characters",
   "profileEditTitle": "Edit profile",
   "profileEditFirstNameRequired": "First name cannot be empty.",
   "profileEditLastNameRequired": "Last name cannot be empty.",

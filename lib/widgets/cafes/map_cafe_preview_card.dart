@@ -45,7 +45,8 @@ class MapCafePreviewCard extends StatelessWidget {
     final imageRadius = BorderRadius.circular(
       _MapCafePreviewCardTokens.imageRadius,
     );
-    final hasVisibleRating = cafe.appRating != null;
+    final visibleRating = cafe.appRating ?? cafe.adminFallbackRating;
+    final hasVisibleRating = visibleRating != null;
     final openStatus = resolveCafeOpenStatus(cafe);
 
     return MapSurface(
@@ -63,14 +64,6 @@ class MapCafePreviewCard extends StatelessWidget {
           child: Ink(
             decoration: BoxDecoration(
               borderRadius: cardRadius,
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  colors.card.withValues(alpha: 0.98),
-                  colors.bg.withValues(alpha: 0.94),
-                ],
-              ),
             ),
             child: InkWell(
               onTap: onTap,
@@ -198,7 +191,8 @@ class MapCafePreviewCard extends StatelessWidget {
                                 iconColor: hasVisibleRating
                                     ? colors.primary
                                     : colors.mutedText,
-                                label: cafeRatingLabel(l10n, cafe),
+                                label: visibleRating?.toStringAsFixed(1) ??
+                                    l10n.cafeNoRatingsYet,
                               ),
                               _MetricPill(
                                 colors: colors,

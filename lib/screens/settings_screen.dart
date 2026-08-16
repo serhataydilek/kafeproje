@@ -50,36 +50,38 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     return Scaffold(
       backgroundColor: colors.bg,
+      appBar: AppBar(
+        backgroundColor: colors.bg,
+        surfaceTintColor: Colors.transparent,
+        leading: IconButton(
+          tooltip: l10n.commonBack,
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+              return;
+            }
+            context.go('/profile');
+          },
+          icon: Icon(Icons.arrow_back_rounded, color: colors.text),
+        ),
+        title: Text(
+          l10n.commonSettings,
+          style: TextStyle(
+            color: colors.text,
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.all(AppSpacing.md),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.md,
+            AppSpacing.sm,
+            AppSpacing.md,
+            AppSpacing.xl,
+          ),
           children: [
-            GestureDetector(
-              onTap: () => context.pop(),
-              child: Row(
-                children: [
-                  Icon(Icons.arrow_back, size: 18, color: colors.text),
-                  const SizedBox(width: 4),
-                  Text(
-                    l10n.commonBack,
-                    style: TextStyle(
-                      color: colors.primary,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              l10n.commonSettings,
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w800,
-                color: colors.text,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
             AppSectionTitle(colors: colors, title: l10n.commonTheme),
             const SizedBox(height: AppSpacing.sm),
             ...[
@@ -148,7 +150,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    _version.isEmpty ? 'Loading...' : _version,
+                    _version.isEmpty ? l10n.commonLoading : _version,
                     style: TextStyle(
                       color: colors.mutedText,
                       fontWeight: FontWeight.w500,

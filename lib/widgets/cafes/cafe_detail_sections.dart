@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../l10n/l10n.dart';
 import '../../models/index.dart';
 import '../../providers/app_provider.dart';
@@ -92,10 +93,13 @@ class CafeDetailHeaderSection extends StatelessWidget {
             children: [
               Text(
                 cafe.name,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 26,
+                  fontSize: 24,
                   fontWeight: FontWeight.w800,
                   color: colors.text,
+                  height: 1.15,
                 ),
               ),
               if (cafe.isActiveFeatured) ...[
@@ -180,7 +184,10 @@ class CafeDetailRatingSection extends ConsumerWidget {
     final hasGoogleRating = (cafe.googleRating ?? 0) > 0;
     final hasGoogleReviewCount = (cafe.googleReviewCount ?? 0) > 0;
     final externalUpdatedLabel = hasGoogleRating || hasGoogleReviewCount
-        ? _externalMetadataFreshnessLabel(cafe.googlePlaceData?.lastSyncedAt)
+        ? _externalMetadataFreshnessLabel(
+            l10n,
+            cafe.googlePlaceData?.lastSyncedAt,
+          )
         : null;
     final hasSecondaryMetadata = hasGoogleRating || hasGoogleReviewCount;
 
@@ -366,7 +373,10 @@ class CafeDetailRatingSection extends ConsumerWidget {
   }
 }
 
-String? _externalMetadataFreshnessLabel(String? rawTimestamp) {
+String? _externalMetadataFreshnessLabel(
+  AppLocalizations l10n,
+  String? rawTimestamp,
+) {
   final raw = rawTimestamp?.trim();
   if (raw == null || raw.isEmpty) {
     return null;
@@ -383,16 +393,16 @@ String? _externalMetadataFreshnessLabel(String? rawTimestamp) {
   }
 
   if (age.inMinutes < 1) {
-    return 'just now';
+    return l10n.metadataJustNow;
   }
   if (age.inHours < 1) {
-    return '${age.inMinutes}m ago';
+    return l10n.metadataMinutesAgo(age.inMinutes);
   }
   if (age.inDays < 1) {
-    return '${age.inHours}h ago';
+    return l10n.metadataHoursAgo(age.inHours);
   }
   if (age.inDays < 7) {
-    return '${age.inDays}d ago';
+    return l10n.metadataDaysAgo(age.inDays);
   }
 
   final utc = parsed.toUtc();

@@ -113,13 +113,14 @@ class _FilterModalScreenState extends ConsumerState<FilterModalScreen> {
   }
 
   Future<void> _savePreset() async {
+    final l10n = context.l10n;
     final name = _presetNameCtrl.text.trim();
     if (name.isEmpty) {
-      _showPresetFeedback('Preset name cannot be empty.');
+      _showPresetFeedback(l10n.filterPresetNameEmpty);
       return;
     }
     if (_draft.activeCount == 0) {
-      _showPresetFeedback('Add at least one filter before saving a preset.');
+      _showPresetFeedback(l10n.filterPresetNeedFilters);
       return;
     }
 
@@ -190,7 +191,9 @@ class _FilterModalScreenState extends ConsumerState<FilterModalScreen> {
       _presetNameCtrl.text = target.name;
     });
     await _persistPresets(next);
-    _showPresetFeedback(wasOverwrite ? 'Preset updated.' : 'Preset saved.');
+    _showPresetFeedback(
+      wasOverwrite ? l10n.filterPresetUpdated : l10n.filterPresetSaved,
+    );
   }
 
   Future<void> _deletePreset(FilterPreset preset) async {
@@ -276,7 +279,17 @@ class _FilterModalScreenState extends ConsumerState<FilterModalScreen> {
                         children: [
                           TextButton.icon(
                             key: const Key('filters-back-button'),
-                            onPressed: () => context.pop(),
+                            onPressed: () {
+                              if (context.canPop()) {
+                                context.pop();
+                                return;
+                              }
+                              context.go(
+                                _scope == _FilterScope.map
+                                    ? '/map'
+                                    : '/explore',
+                              );
+                            },
                             icon: Icon(
                               Icons.arrow_back,
                               size: 18,
@@ -610,7 +623,7 @@ class _FilterModalScreenState extends ConsumerState<FilterModalScreen> {
 
     return _FilterSectionCard(
       colors: colors,
-      title: 'Presets',
+      title: l10n.filterPresetsTitle,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -623,7 +636,7 @@ class _FilterModalScreenState extends ConsumerState<FilterModalScreen> {
                   textInputAction: TextInputAction.done,
                   onSubmitted: (_) => unawaited(_savePreset()),
                   decoration: InputDecoration(
-                    hintText: 'Save current filters as a preset',
+                    hintText: l10n.filterPresetNameHint,
                     filled: true,
                     fillColor: colors.card,
                     contentPadding: const EdgeInsets.symmetric(
@@ -679,7 +692,7 @@ class _FilterModalScreenState extends ConsumerState<FilterModalScreen> {
             const LinearProgressIndicator(minHeight: 2)
           else if (_presets.isEmpty)
             Text(
-              'No presets yet. Save your current filters to reuse them.',
+              l10n.filterPresetEmpty,
               style: TextStyle(
                 color: colors.mutedText,
                 fontWeight: FontWeight.w500,
@@ -849,6 +862,7 @@ class _FilterPresetRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       padding: const EdgeInsets.symmetric(
@@ -881,7 +895,7 @@ class _FilterPresetRow extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${preset.filters.activeCount} filters',
+                  l10n.mapFilterCount(preset.filters.activeCount),
                   style: TextStyle(
                     color: colors.mutedText,
                     fontWeight: FontWeight.w500,
@@ -893,7 +907,8 @@ class _FilterPresetRow extends StatelessWidget {
           ),
           IconButton(
             key: Key('filter-preset-apply-$index'),
-            tooltip: 'Apply',
+            tooltip: l10n.commonApply,
+            visualDensity: VisualDensity.compact,
             onPressed: onApply,
             icon: Icon(
               Icons.play_arrow_rounded,
@@ -902,7 +917,8 @@ class _FilterPresetRow extends StatelessWidget {
           ),
           IconButton(
             key: Key('filter-preset-edit-$index'),
-            tooltip: 'Edit',
+            tooltip: l10n.commonEdit,
+            visualDensity: VisualDensity.compact,
             onPressed: onEdit,
             icon: Icon(
               Icons.edit_outlined,
@@ -912,7 +928,8 @@ class _FilterPresetRow extends StatelessWidget {
           ),
           IconButton(
             key: Key('filter-preset-delete-$index'),
-            tooltip: 'Delete',
+            tooltip: MaterialLocalizations.of(context).deleteButtonTooltip,
+            visualDensity: VisualDensity.compact,
             onPressed: onDelete,
             icon: Icon(
               Icons.delete_outline_rounded,

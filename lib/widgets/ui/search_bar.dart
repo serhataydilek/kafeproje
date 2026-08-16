@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../theme/app_theme.dart';
 
 class AppSearchBar extends StatefulWidget {
@@ -134,7 +135,8 @@ class _AppSearchBarState extends State<AppSearchBar> {
                 children: [
                   if (hasInput)
                     IconButton(
-                      tooltip: 'Clear search',
+                      tooltip:
+                          AppLocalizations.of(context)?.commonClear ?? 'Clear',
                       visualDensity: VisualDensity.compact,
                       icon: Icon(
                         Icons.close_rounded,

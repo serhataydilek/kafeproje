@@ -882,7 +882,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Single Cafe'), findsWidgets);
-        expect(find.byKey(const Key('compare-table-cell-0-0')), findsOneWidget);
+        expect(find.byKey(const Key('compare-table-cell-0-0')), findsNothing);
         expect(
             find.byKey(const Key('compare-add-cafe-button')), findsOneWidget);
         expect(tester.takeException(), isNull);

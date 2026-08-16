@@ -527,6 +527,29 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get filterPresetsTitle => 'Presets';
+
+  @override
+  String get filterPresetNameHint => 'Save current filters as a preset';
+
+  @override
+  String get filterPresetNameEmpty => 'Preset name cannot be empty.';
+
+  @override
+  String get filterPresetNeedFilters =>
+      'Add at least one filter before saving a preset.';
+
+  @override
+  String get filterPresetUpdated => 'Preset updated.';
+
+  @override
+  String get filterPresetSaved => 'Preset saved.';
+
+  @override
+  String get filterPresetEmpty =>
+      'No presets yet. Save your current filters to reuse them.';
+
+  @override
   String get mapPreparing => 'Preparing map view';
 
   @override
@@ -634,6 +657,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cafeDetailOpenOnMap => 'Open on map';
+
+  @override
+  String get metadataJustNow => 'just now';
+
+  @override
+  String metadataMinutesAgo(int count) {
+    return '${count}m ago';
+  }
+
+  @override
+  String metadataHoursAgo(int count) {
+    return '${count}h ago';
+  }
+
+  @override
+  String metadataDaysAgo(int count) {
+    return '${count}d ago';
+  }
 
   @override
   String get metricWifi => 'Wi-Fi';
@@ -897,6 +938,45 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminEdit => 'Edit';
+
+  @override
+  String get profileEditPhoto => 'Edit photo';
+
+  @override
+  String get profileRemovePhoto => 'Remove photo';
+
+  @override
+  String get profilePhotoHintAdd =>
+      'Add a photo to make your profile feel more personal.';
+
+  @override
+  String get profilePhotoReady =>
+      'A new photo is ready. Save to upload it to your profile.';
+
+  @override
+  String get profileEditIntro =>
+      'You can now manage your entire profile from here.';
+
+  @override
+  String get profilePhotoSection => 'Profile photo';
+
+  @override
+  String get profilePhotoPreviewReady =>
+      'Preview ready. Saving will upload the compressed photo from your gallery.';
+
+  @override
+  String get profilePhotoReplaceHint =>
+      'You can replace or remove your current photo.';
+
+  @override
+  String get profilePhotoPickHint =>
+      'Pick a photo from your gallery to preview it before saving.';
+
+  @override
+  String get profileChooseFromGallery => 'Choose from gallery';
+
+  @override
+  String get profileUsernameHint => '3-24 characters';
 
   @override
   String get profileEditTitle => 'Edit profile';

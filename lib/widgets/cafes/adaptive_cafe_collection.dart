@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 import '../../theme/app_theme.dart';
 import '../layout/adaptive_layout.dart';
@@ -40,9 +39,7 @@ class AdaptiveCafeCollection extends StatelessWidget {
             controller: controller,
             shrinkWrap: shrinkWrap,
             physics: physics,
-            scrollCacheExtent: cacheExtent != null
-                ? ScrollCacheExtent.pixels(cacheExtent!)
-                : null,
+            cacheExtent: cacheExtent,
             itemCount: itemCount,
             padding: padding,
             itemBuilder: itemBuilder,
@@ -60,9 +57,7 @@ class AdaptiveCafeCollection extends StatelessWidget {
           controller: controller,
           shrinkWrap: shrinkWrap,
           physics: physics,
-          scrollCacheExtent: cacheExtent != null
-              ? ScrollCacheExtent.pixels(cacheExtent!)
-              : null,
+          cacheExtent: cacheExtent,
           itemCount: itemCount,
           padding: padding,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

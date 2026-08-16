@@ -41,6 +41,7 @@ class CafeDetailBody extends ConsumerWidget {
         colors: colors,
         isLoading: isLoading,
         errorMessage: errorMessage,
+        onBack: onBack,
       );
     }
 
@@ -59,12 +60,14 @@ class CafeDetailStateSection extends ConsumerWidget {
     required this.colors,
     required this.isLoading,
     required this.errorMessage,
+    required this.onBack,
   });
 
   final String cafeId;
   final AppColors colors;
   final bool isLoading;
   final String? errorMessage;
+  final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -78,18 +81,36 @@ class CafeDetailStateSection extends ConsumerWidget {
             ? l10n.cafeDetailNotFound
             : normalizedError;
 
-    return isLoading
-        ? LoadingStateView(colors: colors, label: l10n.commonLoading)
-        : ErrorStateView(
-            colors: colors,
-            message: message,
-            onRetry: () =>
-                ref.read(cafeProvider.notifier).ensureCafeLoaded(cafeId),
-          );
+    return Column(
+      children: [
+        SafeArea(
+          bottom: false,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: IconButton(
+              key: const ValueKey('cafe-detail-back-button'),
+              tooltip: l10n.commonBack,
+              icon: Icon(Icons.arrow_back_rounded, color: colors.text),
+              onPressed: onBack,
+            ),
+          ),
+        ),
+        Expanded(
+          child: isLoading
+              ? LoadingStateView(colors: colors, label: l10n.commonLoading)
+              : ErrorStateView(
+                  colors: colors,
+                  message: message,
+                  onRetry: () =>
+                      ref.read(cafeProvider.notifier).ensureCafeLoaded(cafeId),
+                ),
+        ),
+      ],
+    );
   }
 }
 
-class CafeDetailContent extends StatelessWidget {
+class CafeDetailContent extends ConsumerWidget {
   const CafeDetailContent({
     super.key,
     required this.cafe,
@@ -102,7 +123,11 @@ class CafeDetailContent extends StatelessWidget {
   final VoidCallback onBack;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isAdmin = ref.watch(isAdminProvider);
+    final canManage = ref.watch(canManageCafeProvider(cafe));
+    const ownerClaimsEnabled = bool.fromEnvironment('ENABLE_OWNER_CLAIMS');
+    final showOwnership = canManage || (ownerClaimsEnabled && !isAdmin);
     return LayoutBuilder(
       builder: (context, constraints) {
         final layout = AdaptiveLayoutData.fromWidth(constraints.maxWidth);
@@ -119,14 +144,28 @@ class CafeDetailContent extends StatelessWidget {
           cafe: cafe,
           colors: colors,
         );
-        final ownership = CafeOwnershipClaimSection(
-          cafe: cafe,
-          colors: colors,
-        );
+        final ownership = showOwnership
+            ? CafeOwnershipClaimSection(
+                cafe: cafe,
+                colors: colors,
+              )
+            : null;
         final reviews = CafeDetailReviewsSection(
           cafeId: cafe.id,
           colors: colors,
         );
+
+        Widget ownershipBlock() {
+          if (ownership == null) {
+            return const SizedBox.shrink();
+          }
+          return Column(
+            children: [
+              SizedBox(height: layout.sectionSpacing),
+              ownership,
+            ],
+          );
+        }
 
         return CustomScrollView(
           slivers: [
@@ -160,8 +199,7 @@ class CafeDetailContent extends StatelessWidget {
                                         metadata,
                                         SizedBox(height: layout.sectionSpacing),
                                         actions,
-                                        SizedBox(height: layout.sectionSpacing),
-                                        ownership,
+                                        ownershipBlock(),
                                       ],
                                     ),
                                   ),
@@ -183,8 +221,7 @@ class CafeDetailContent extends StatelessWidget {
                               metadata,
                               SizedBox(height: layout.sectionSpacing),
                               actions,
-                              SizedBox(height: layout.sectionSpacing),
-                              ownership,
+                              ownershipBlock(),
                               SizedBox(height: layout.sectionSpacing * 1.5),
                               reviews,
                               SizedBox(height: layout.sectionSpacing * 2),

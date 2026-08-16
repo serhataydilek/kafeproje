@@ -251,7 +251,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
       MediaQuery.platformBrightnessOf(context),
     );
     final l10n = context.l10n;
-    final isTr = Localizations.localeOf(context).languageCode == 'tr';
     final isSavingProfile =
         profileUpdateState is async_result.AsyncLoading<void>;
 
@@ -315,16 +314,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                       avatarImageProvider: previewImageProvider,
                       subtitle: avatarUrl == null
                           ? (_pendingAvatarBytes != null
-                              ? (isTr
-                                  ? 'Yeni fotograf secildi. Kaydet dediginde profiline yuklenecek.'
-                                  : 'A new photo is ready. Save to upload it to your profile.')
-                              : (isTr
-                                  ? 'Foto ekleyerek profilini daha kolay taninir hale getir.'
-                                  : 'Add a photo to make your profile feel more personal.'))
+                              ? l10n.profilePhotoReady
+                              : l10n.profilePhotoHintAdd)
                           : (_pendingAvatarBytes != null
-                              ? (isTr
-                                  ? 'Yeni fotograf secildi. Kaydet dediginde profiline yuklenecek.'
-                                  : 'A new photo is ready. Save to upload it to your profile.')
+                              ? l10n.profilePhotoReady
                               : null),
                       badge: user.isAdmin
                           ? Container(
@@ -354,8 +347,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                               ProfileAvatarActionChip(
                                 colors: colors,
                                 icon: Icons.photo_library_outlined,
-                                label:
-                                    isTr ? 'Fotoğrafı düzenle' : 'Edit photo',
+                                label: l10n.profileEditPhoto,
                                 onTap: _pickingAvatar
                                     ? null
                                     : _pickAvatarFromGallery,
@@ -363,8 +355,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                               ProfileAvatarActionChip(
                                 colors: colors,
                                 icon: Icons.delete_outline,
-                                label:
-                                    isTr ? 'Fotoğrafı kaldır' : 'Remove photo',
+                                label: l10n.profileRemovePhoto,
                                 destructive: true,
                                 onTap: (avatarUrl == null &&
                                         _pendingAvatarBytes == null)
@@ -448,9 +439,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        isTr
-                            ? 'Tum profil duzenlemelerini artik burada yapabilirsin.'
-                            : 'You can now manage your entire profile from here.',
+                        l10n.profileEditIntro,
                         style: TextStyle(
                           color: colors.mutedText,
                           fontWeight: FontWeight.w500,
@@ -469,7 +458,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              isTr ? 'Profil fotoğrafı' : 'Profile photo',
+                              l10n.profilePhotoSection,
                               style: TextStyle(
                                 color: colors.text,
                                 fontWeight: FontWeight.w700,
@@ -478,16 +467,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                             const SizedBox(height: AppSpacing.xs),
                             Text(
                               _pendingAvatarBytes != null
-                                  ? (isTr
-                                      ? 'Önizleme hazır. Kaydettiğinde sıkıştırılmış fotoğraf galeriden yüklenecek.'
-                                      : 'Preview ready. Saving will upload the compressed photo from your gallery.')
+                                  ? l10n.profilePhotoPreviewReady
                                   : avatarUrl != null
-                                      ? (isTr
-                                          ? 'Mevcut fotoğrafını değiştirebilir veya kaldırabilirsin.'
-                                          : 'You can replace or remove your current photo.')
-                                      : (isTr
-                                          ? 'Galeriden fotoğraf seçerek profilinde hemen önizlemesini görebilirsin.'
-                                          : 'Pick a photo from your gallery to preview it before saving.'),
+                                      ? l10n.profilePhotoReplaceHint
+                                      : l10n.profilePhotoPickHint,
                               style: TextStyle(
                                 color: colors.mutedText,
                                 fontSize: 12,
@@ -495,54 +478,61 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                               ),
                             ),
                             const SizedBox(height: AppSpacing.sm),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: OutlinedButton.icon(
-                                    onPressed: _pickingAvatar
-                                        ? null
-                                        : _pickAvatarFromGallery,
-                                    icon: _pickingAvatar
-                                        ? SizedBox(
-                                            width: 16,
-                                            height: 16,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              color: colors.primary,
-                                            ),
-                                          )
-                                        : const Icon(
-                                            Icons.photo_library_outlined),
-                                    label: Text(
-                                      isTr
-                                          ? 'Galeriden sec'
-                                          : 'Choose from gallery',
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: AppSpacing.sm),
-                                Expanded(
-                                  child: OutlinedButton.icon(
-                                    onPressed: (avatarUrl == null &&
-                                            _pendingAvatarBytes == null)
-                                        ? null
-                                        : () {
-                                            setState(() {
-                                              _pendingAvatarBytes = null;
-                                              _pendingAvatarExtension = null;
-                                              _removeAvatarOnSave = true;
-                                              _success = null;
-                                            });
-                                          },
-                                    icon: const Icon(Icons.delete_outline),
-                                    label: Text(
-                                      isTr
-                                          ? 'Fotoğrafı kaldır'
-                                          : 'Remove photo',
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            Builder(
+                              builder: (context) {
+                                final stackPhotoActions =
+                                    MediaQuery.sizeOf(context).width < 360;
+                                final galleryButton = OutlinedButton.icon(
+                                  onPressed: _pickingAvatar
+                                      ? null
+                                      : _pickAvatarFromGallery,
+                                  icon: _pickingAvatar
+                                      ? SizedBox(
+                                          width: 16,
+                                          height: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: colors.primary,
+                                          ),
+                                        )
+                                      : const Icon(
+                                          Icons.photo_library_outlined),
+                                  label: Text(l10n.profileChooseFromGallery),
+                                );
+                                final removeButton = OutlinedButton.icon(
+                                  onPressed: (avatarUrl == null &&
+                                          _pendingAvatarBytes == null)
+                                      ? null
+                                      : () {
+                                          setState(() {
+                                            _pendingAvatarBytes = null;
+                                            _pendingAvatarExtension = null;
+                                            _removeAvatarOnSave = true;
+                                            _success = null;
+                                          });
+                                        },
+                                  icon: const Icon(Icons.delete_outline),
+                                  label: Text(l10n.profileRemovePhoto),
+                                );
+                                if (stackPhotoActions) {
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      galleryButton,
+                                      const SizedBox(height: AppSpacing.sm),
+                                      removeButton,
+                                    ],
+                                  );
+                                }
+                                return Row(
+                                  children: [
+                                    Expanded(child: galleryButton),
+                                    const SizedBox(width: AppSpacing.sm),
+                                    Expanded(child: removeButton),
+                                  ],
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -564,7 +554,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                         colors,
                         l10n.authUsername,
                         _usernameCtrl,
-                        hint: isTr ? '3-24 karakter' : '3-24 characters',
+                        hint: l10n.profileUsernameHint,
                         errorText: _fieldError(l10n, _usernameCtrl),
                       ),
                       _field(
@@ -605,7 +595,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       AppActionButton(
-                        label: isTr ? 'İptal' : 'Cancel',
+                        label: l10n.commonCancel,
                         onPressed: isSubmitting
                             ? null
                             : () {

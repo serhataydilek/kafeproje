@@ -109,14 +109,17 @@ class AppRadioTile extends StatelessWidget {
               color: active ? colors.primary : colors.mutedText,
             ),
             const SizedBox(width: AppSpacing.sm),
-            Text(
-              label,
-              style: TextStyle(
-                color: colors.text,
-                fontWeight: FontWeight.w600,
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: colors.text,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-            const Spacer(),
             if (active)
               Icon(
                 Icons.check_circle,

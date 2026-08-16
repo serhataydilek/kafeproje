@@ -198,24 +198,7 @@ class _WideActionButton extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius:
                     BorderRadius.circular(_CafePrimaryActionTokens.innerRadius),
-                gradient: LinearGradient(
-                  colors: [
-                    accentColor,
-                    Color.alphaBlend(
-                      Colors.white.withValues(alpha: 0.08),
-                      accentColor,
-                    ),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: accentColor.withValues(alpha: 0.18),
-                    blurRadius: 14,
-                    offset: const Offset(0, 7),
-                  ),
-                ],
+                color: accentColor,
               ),
               child: Row(
                 children: [

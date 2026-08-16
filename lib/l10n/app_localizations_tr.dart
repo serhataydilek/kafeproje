@@ -9,7 +9,7 @@ class AppLocalizationsTr extends AppLocalizations {
   AppLocalizationsTr([String locale = 'tr']) : super(locale);
 
   @override
-  String get appTitle => 'Istanbul Kafe';
+  String get appTitle => 'İstanbul Kafe';
 
   @override
   String get commonBack => 'Geri';
@@ -33,7 +33,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get commonEdit => 'Düzenle';
 
   @override
-  String get commonLoadMore => 'Daha fazla yukle';
+  String get commonLoadMore => 'Daha fazla yükle';
 
   @override
   String get commonReset => 'Sıfırla';
@@ -57,7 +57,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get commonUnknown => 'Belirtilmemiş';
 
   @override
-  String get cafeNoRatingsYet => 'Henuz puan yok';
+  String get cafeNoRatingsYet => 'Henüz puan yok';
 
   @override
   String get commonNoData => 'Belirtilmemiş';
@@ -109,7 +109,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get offlineBannerMessage =>
-      'Cevrimdisisin. Onbellekteki veriler gosteriliyor ve degisiklikler esitleme icin kuyruklaniyor.';
+      'Çevrimdışısın. Önbellekteki veriler gösteriliyor ve değişiklikler eşitleme için kuyruklanıyor.';
 
   @override
   String get navHome => 'Ana Sayfa';
@@ -262,7 +262,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get preferenceBudget => 'Uygun fiyat';
 
   @override
-  String get homeTitle => 'Istanbul\'da kafe bul';
+  String get homeTitle => 'İstanbul\'da kafe bul';
 
   @override
   String get homeSearchHint => 'Kafe ara...';
@@ -341,16 +341,16 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get profileSyncQueued =>
-      'Degisikliklerin cevrimdisi kaydedildi ve baglanti gelince otomatik esitlenecek.';
+      'Değişikliklerin çevrimdışı kaydedildi ve bağlantı gelince otomatik eşitlenecek.';
 
   @override
   String profileSyncPending(int count) {
-    return '$count degisiklik esitleme bekliyor.';
+    return '$count değişiklik eşitleme bekliyor.';
   }
 
   @override
   String profileSyncDeadLetters(int count) {
-    return '$count degisiklik otomatik olarak esitlenemedi.';
+    return '$count değişiklik otomatik olarak eşitlenemedi.';
   }
 
   @override
@@ -467,13 +467,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get reviewsQueuedSuccess =>
-      'Yorumun cevrimdisi kaydedildi ve baglanti gelince otomatik esitlenecek.';
+      'Yorumun çevrimdışı kaydedildi ve bağlantı gelince otomatik eşitlenecek.';
 
   @override
-  String get onboardingBrand => 'Istanbul Kafe';
+  String get onboardingBrand => 'İstanbul Kafe';
 
   @override
-  String get onboardingTitle => 'Istanbul\'da bir sonraki favori kafeni keşfet';
+  String get onboardingTitle => 'İstanbul\'da bir sonraki favori kafeni keşfet';
 
   @override
   String get onboardingSubtitle =>
@@ -527,6 +527,30 @@ class AppLocalizationsTr extends AppLocalizations {
   String filterApplyCount(int count) {
     return 'Uygula ($count filtre)';
   }
+
+  @override
+  String get filterPresetsTitle => 'Kayıtlı filtreler';
+
+  @override
+  String get filterPresetNameHint =>
+      'Geçerli filtreleri bir hazır ayar olarak kaydet';
+
+  @override
+  String get filterPresetNameEmpty => 'Hazır ayar adı boş olamaz.';
+
+  @override
+  String get filterPresetNeedFilters =>
+      'Kaydetmeden önce en az bir filtre ekleyin.';
+
+  @override
+  String get filterPresetUpdated => 'Hazır ayar güncellendi.';
+
+  @override
+  String get filterPresetSaved => 'Hazır ayar kaydedildi.';
+
+  @override
+  String get filterPresetEmpty =>
+      'Henüz hazır ayar yok. Tekrar kullanmak için geçerli filtreleri kaydedin.';
 
   @override
   String get mapPreparing => 'Harita görünümü hazırlanıyor';
@@ -593,7 +617,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get mapRadiusLarge => '4 km';
 
   @override
-  String get mapDevLabel => 'Istanbul geliştirme haritası';
+  String get mapDevLabel => 'İstanbul geliştirme haritası';
 
   @override
   String get cafeDetailNotFound =>
@@ -636,6 +660,24 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get cafeDetailOpenOnMap => 'Haritada aç';
+
+  @override
+  String get metadataJustNow => 'az önce';
+
+  @override
+  String metadataMinutesAgo(int count) {
+    return '${count}dk önce';
+  }
+
+  @override
+  String metadataHoursAgo(int count) {
+    return '${count}sa önce';
+  }
+
+  @override
+  String metadataDaysAgo(int count) {
+    return '${count}g önce';
+  }
 
   @override
   String get metricWifi => 'Wi‑Fi';
@@ -853,7 +895,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get settingsAboutDescription =>
-      'Istanbul\'daki en iyi kafeleri keşfet, karşılaştır ve favorilerine ekle.';
+      'İstanbul\'daki en iyi kafeleri keşfet, karşılaştır ve favorilerine ekle.';
 
   @override
   String get adminTitle => 'Yönetim paneli';
@@ -898,6 +940,45 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get adminEdit => 'Düzenle';
+
+  @override
+  String get profileEditPhoto => 'Fotoğrafı düzenle';
+
+  @override
+  String get profileRemovePhoto => 'Fotoğrafı kaldır';
+
+  @override
+  String get profilePhotoHintAdd =>
+      'Fotoğraf ekleyerek profilini daha kolay tanınır hale getir.';
+
+  @override
+  String get profilePhotoReady =>
+      'Yeni fotoğraf seçildi. Kaydet dediğinde profiline yüklenecek.';
+
+  @override
+  String get profileEditIntro =>
+      'Tüm profil düzenlemelerini artık burada yapabilirsin.';
+
+  @override
+  String get profilePhotoSection => 'Profil fotoğrafı';
+
+  @override
+  String get profilePhotoPreviewReady =>
+      'Önizleme hazır. Kaydettiğinde sıkıştırılmış fotoğraf galeriden yüklenecek.';
+
+  @override
+  String get profilePhotoReplaceHint =>
+      'Mevcut fotoğrafını değiştirebilir veya kaldırabilirsin.';
+
+  @override
+  String get profilePhotoPickHint =>
+      'Galeriden fotoğraf seçerek profilinde hemen önizlemesini görebilirsin.';
+
+  @override
+  String get profileChooseFromGallery => 'Galeriden seç';
+
+  @override
+  String get profileUsernameHint => '3-24 karakter';
 
   @override
   String get profileEditTitle => 'Profili düzenle';

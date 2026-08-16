@@ -942,6 +942,50 @@ void main() {
       expect(closeButtonSize.height, greaterThanOrEqualTo(40));
     });
 
+    testWidgets(
+        'map preview keeps Google rating secondary when app rating is missing',
+        (tester) async {
+      final container = createTestContainer(
+        state: buildTestAppShellState(currentUser: testUser),
+      );
+      addTearDown(container.dispose);
+
+      final cafe = buildTestCafe(
+        id: 'google-only-cafe',
+        name: 'Google Only Cafe',
+        rating: 0,
+      ).copyWith(
+        googlePlaceData: () => const GooglePlaceData(
+          googleRating: 4.9,
+          googleReviewCount: 120,
+        ),
+      );
+
+      await tester.pumpWidget(
+        buildTestApp(
+          container: container,
+          child: Center(
+            child: SizedBox(
+              width: 360,
+              child: MapCafePreviewCard(
+                colors: lightColors,
+                cafe: cafe,
+                onTap: () {},
+                onClose: () {},
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final l10n = AppLocalizations.of(
+        tester.element(find.byType(MapCafePreviewCard)),
+      )!;
+      expect(find.text('4.9'), findsNothing);
+      expect(find.text(l10n.cafeNoRatingsYet), findsOneWidget);
+    });
+
     testWidgets('map overlay controls use stable compact touch targets',
         (tester) async {
       final container = createTestContainer(
