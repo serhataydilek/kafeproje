@@ -13,6 +13,7 @@ import '../utils/filter_sort.dart';
 import '../widgets/cafes/adaptive_cafe_collection.dart';
 import '../widgets/cafes/cafe_card.dart';
 import '../widgets/layout/adaptive_layout.dart';
+import '../widgets/ui/list_tiles.dart';
 import '../widgets/ui/search_bar.dart';
 import '../widgets/ui/state_views.dart';
 import '../widgets/ui/shimmer_loading.dart';
@@ -332,13 +333,10 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                   ? AppSpacing.sm
                                   : layout.sectionSpacing,
                             ),
-                            Text(
-                              l10n.exploreTitle,
-                              style: TextStyle(
-                                fontSize: layout.isTablet ? 32 : 28,
-                                fontWeight: FontWeight.w800,
-                                color: colors.text,
-                              ),
+                            AppPageTitle(
+                              colors: colors,
+                              title: l10n.exploreTitle,
+                              large: layout.isTablet,
                             ),
                             if (cacheStatus != null &&
                                 cacheStatus.shouldShowBanner) ...[
@@ -430,6 +428,17 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                     )
                                     .toList(growable: false),
                               ),
+                              if (!isLoading && visibleCafes.isNotEmpty) ...[
+                                const SizedBox(height: AppSpacing.sm),
+                                Text(
+                                  l10n.exploreResultCount(visibleCafes.length),
+                                  style: TextStyle(
+                                    color: colors.mutedText,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
                             ],
                             SizedBox(height: layout.sectionSpacing / 2),
                             Expanded(
@@ -583,7 +592,7 @@ class _ExploreSortChip extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              color: active ? colors.card : colors.text,
+              color: active ? onColor(colors.primary) : colors.text,
               fontWeight: FontWeight.w600,
               fontSize: 13,
             ),

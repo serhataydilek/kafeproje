@@ -8,7 +8,7 @@
   "commonClose": "Kapat",
   "commonClear": "Temizle",
   "commonEdit": "Düzenle",
-  "commonLoadMore": "Daha fazla yukle",
+  "commonLoadMore": "Daha fazla yükle",
   "@commonLoadMore": {
     "description": "Daha fazla icerik yuklemek icin genel eylem etiketi."
   },
@@ -19,7 +19,7 @@
   "commonOpen": "Açık",
   "commonClosed": "Kapalı",
   "commonUnknown": "Belirtilmemiş",
-  "cafeNoRatingsYet": "Henuz puan yok",
+  "cafeNoRatingsYet": "Henüz puan yok",
   "commonNoData": "Belirtilmemiş",
   "commonCategory": "Kategori",
   "cafeCategoryNormal": "Standart kafe",
@@ -36,7 +36,7 @@
   "commonTurkish": "Türkçe",
   "commonEnglish": "İngilizce",
   "errorGenericTitle": "Bir sorun oluştu",
-  "offlineBannerMessage": "Cevrimdisisin. Onbellekteki veriler gosteriliyor ve degisiklikler esitleme icin kuyruklaniyor.",
+  "offlineBannerMessage": "Çevrimdışısın. Önbellekteki veriler gösteriliyor ve değişiklikler eşitleme için kuyruklanıyor.",
   "@offlineBannerMessage": {
     "description": "Cihaz cevrimdisiyken ve uygulama onbellekteki verileri gosterirken acilan banner mesaji."
   },
@@ -90,7 +90,8 @@
   "preferenceOutdoor": "Açık hava",
   "preferencePetFriendly": "Evcil hayvan dostu",
   "preferenceBudget": "Uygun fiyat",
-  "homeTitle": "Istanbul'da kafe bul",
+  "homeTitle": "İstanbul'da kafe bul",
+  "homeSubtitle": "Şehirdeki iyi kafeleri keşfet.",
   "homeSearchHint": "Kafe ara...",
   "homePopularDistricts": "Popüler semtler",
   "homeCategories": "Kategoriler",
@@ -103,10 +104,26 @@
   "homeMockDataInfo": "Supabase hazır olana kadar örnek kafe verileri gösteriliyor.",
   "homeMockFallbackInfo": "Canlı veri alınamadı. Uygulama şu an örnek verilerle çalışıyor.",
   "exploreTitle": "Keşfet",
+  "exploreResultCount": "{count} kafe",
+  "@exploreResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "exploreEmptyTitle": "Filtrelere uygun kafe bulunamadı",
   "exploreEmptyMessage": "Arama veya filtreleri gevşeterek tekrar deneyin.",
   "exploreEmptyCompareMessage": "Geçerli filtrelere uygun kafe yok, ancak seçtiğin kafeler karşılaştırmaya hazır.",
-  "favoritesTitle": "Favori kafelerim",
+  "favoritesTitle": "Favoriler",
+  "favoritesCount": "{count} kayıtlı",
+  "@favoritesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "favoritesLoading": "Favoriler yükleniyor",
   "favoritesEmptyTitle": "Henüz favori kafen yok",
   "favoritesEmptyMessage": "Beğendiğin kafeleri kaydet, buradan kolayca ulaş.",
@@ -114,11 +131,11 @@
   "profileGuestTitle": "Giriş yapılmadı",
   "profileGuestAction": "Giriş yap",
   "profileSectionAccount": "Hesap",
-  "profileSyncQueued": "Degisikliklerin cevrimdisi kaydedildi ve baglanti gelince otomatik esitlenecek.",
+  "profileSyncQueued": "Değişikliklerin çevrimdışı kaydedildi ve bağlantı gelince otomatik eşitlenecek.",
   "@profileSyncQueued": {
     "description": "Profil degisikligi cevrimdisi kuyruga alindiginda gosterilen basari mesaji."
   },
-  "profileSyncPending": "{count} degisiklik esitleme bekliyor.",
+  "profileSyncPending": "{count} değişiklik eşitleme bekliyor.",
   "@profileSyncPending": {
     "description": "Hala kuyrukta bekleyen cevrimdisi degisiklik sayisini gosteren durum metni.",
     "placeholders": {
@@ -127,7 +144,7 @@
       }
     }
   },
-  "profileSyncDeadLetters": "{count} degisiklik otomatik olarak esitlenemedi.",
+  "profileSyncDeadLetters": "{count} değişiklik otomatik olarak eşitlenemedi.",
   "@profileSyncDeadLetters": {
     "description": "Otomatik esitlemesi basarisiz olan kuyruktaki degisiklik sayisini gosteren durum metni.",
     "placeholders": {
@@ -136,6 +153,18 @@
       }
     }
   },
+  "profileEditIntro": "Profil bilgilerini buradan güncelleyebilirsin.",
+  "profilePhotoLabel": "Profil fotoğrafı",
+  "profilePhotoHint": "Fotoğraf ekleyerek profilini daha kolay tanınır hale getir.",
+  "profilePhotoPending": "Yeni fotoğraf seçildi. Kaydet dediğinde profiline yüklenecek.",
+  "profilePhotoPreviewReady": "Önizleme hazır. Kaydettiğinde fotoğraf yüklenecek.",
+  "profilePhotoReplaceHint": "Mevcut fotoğrafını değiştirebilir veya kaldırabilirsin.",
+  "profilePhotoPickHint": "Galeriden fotoğraf seçerek kaydetmeden önce önizleyebilirsin.",
+  "profilePhotoEdit": "Fotoğrafı düzenle",
+  "profilePhotoRemove": "Fotoğrafı kaldır",
+  "profilePhotoChooseGallery": "Galeriden seç",
+  "profilePhotoPickFailed": "Fotoğraf seçilemedi. Lütfen tekrar dene.",
+  "profileUsernameHint": "3-24 karakter",
   "profileEdit": "Profili düzenle",
   "profileAdminPanel": "Yönetim paneli",
   "profileManagerBadge": "Yönetici",

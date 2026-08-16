@@ -1372,8 +1372,8 @@ void main() {
       expect(border.top.width, 2.4);
       expect(border.top.color, isNot(lightColors.border));
       expect(decoration.color, isNot(lightColors.card));
-      expect(decoration.boxShadow, hasLength(2));
-      expect(decoration.boxShadow?.first.blurRadius, 24);
+      expect(decoration.boxShadow, hasLength(1));
+      expect(decoration.boxShadow?.first.blurRadius, 16);
     });
 
     testWidgets('normal cafe card keeps standard border treatment',

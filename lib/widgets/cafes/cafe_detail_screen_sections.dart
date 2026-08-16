@@ -41,6 +41,7 @@ class CafeDetailBody extends ConsumerWidget {
         colors: colors,
         isLoading: isLoading,
         errorMessage: errorMessage,
+        onBack: onBack,
       );
     }
 
@@ -59,12 +60,14 @@ class CafeDetailStateSection extends ConsumerWidget {
     required this.colors,
     required this.isLoading,
     required this.errorMessage,
+    required this.onBack,
   });
 
   final String cafeId;
   final AppColors colors;
   final bool isLoading;
   final String? errorMessage;
+  final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -78,18 +81,36 @@ class CafeDetailStateSection extends ConsumerWidget {
             ? l10n.cafeDetailNotFound
             : normalizedError;
 
-    return isLoading
-        ? LoadingStateView(colors: colors, label: l10n.commonLoading)
-        : ErrorStateView(
-            colors: colors,
-            message: message,
-            onRetry: () =>
-                ref.read(cafeProvider.notifier).ensureCafeLoaded(cafeId),
-          );
+    return Column(
+      children: [
+        SafeArea(
+          bottom: false,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: IconButton(
+              key: const ValueKey('cafe-detail-back-button'),
+              tooltip: l10n.commonBack,
+              icon: Icon(Icons.arrow_back_rounded, color: colors.text),
+              onPressed: onBack,
+            ),
+          ),
+        ),
+        Expanded(
+          child: isLoading
+              ? LoadingStateView(colors: colors, label: l10n.commonLoading)
+              : ErrorStateView(
+                  colors: colors,
+                  message: message,
+                  onRetry: () =>
+                      ref.read(cafeProvider.notifier).ensureCafeLoaded(cafeId),
+                ),
+        ),
+      ],
+    );
   }
 }
 
-class CafeDetailContent extends StatelessWidget {
+class CafeDetailContent extends ConsumerWidget {
   const CafeDetailContent({
     super.key,
     required this.cafe,
@@ -102,7 +123,12 @@ class CafeDetailContent extends StatelessWidget {
   final VoidCallback onBack;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isAdmin = ref.watch(isAdminProvider);
+    final canManage = ref.watch(canManageCafeProvider(cafe));
+    const ownerClaimsEnabled = bool.fromEnvironment('ENABLE_OWNER_CLAIMS');
+    final showOwnership = !isAdmin && (canManage || ownerClaimsEnabled);
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final layout = AdaptiveLayoutData.fromWidth(constraints.maxWidth);
@@ -119,14 +145,28 @@ class CafeDetailContent extends StatelessWidget {
           cafe: cafe,
           colors: colors,
         );
-        final ownership = CafeOwnershipClaimSection(
-          cafe: cafe,
-          colors: colors,
-        );
+        final ownership = showOwnership
+            ? CafeOwnershipClaimSection(
+                cafe: cafe,
+                colors: colors,
+              )
+            : null;
         final reviews = CafeDetailReviewsSection(
           cafeId: cafe.id,
           colors: colors,
         );
+
+        Widget spacedOwnership() {
+          if (ownership == null) {
+            return const SizedBox.shrink();
+          }
+          return Column(
+            children: [
+              SizedBox(height: layout.sectionSpacing),
+              ownership,
+            ],
+          );
+        }
 
         return CustomScrollView(
           slivers: [
@@ -160,8 +200,7 @@ class CafeDetailContent extends StatelessWidget {
                                         metadata,
                                         SizedBox(height: layout.sectionSpacing),
                                         actions,
-                                        SizedBox(height: layout.sectionSpacing),
-                                        ownership,
+                                        spacedOwnership(),
                                       ],
                                     ),
                                   ),
@@ -183,8 +222,7 @@ class CafeDetailContent extends StatelessWidget {
                               metadata,
                               SizedBox(height: layout.sectionSpacing),
                               actions,
-                              SizedBox(height: layout.sectionSpacing),
-                              ownership,
+                              spacedOwnership(),
                               SizedBox(height: layout.sectionSpacing * 1.5),
                               reviews,
                               SizedBox(height: layout.sectionSpacing * 2),
@@ -295,6 +333,9 @@ class CafeOwnershipClaimSection extends ConsumerWidget {
     final isAdmin = ref.watch(isAdminProvider);
     final canManage = ref.watch(canManageCafeProvider(cafe));
     const ownerClaimsEnabled = bool.fromEnvironment('ENABLE_OWNER_CLAIMS');
+    if (isAdmin || (!canManage && !ownerClaimsEnabled)) {
+      return const SizedBox.shrink();
+    }
     final claim = ownerClaimsEnabled
         ? ref.watch(cafeOwnerClaimForCafeProvider(cafe.id))
         : null;
@@ -303,48 +344,23 @@ class CafeOwnershipClaimSection extends ConsumerWidget {
 
     final title = _trEn(
       context,
-      'Bu isletmenin sahibi misiniz?',
+      'Bu işletmenin sahibi misiniz?',
       'Do you own this business?',
     );
     late final String body;
     late final Widget action;
 
-    if (isAdmin) {
+    if (canManage) {
       body = _trEn(
         context,
-        'Yonetici olarak bu kafeyi duzenleyebilirsiniz.',
-        'Admins can manage this cafe.',
-      );
-      action = OutlinedButton.icon(
-        key: ValueKey('cafe-owner-admin-manage-${cafe.id}'),
-        onPressed: () => context.push('/cafe-edit/${cafe.id}'),
-        icon: const Icon(Icons.admin_panel_settings_rounded),
-        label: Text(_trEn(context, 'Yonet', 'Manage')),
-      );
-    } else if (canManage) {
-      body = _trEn(
-        context,
-        'Sahiplik onaylandi. Bu kafeyi yonetebilirsiniz.',
+        'Sahiplik onaylandı. Bu kafeyi yönetebilirsiniz.',
         'Ownership is approved. You can manage this cafe.',
       );
       action = FilledButton.icon(
         key: ValueKey('cafe-owner-manage-${cafe.id}'),
         onPressed: () => context.push('/cafe-edit/${cafe.id}'),
         icon: const Icon(Icons.storefront_rounded),
-        label: Text(_trEn(context, 'Kafeyi yonet', 'Manage cafe')),
-      );
-    } else if (!ownerClaimsEnabled) {
-      body = _trEn(
-        context,
-        'Kafe yonetimi sadece yonetici tarafindan atanmis cafe_owner hesaplarina aciktir.',
-        'Cafe management is available only to cafe_owner accounts assigned by an admin.',
-      );
-      action = OutlinedButton.icon(
-        key: ValueKey('cafe-owner-claim-disabled-${cafe.id}'),
-        onPressed: null,
-        icon: const Icon(Icons.lock_outline_rounded),
-        label: Text(_trEn(
-            context, 'Yonetici atamasi gerekli', 'Admin assignment required')),
+        label: Text(_trEn(context, 'Kafeyi yönet', 'Manage cafe')),
       );
     } else if (claim?.isPending == true) {
       body = _trEn(

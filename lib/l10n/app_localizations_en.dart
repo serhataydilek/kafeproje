@@ -265,6 +265,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeTitle => 'Find a cafe in Istanbul';
 
   @override
+  String get homeSubtitle => 'Discover good cafes around the city.';
+
+  @override
   String get homeSearchHint => 'Search cafes...';
 
   @override
@@ -303,6 +306,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exploreTitle => 'Explore';
 
   @override
+  String exploreResultCount(int count) {
+    return '$count cafes';
+  }
+
+  @override
   String get exploreEmptyTitle => 'No cafes match these filters';
 
   @override
@@ -313,17 +321,22 @@ class AppLocalizationsEn extends AppLocalizations {
       'No cafes match current filters, but you still have selected cafes ready to compare.';
 
   @override
-  String get favoritesTitle => 'My favorite cafes';
+  String get favoritesTitle => 'Favorites';
+
+  @override
+  String favoritesCount(int count) {
+    return '$count saved';
+  }
 
   @override
   String get favoritesLoading => 'Loading favorites';
 
   @override
-  String get favoritesEmptyTitle => 'You do not have any favorite cafes yet';
+  String get favoritesEmptyTitle => 'No saved cafes yet';
 
   @override
   String get favoritesEmptyMessage =>
-      'Save the cafes you like and reach them easily here.';
+      'Save cafes you like and find them here later.';
 
   @override
   String get favoritesExploreAction => 'Explore cafes';
@@ -350,6 +363,48 @@ class AppLocalizationsEn extends AppLocalizations {
   String profileSyncDeadLetters(int count) {
     return '$count change(s) could not be synced automatically.';
   }
+
+  @override
+  String get profileEditIntro => 'Update your profile details here.';
+
+  @override
+  String get profilePhotoLabel => 'Profile photo';
+
+  @override
+  String get profilePhotoHint =>
+      'Add a photo to make your profile easier to recognize.';
+
+  @override
+  String get profilePhotoPending =>
+      'A new photo is ready. Save to upload it to your profile.';
+
+  @override
+  String get profilePhotoPreviewReady =>
+      'Preview ready. Saving will upload the photo.';
+
+  @override
+  String get profilePhotoReplaceHint =>
+      'You can replace or remove your current photo.';
+
+  @override
+  String get profilePhotoPickHint =>
+      'Pick a photo from your gallery to preview it before saving.';
+
+  @override
+  String get profilePhotoEdit => 'Edit photo';
+
+  @override
+  String get profilePhotoRemove => 'Remove photo';
+
+  @override
+  String get profilePhotoChooseGallery => 'Choose from gallery';
+
+  @override
+  String get profilePhotoPickFailed =>
+      'Photo selection failed. Please try again.';
+
+  @override
+  String get profileUsernameHint => '3-24 characters';
 
   @override
   String get profileEdit => 'Edit profile';

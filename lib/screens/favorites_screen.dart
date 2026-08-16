@@ -8,6 +8,7 @@ import '../theme/app_theme.dart';
 import '../widgets/cafes/adaptive_cafe_collection.dart';
 import '../widgets/cafes/cafe_card.dart';
 import '../widgets/layout/adaptive_layout.dart';
+import '../widgets/ui/list_tiles.dart';
 import '../widgets/ui/state_views.dart';
 
 class FavoritesScreen extends ConsumerStatefulWidget {
@@ -60,13 +61,13 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(height: layout.sectionSpacing),
-                            Text(
-                              l10n.favoritesTitle,
-                              style: TextStyle(
-                                fontSize: layout.isTablet ? 32 : 28,
-                                fontWeight: FontWeight.w800,
-                                color: colors.text,
-                              ),
+                            AppPageTitle(
+                              colors: colors,
+                              title: l10n.favoritesTitle,
+                              subtitle: favoriteCafes.isEmpty
+                                  ? null
+                                  : l10n.favoritesCount(favoriteCafes.length),
+                              large: layout.isTablet,
                             ),
                             SizedBox(height: layout.sectionSpacing),
                             Expanded(

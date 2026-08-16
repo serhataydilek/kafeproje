@@ -339,6 +339,7 @@ class _BottomNavShell extends ConsumerWidget {
     final securityReadinessAsync = ref.watch(securityReadinessProvider);
     final pendingSyncCount = ref.watch(offlinePendingCountProvider);
     final currentUser = ref.watch(currentUserProvider);
+    final isAdmin = ref.watch(isAdminProvider);
     final showCompareFab =
         location != '/map' && currentUser != null && compareCount > 0;
     final compareCountLabel = compareCount > 9 ? '9+' : '$compareCount';
@@ -356,7 +357,7 @@ class _BottomNavShell extends ConsumerWidget {
     );
     final securityReport = securityReadinessAsync.valueOrNull;
     final hasSecurityReadinessWarning =
-        securityReport?.shouldShowRuntimeWarning ?? false;
+        isAdmin && (securityReport?.shouldShowRuntimeWarning ?? false);
     final securityBannerMessage =
         securityReport?.message ?? 'Security readiness check failed.';
     final securityBannerColor =

@@ -89,6 +89,8 @@ void main() {
       expect(find.byKey(const ValueKey('cafe-detail-header-deleted-cafe')),
           findsNothing);
       expect(find.byType(ErrorStateView), findsOneWidget);
+      expect(find.byKey(const ValueKey('cafe-detail-back-button')),
+          findsOneWidget);
     });
 
     testWidgets('renders sponsored badge for active featured cafes',
@@ -226,6 +228,8 @@ void main() {
       await tester.pump();
 
       expect(find.byType(LoadingStateView), findsOneWidget);
+      expect(find.byKey(const ValueKey('cafe-detail-back-button')),
+          findsOneWidget);
     });
 
     testWidgets('renders error state when detail load fails', (tester) async {
@@ -254,6 +258,8 @@ void main() {
       expect(find.byType(ErrorStateView), findsOneWidget);
       expect(find.text(errorMessage), findsOneWidget);
       expect(find.text('Retry'), findsOneWidget);
+      expect(find.byKey(const ValueKey('cafe-detail-back-button')),
+          findsOneWidget);
     });
 
     testWidgets(
@@ -823,6 +829,46 @@ void main() {
       expect(
         container.read(reviewSubmissionControllerProvider('cafe-5')),
         isA<async_result.AsyncData<void>>(),
+      );
+    });
+
+    testWidgets('hides owner-claim UI from normal users in the demo',
+        (tester) async {
+      final cafe = buildTestCafe(
+        id: 'cafe-claim-hidden',
+        name: 'Public Cafe',
+        images: const [],
+      );
+      final container = createTestContainer(
+        state: buildTestAppShellState(
+          cafes: [cafe],
+          currentUser: testUser,
+        ),
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        buildTestApp(
+          container: container,
+          child: const CafeDetailScreen(cafeId: 'cafe-claim-hidden'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(
+            const ValueKey('cafe-owner-claim-section-cafe-claim-hidden')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const ValueKey('cafe-owner-claim-cafe-claim-hidden')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(
+          const ValueKey('cafe-owner-claim-disabled-cafe-claim-hidden'),
+        ),
+        findsNothing,
       );
     });
   });

@@ -91,6 +91,7 @@
   "preferencePetFriendly": "Pet-friendly",
   "preferenceBudget": "Budget-friendly",
   "homeTitle": "Find a cafe in Istanbul",
+  "homeSubtitle": "Discover good cafes around the city.",
   "homeSearchHint": "Search cafes...",
   "homePopularDistricts": "Popular districts",
   "homeCategories": "Categories",
@@ -103,13 +104,29 @@
   "homeMockDataInfo": "Sample cafe data is shown until Supabase is ready.",
   "homeMockFallbackInfo": "Live data could not be loaded. The app is currently using sample data.",
   "exploreTitle": "Explore",
+  "exploreResultCount": "{count} cafes",
+  "@exploreResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "exploreEmptyTitle": "No cafes match these filters",
   "exploreEmptyMessage": "Try loosening your search or filters.",
   "exploreEmptyCompareMessage": "No cafes match current filters, but you still have selected cafes ready to compare.",
-  "favoritesTitle": "My favorite cafes",
+  "favoritesTitle": "Favorites",
+  "favoritesCount": "{count} saved",
+  "@favoritesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "favoritesLoading": "Loading favorites",
-  "favoritesEmptyTitle": "You do not have any favorite cafes yet",
-  "favoritesEmptyMessage": "Save the cafes you like and reach them easily here.",
+  "favoritesEmptyTitle": "No saved cafes yet",
+  "favoritesEmptyMessage": "Save cafes you like and find them here later.",
   "favoritesExploreAction": "Explore cafes",
   "profileGuestTitle": "You are not signed in",
   "profileGuestAction": "Sign in",
@@ -136,6 +153,18 @@
       }
     }
   },
+  "profileEditIntro": "Update your profile details here.",
+  "profilePhotoLabel": "Profile photo",
+  "profilePhotoHint": "Add a photo to make your profile easier to recognize.",
+  "profilePhotoPending": "A new photo is ready. Save to upload it to your profile.",
+  "profilePhotoPreviewReady": "Preview ready. Saving will upload the photo.",
+  "profilePhotoReplaceHint": "You can replace or remove your current photo.",
+  "profilePhotoPickHint": "Pick a photo from your gallery to preview it before saving.",
+  "profilePhotoEdit": "Edit photo",
+  "profilePhotoRemove": "Remove photo",
+  "profilePhotoChooseGallery": "Choose from gallery",
+  "profilePhotoPickFailed": "Photo selection failed. Please try again.",
+  "profileUsernameHint": "3-24 characters",
   "profileEdit": "Edit profile",
   "profileAdminPanel": "Admin panel",
   "profileManagerBadge": "Admin",

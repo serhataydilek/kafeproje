@@ -10,6 +10,7 @@ import '../theme/app_theme.dart';
 import '../utils/cafe_hours.dart';
 import '../utils/compare_formatters.dart';
 import '../widgets/cafes/cafe_image_carousel.dart';
+import '../widgets/cafes/compare_single_state.dart';
 import '../widgets/layout/adaptive_layout.dart';
 import '../widgets/ui/state_views.dart';
 
@@ -42,7 +43,13 @@ class CompareScreen extends ConsumerWidget {
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
           tooltip: l10n.commonBack,
-          onPressed: () => context.pop(),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+              return;
+            }
+            context.go('/');
+          },
           icon: Icon(Icons.arrow_back_rounded, color: colors.text),
         ),
         titleSpacing: 0,
@@ -65,11 +72,16 @@ class CompareScreen extends ConsumerWidget {
               ? LoadingStateView(colors: colors, label: l10n.commonLoading)
               : compareIds.isEmpty
                   ? _CompareEmptyState(colors: colors)
-                  : _CompareBoard(
-                      slots: slots,
-                      colors: colors,
-                      currentLocation: currentLocation,
-                    ),
+                  : compareIds.length == 1 && compareCafes.length == 1
+                      ? CompareSingleState(
+                          cafe: compareCafes.first,
+                          colors: colors,
+                        )
+                      : _CompareBoard(
+                          slots: slots,
+                          colors: colors,
+                          currentLocation: currentLocation,
+                        ),
         ),
       ),
     );

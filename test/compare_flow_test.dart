@@ -10,6 +10,7 @@ import 'package:kafeproje/repositories/cafe_repository.dart';
 import 'package:kafeproje/screens/cafe_detail_screen.dart';
 import 'package:kafeproje/screens/compare_screen.dart';
 import 'package:kafeproje/screens/home_screen.dart';
+import 'package:kafeproje/widgets/cafes/compare_single_state.dart';
 import 'package:go_router/go_router.dart';
 
 import 'test_helpers.dart';
@@ -882,7 +883,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Single Cafe'), findsWidgets);
-        expect(find.byKey(const Key('compare-table-cell-0-0')), findsOneWidget);
+        expect(find.byType(CompareSingleState), findsOneWidget);
         expect(
             find.byKey(const Key('compare-add-cafe-button')), findsOneWidget);
         expect(tester.takeException(), isNull);

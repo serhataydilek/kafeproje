@@ -582,7 +582,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                             : null,
                                       ),
                                     ),
-                                  if (kDebugMode)
+                                  if (kDebugMode && kVerboseCafeDiagnostics)
                                     Positioned(
                                       top: layout.horizontalPadding,
                                       left: layout.horizontalPadding,

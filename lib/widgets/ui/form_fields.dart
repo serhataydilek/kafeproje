@@ -74,6 +74,10 @@ class AppFormInput extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppRadius.md),
             borderSide: BorderSide(color: colors.border),
           ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            borderSide: BorderSide(color: colors.primary, width: 1.4),
+          ),
         ),
       ),
     );

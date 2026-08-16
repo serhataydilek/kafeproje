@@ -33,7 +33,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get commonEdit => 'Düzenle';
 
   @override
-  String get commonLoadMore => 'Daha fazla yukle';
+  String get commonLoadMore => 'Daha fazla yükle';
 
   @override
   String get commonReset => 'Sıfırla';
@@ -57,7 +57,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get commonUnknown => 'Belirtilmemiş';
 
   @override
-  String get cafeNoRatingsYet => 'Henuz puan yok';
+  String get cafeNoRatingsYet => 'Henüz puan yok';
 
   @override
   String get commonNoData => 'Belirtilmemiş';
@@ -109,7 +109,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get offlineBannerMessage =>
-      'Cevrimdisisin. Onbellekteki veriler gosteriliyor ve degisiklikler esitleme icin kuyruklaniyor.';
+      'Çevrimdışısın. Önbellekteki veriler gösteriliyor ve değişiklikler eşitleme için kuyruklanıyor.';
 
   @override
   String get navHome => 'Ana Sayfa';
@@ -262,7 +262,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get preferenceBudget => 'Uygun fiyat';
 
   @override
-  String get homeTitle => 'Istanbul\'da kafe bul';
+  String get homeTitle => 'İstanbul\'da kafe bul';
+
+  @override
+  String get homeSubtitle => 'Şehirdeki iyi kafeleri keşfet.';
 
   @override
   String get homeSearchHint => 'Kafe ara...';
@@ -304,6 +307,11 @@ class AppLocalizationsTr extends AppLocalizations {
   String get exploreTitle => 'Keşfet';
 
   @override
+  String exploreResultCount(int count) {
+    return '$count kafe';
+  }
+
+  @override
   String get exploreEmptyTitle => 'Filtrelere uygun kafe bulunamadı';
 
   @override
@@ -315,7 +323,12 @@ class AppLocalizationsTr extends AppLocalizations {
       'Geçerli filtrelere uygun kafe yok, ancak seçtiğin kafeler karşılaştırmaya hazır.';
 
   @override
-  String get favoritesTitle => 'Favori kafelerim';
+  String get favoritesTitle => 'Favoriler';
+
+  @override
+  String favoritesCount(int count) {
+    return '$count kayıtlı';
+  }
 
   @override
   String get favoritesLoading => 'Favoriler yükleniyor';
@@ -341,17 +354,60 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get profileSyncQueued =>
-      'Degisikliklerin cevrimdisi kaydedildi ve baglanti gelince otomatik esitlenecek.';
+      'Değişikliklerin çevrimdışı kaydedildi ve bağlantı gelince otomatik eşitlenecek.';
 
   @override
   String profileSyncPending(int count) {
-    return '$count degisiklik esitleme bekliyor.';
+    return '$count değişiklik eşitleme bekliyor.';
   }
 
   @override
   String profileSyncDeadLetters(int count) {
-    return '$count degisiklik otomatik olarak esitlenemedi.';
+    return '$count değişiklik otomatik olarak eşitlenemedi.';
   }
+
+  @override
+  String get profileEditIntro =>
+      'Profil bilgilerini buradan güncelleyebilirsin.';
+
+  @override
+  String get profilePhotoLabel => 'Profil fotoğrafı';
+
+  @override
+  String get profilePhotoHint =>
+      'Fotoğraf ekleyerek profilini daha kolay tanınır hale getir.';
+
+  @override
+  String get profilePhotoPending =>
+      'Yeni fotoğraf seçildi. Kaydet dediğinde profiline yüklenecek.';
+
+  @override
+  String get profilePhotoPreviewReady =>
+      'Önizleme hazır. Kaydettiğinde fotoğraf yüklenecek.';
+
+  @override
+  String get profilePhotoReplaceHint =>
+      'Mevcut fotoğrafını değiştirebilir veya kaldırabilirsin.';
+
+  @override
+  String get profilePhotoPickHint =>
+      'Galeriden fotoğraf seçerek kaydetmeden önce önizleyebilirsin.';
+
+  @override
+  String get profilePhotoEdit => 'Fotoğrafı düzenle';
+
+  @override
+  String get profilePhotoRemove => 'Fotoğrafı kaldır';
+
+  @override
+  String get profilePhotoChooseGallery => 'Galeriden seç';
+
+  @override
+  String get profilePhotoPickFailed =>
+      'Fotoğraf seçilemedi. Lütfen tekrar dene.';
+
+  @override
+  String get profileUsernameHint => '3-24 karakter';
 
   @override
   String get profileEdit => 'Profili düzenle';
