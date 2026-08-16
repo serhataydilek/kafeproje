@@ -61,7 +61,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               context.pop();
               return;
             }
-            context.go('/');
+            context.go('/profile');
           },
           icon: Icon(Icons.arrow_back_rounded, color: colors.text),
         ),

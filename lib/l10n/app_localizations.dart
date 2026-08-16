@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In tr, this message translates to:
-  /// **'Istanbul Kafe'**
+  /// **'İstanbul Kafe'**
   String get appTitle;
 
   /// No description provided for @commonBack.
@@ -1067,19 +1067,19 @@ abstract class AppLocalizations {
   /// Yorum cevrimdisi kuyruga alindiginda gosterilen basari mesaji.
   ///
   /// In tr, this message translates to:
-  /// **'Yorumun cevrimdisi kaydedildi ve baglanti gelince otomatik esitlenecek.'**
+  /// **'Yorumun çevrimdışı kaydedildi ve bağlantı gelince otomatik eşitlenecek.'**
   String get reviewsQueuedSuccess;
 
   /// No description provided for @onboardingBrand.
   ///
   /// In tr, this message translates to:
-  /// **'Istanbul Kafe'**
+  /// **'İstanbul Kafe'**
   String get onboardingBrand;
 
   /// No description provided for @onboardingTitle.
   ///
   /// In tr, this message translates to:
-  /// **'Istanbul\'da bir sonraki favori kafeni keşfet'**
+  /// **'İstanbul\'da bir sonraki favori kafeni keşfet'**
   String get onboardingTitle;
 
   /// No description provided for @onboardingSubtitle.
@@ -1177,6 +1177,48 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Uygula ({count} filtre)'**
   String filterApplyCount(int count);
+
+  /// No description provided for @filterPresetsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kayıtlı filtreler'**
+  String get filterPresetsTitle;
+
+  /// No description provided for @filterPresetNameHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçerli filtreleri bir hazır ayar olarak kaydet'**
+  String get filterPresetNameHint;
+
+  /// No description provided for @filterPresetNameEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hazır ayar adı boş olamaz.'**
+  String get filterPresetNameEmpty;
+
+  /// No description provided for @filterPresetNeedFilters.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydetmeden önce en az bir filtre ekleyin.'**
+  String get filterPresetNeedFilters;
+
+  /// No description provided for @filterPresetUpdated.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hazır ayar güncellendi.'**
+  String get filterPresetUpdated;
+
+  /// No description provided for @filterPresetSaved.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hazır ayar kaydedildi.'**
+  String get filterPresetSaved;
+
+  /// No description provided for @filterPresetEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz hazır ayar yok. Tekrar kullanmak için geçerli filtreleri kaydedin.'**
+  String get filterPresetEmpty;
 
   /// No description provided for @mapPreparing.
   ///
@@ -1283,7 +1325,7 @@ abstract class AppLocalizations {
   /// No description provided for @mapDevLabel.
   ///
   /// In tr, this message translates to:
-  /// **'Istanbul geliştirme haritası'**
+  /// **'İstanbul geliştirme haritası'**
   String get mapDevLabel;
 
   /// No description provided for @cafeDetailNotFound.
@@ -1363,6 +1405,30 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Haritada aç'**
   String get cafeDetailOpenOnMap;
+
+  /// No description provided for @metadataJustNow.
+  ///
+  /// In tr, this message translates to:
+  /// **'az önce'**
+  String get metadataJustNow;
+
+  /// No description provided for @metadataMinutesAgo.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count}dk önce'**
+  String metadataMinutesAgo(int count);
+
+  /// No description provided for @metadataHoursAgo.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count}sa önce'**
+  String metadataHoursAgo(int count);
+
+  /// No description provided for @metadataDaysAgo.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count}g önce'**
+  String metadataDaysAgo(int count);
 
   /// No description provided for @metricWifi.
   ///
@@ -1757,7 +1823,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsAboutDescription.
   ///
   /// In tr, this message translates to:
-  /// **'Istanbul\'daki en iyi kafeleri keşfet, karşılaştır ve favorilerine ekle.'**
+  /// **'İstanbul\'daki en iyi kafeleri keşfet, karşılaştır ve favorilerine ekle.'**
   String get settingsAboutDescription;
 
   /// No description provided for @adminTitle.

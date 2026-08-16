@@ -250,6 +250,13 @@
       }
     }
   },
+  "filterPresetsTitle": "Presets",
+  "filterPresetNameHint": "Save current filters as a preset",
+  "filterPresetNameEmpty": "Preset name cannot be empty.",
+  "filterPresetNeedFilters": "Add at least one filter before saving a preset.",
+  "filterPresetUpdated": "Preset updated.",
+  "filterPresetSaved": "Preset saved.",
+  "filterPresetEmpty": "No presets yet. Save your current filters to reuse them.",
   "mapPreparing": "Preparing map view",
   "mapLocateMe": "Locate me",
   "mapEmptyTitle": "There are no cafes to show on the map",
@@ -312,6 +319,31 @@
   "cafeDetailCompare": "Compare",
   "cafeDetailCompared": "Added",
   "cafeDetailOpenOnMap": "Open on map",
+  "metadataJustNow": "just now",
+  "metadataMinutesAgo": "{count}m ago",
+  "@metadataMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "metadataHoursAgo": "{count}h ago",
+  "@metadataHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "metadataDaysAgo": "{count}d ago",
+  "@metadataDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "metricWifi": "Wi-Fi",
   "metricOutlet": "Outlets",
   "metricQuietness": "Quietness",

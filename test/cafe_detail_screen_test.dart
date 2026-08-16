@@ -334,6 +334,50 @@ void main() {
       expect(find.text(l10n.cafeDetailHoursEmpty), findsOneWidget);
     });
 
+    testWidgets('long cafe names stay bounded next to status on a 320px width',
+        (tester) async {
+      tester.view.physicalSize = const Size(320, 720);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      const longName =
+          'Çok Uzun İsimli Bağımsız Kahve Dükkanı ve Çalışma Alanı';
+      final cafe = buildTestCafe(
+        id: 'cafe-narrow',
+        name: longName,
+        images: const [],
+      );
+      final container = createTestContainer(
+        state: buildTestAppShellState(
+          cafes: [cafe],
+          currentUser: testUser,
+        ),
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        buildTestApp(
+          container: container,
+          child: const CafeDetailScreen(cafeId: 'cafe-narrow'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      final header =
+          find.byKey(const ValueKey('cafe-detail-header-cafe-narrow'));
+      expect(header, findsOneWidget);
+      expect(tester.getSize(header).width, lessThanOrEqualTo(320));
+      final nameText = tester.widget<Text>(
+        find.descendant(of: header, matching: find.text(longName)),
+      );
+      expect(nameText.maxLines, 2);
+      expect(nameText.overflow, TextOverflow.ellipsis);
+    });
+
     testWidgets(
         'keeps app rating primary and Google data secondary in detail UI',
         (tester) async {

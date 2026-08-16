@@ -44,8 +44,7 @@ class MapCafePreviewCard extends StatelessWidget {
     final imageRadius = BorderRadius.circular(
       _MapCafePreviewCardTokens.imageRadius,
     );
-    final visibleRating =
-        cafe.appRating ?? cafe.adminFallbackRating ?? cafe.googleRating;
+    final visibleRating = cafe.appRating ?? cafe.adminFallbackRating;
     final hasVisibleRating = visibleRating != null;
     final openStatus = resolveCafeOpenStatus(cafe);
 

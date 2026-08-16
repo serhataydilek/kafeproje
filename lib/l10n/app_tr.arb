@@ -1,6 +1,6 @@
 {
   "@@locale": "tr",
-  "appTitle": "Istanbul Kafe",
+  "appTitle": "İstanbul Kafe",
   "commonBack": "Geri",
   "commonSave": "Kaydet",
   "commonCancel": "İptal",
@@ -214,12 +214,12 @@
   },
   "authSignUpSuccess": "Hesabın oluşturuldu. E-posta adresini doğrulamak için gelen kutunu kontrol et.",
   "authGenericError": "Bir şeyler ters gitti.",
-  "reviewsQueuedSuccess": "Yorumun cevrimdisi kaydedildi ve baglanti gelince otomatik esitlenecek.",
+  "reviewsQueuedSuccess": "Yorumun çevrimdışı kaydedildi ve bağlantı gelince otomatik eşitlenecek.",
   "@reviewsQueuedSuccess": {
     "description": "Yorum cevrimdisi kuyruga alindiginda gosterilen basari mesaji."
   },
-  "onboardingBrand": "Istanbul Kafe",
-  "onboardingTitle": "Istanbul'da bir sonraki favori kafeni keşfet",
+  "onboardingBrand": "İstanbul Kafe",
+  "onboardingTitle": "İstanbul'da bir sonraki favori kafeni keşfet",
   "onboardingSubtitle": "Senin için en önemli şeyleri seç, önerileri buna göre düzenleyelim.",
   "onboardingContinue": "Keşfetmeye başla",
   "filterTitle": "Filtreler",
@@ -250,6 +250,13 @@
       }
     }
   },
+  "filterPresetsTitle": "Kayıtlı filtreler",
+  "filterPresetNameHint": "Geçerli filtreleri bir hazır ayar olarak kaydet",
+  "filterPresetNameEmpty": "Hazır ayar adı boş olamaz.",
+  "filterPresetNeedFilters": "Kaydetmeden önce en az bir filtre ekleyin.",
+  "filterPresetUpdated": "Hazır ayar güncellendi.",
+  "filterPresetSaved": "Hazır ayar kaydedildi.",
+  "filterPresetEmpty": "Henüz hazır ayar yok. Tekrar kullanmak için geçerli filtreleri kaydedin.",
   "mapPreparing": "Harita görünümü hazırlanıyor",
   "mapLocateMe": "Konumumu bul",
   "mapEmptyTitle": "Haritada gösterilecek kafe yok",
@@ -298,7 +305,7 @@
   "mapRadiusSmall": "1 km",
   "mapRadiusMedium": "2 km",
   "mapRadiusLarge": "4 km",
-  "mapDevLabel": "Istanbul geliştirme haritası",
+  "mapDevLabel": "İstanbul geliştirme haritası",
   "cafeDetailNotFound": "Bu kafe bulunamadı veya veri henüz yüklenmedi.",
   "cafeDetailDetails": "Detaylar",
   "cafeDetailContributionTitle": "Bu kafeyi birlikte iyileştirelim",
@@ -312,6 +319,31 @@
   "cafeDetailCompare": "Karşılaştır",
   "cafeDetailCompared": "Eklendi",
   "cafeDetailOpenOnMap": "Haritada aç",
+  "metadataJustNow": "az önce",
+  "metadataMinutesAgo": "{count}dk önce",
+  "@metadataMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "metadataHoursAgo": "{count}sa önce",
+  "@metadataHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "metadataDaysAgo": "{count}g önce",
+  "@metadataDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "metricWifi": "Wi‑Fi",
   "metricOutlet": "Priz",
   "metricQuietness": "Sessizlik",
@@ -398,7 +430,7 @@
   "compareEmptyFeatureWifi": "Kafenin Ã§alÄ±ÅŸmaya veya ders Ã§alÄ±ÅŸmaya uygunluÄŸu.",
   "compareEmptyFeatureAmbiance": "Genel atmosfer ve konfor sinyalleri.",
   "compareEmptyFeatureOutlet": "DizÃ¼stÃ¼ ve telefonlar iÃ§in ÅŸarj imkanÄ±.",
-  "settingsAboutDescription": "Istanbul'daki en iyi kafeleri keşfet, karşılaştır ve favorilerine ekle.",
+  "settingsAboutDescription": "İstanbul'daki en iyi kafeleri keşfet, karşılaştır ve favorilerine ekle.",
   "adminTitle": "Yönetim paneli",
   "adminBlockedTitle": "Erişim engellendi",
   "adminBlockedMessage": "Bu sayfa yalnızca yöneticiler tarafından görüntülenebilir.",

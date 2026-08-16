@@ -107,7 +107,7 @@ class CompareSingleState extends ConsumerWidget {
                           const SizedBox(height: AppSpacing.xs),
                           Text(
                             cafeLocationSummary(l10n, cafe),
-                            maxLines: 1,
+                            maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: colors.mutedText,

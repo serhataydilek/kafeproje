@@ -9,7 +9,7 @@ class AppLocalizationsTr extends AppLocalizations {
   AppLocalizationsTr([String locale = 'tr']) : super(locale);
 
   @override
-  String get appTitle => 'Istanbul Kafe';
+  String get appTitle => 'İstanbul Kafe';
 
   @override
   String get commonBack => 'Geri';
@@ -523,13 +523,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get reviewsQueuedSuccess =>
-      'Yorumun cevrimdisi kaydedildi ve baglanti gelince otomatik esitlenecek.';
+      'Yorumun çevrimdışı kaydedildi ve bağlantı gelince otomatik eşitlenecek.';
 
   @override
-  String get onboardingBrand => 'Istanbul Kafe';
+  String get onboardingBrand => 'İstanbul Kafe';
 
   @override
-  String get onboardingTitle => 'Istanbul\'da bir sonraki favori kafeni keşfet';
+  String get onboardingTitle => 'İstanbul\'da bir sonraki favori kafeni keşfet';
 
   @override
   String get onboardingSubtitle =>
@@ -583,6 +583,30 @@ class AppLocalizationsTr extends AppLocalizations {
   String filterApplyCount(int count) {
     return 'Uygula ($count filtre)';
   }
+
+  @override
+  String get filterPresetsTitle => 'Kayıtlı filtreler';
+
+  @override
+  String get filterPresetNameHint =>
+      'Geçerli filtreleri bir hazır ayar olarak kaydet';
+
+  @override
+  String get filterPresetNameEmpty => 'Hazır ayar adı boş olamaz.';
+
+  @override
+  String get filterPresetNeedFilters =>
+      'Kaydetmeden önce en az bir filtre ekleyin.';
+
+  @override
+  String get filterPresetUpdated => 'Hazır ayar güncellendi.';
+
+  @override
+  String get filterPresetSaved => 'Hazır ayar kaydedildi.';
+
+  @override
+  String get filterPresetEmpty =>
+      'Henüz hazır ayar yok. Tekrar kullanmak için geçerli filtreleri kaydedin.';
 
   @override
   String get mapPreparing => 'Harita görünümü hazırlanıyor';
@@ -649,7 +673,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get mapRadiusLarge => '4 km';
 
   @override
-  String get mapDevLabel => 'Istanbul geliştirme haritası';
+  String get mapDevLabel => 'İstanbul geliştirme haritası';
 
   @override
   String get cafeDetailNotFound =>
@@ -692,6 +716,24 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get cafeDetailOpenOnMap => 'Haritada aç';
+
+  @override
+  String get metadataJustNow => 'az önce';
+
+  @override
+  String metadataMinutesAgo(int count) {
+    return '${count}dk önce';
+  }
+
+  @override
+  String metadataHoursAgo(int count) {
+    return '${count}sa önce';
+  }
+
+  @override
+  String metadataDaysAgo(int count) {
+    return '${count}g önce';
+  }
 
   @override
   String get metricWifi => 'Wi‑Fi';
@@ -909,7 +951,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get settingsAboutDescription =>
-      'Istanbul\'daki en iyi kafeleri keşfet, karşılaştır ve favorilerine ekle.';
+      'İstanbul\'daki en iyi kafeleri keşfet, karşılaştır ve favorilerine ekle.';
 
   @override
   String get adminTitle => 'Yönetim paneli';

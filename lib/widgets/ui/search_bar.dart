@@ -134,8 +134,8 @@ class _AppSearchBarState extends State<AppSearchBar> {
                 children: [
                   if (hasInput)
                     IconButton(
-                      tooltip: AppLocalizations.of(context)?.commonClear ??
-                          'Clear',
+                      tooltip:
+                          AppLocalizations.of(context)?.commonClear ?? 'Clear',
                       visualDensity: VisualDensity.compact,
                       icon: Icon(
                         Icons.close_rounded,
