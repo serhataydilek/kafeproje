@@ -56,11 +56,11 @@ try {
   }
 
   $requiredDocs = @(
-    "README.md",
-    "RELEASE_READINESS.md",
-    "docs/LOCAL_ENV_RUN.md",
+    "docs/PUBLIC_RELEASE_RUNBOOK.md",
+    "docs/STORE_SUBMISSION_CHECKLIST.md",
+    "docs/PRIVACY_POLICY_DRAFT.md",
     "supabase/SECURITY_READINESS.md",
-    "security-evidence/rls-audit/RELEASE_EVIDENCE_TEMPLATE.md"
+    "release-evidence/LIVE_SECURITY_INTEGRITY_SMOKE_CHECK.md"
   )
   foreach ($doc in $requiredDocs) {
     if (-not (Test-Path $doc)) {
