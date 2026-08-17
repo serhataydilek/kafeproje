@@ -44,11 +44,14 @@ class AdminScreen extends ConsumerWidget {
     final cafeCount = ref.watch(
       adminCafeListControllerProvider.select((state) => state.cafes.length),
     );
-    final claimCount = ref.watch(
-      pendingCafeOwnerClaimsProvider.select(
-        (async) => async.valueOrNull?.length ?? 0,
-      ),
-    );
+    const claimsEnabled = bool.fromEnvironment('ENABLE_OWNER_CLAIMS');
+    final claimCount = claimsEnabled
+        ? ref.watch(
+            pendingCafeOwnerClaimsProvider.select(
+              (async) => async.valueOrNull?.length ?? 0,
+            ),
+          )
+        : 0;
     final discoveredCount = ref.watch(
       adminDiscoveredCafesProvider.select((cafes) => cafes.length),
     );

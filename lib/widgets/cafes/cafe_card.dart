@@ -45,8 +45,6 @@ class CafeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final displayFavoriteCount =
-        isFavorite && cafe.favoriteCount == 0 ? 1 : cafe.favoriteCount;
     final openStatus = resolveCafeOpenStatus(cafe);
     final isOpen = openStatus == CafeOpenStatus.open;
     final isUnknown = openStatus == CafeOpenStatus.unknown;
@@ -74,10 +72,18 @@ class CafeCard extends StatelessWidget {
       normalizedUrls: normalizedImageUrls,
       height: 160,
     );
-    final ratingPresentation = _ratingPresentationForCard(
-      cafe,
-      sponsored: showSponsoredTreatment,
-    );
+    final displayRating =
+        cafe.appRating ?? cafe.adminFallbackRating ?? cafe.googleRating;
+    final ratingPresentation = displayRating == null
+        ? null
+        : _CafeCardRatingPresentation(
+            label: displayRating.toStringAsFixed(1),
+            source: cafe.appRating != null
+                ? 'app'
+                : cafe.adminFallbackRating != null
+                    ? 'admin'
+                    : 'google',
+          );
     if (showSponsoredTreatment) {
       AppLogger.debug(
         '[SPONSORED_RATING_UI] cafeId=${_shortCafeId(cafe.id)} visible=${ratingPresentation != null} source=${ratingPresentation?.source ?? 'hidden'}',
@@ -112,24 +118,20 @@ class CafeCard extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: AppSpacing.md),
           decoration: BoxDecoration(
             color: showSponsoredTreatment ? sponsoredSurface : colors.card,
-            borderRadius: BorderRadius.circular(AppRadius.lg + 2),
+            borderRadius: BorderRadius.circular(AppRadius.lg),
             border: Border.all(
               color: cardBorderColor,
               width: cardBorderWidth,
             ),
             boxShadow: [
-              if (showSponsoredTreatment)
-                BoxShadow(
-                  color: sponsoredFrameColor.withValues(
-                    alpha: isDark ? 0.18 : 0.14,
-                  ),
-                  offset: const Offset(0, 9),
-                  blurRadius: 24,
-                ),
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
-                offset: const Offset(0, 7),
-                blurRadius: 18,
+                color: Colors.black.withValues(
+                  alpha: showSponsoredTreatment
+                      ? (isDark ? 0.18 : 0.08)
+                      : (isDark ? 0.16 : 0.05),
+                ),
+                offset: const Offset(0, 4),
+                blurRadius: showSponsoredTreatment ? 16 : 10,
               ),
             ],
           ),
@@ -178,103 +180,48 @@ class CafeCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(
+                      cafe.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                        color: colors.text,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      cafeLocationSummary(l10n, cafe),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: colors.mutedText,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
                     Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                cafe.name,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 18,
-                                  color: colors.text,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                cafeLocationSummary(l10n, cafe),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: colors.mutedText,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
+                        if (ratingPresentation != null) ...[
+                          Icon(
+                            Icons.star_rounded,
+                            color: colors.primary,
+                            size: AppIconSize.sm,
                           ),
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        // ── Rating + Favorite count ──────────────────────
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (ratingPresentation != null) ...[
-                              Icon(Icons.star_rounded,
-                                  color: colors.primary, size: 18),
-                              const SizedBox(width: 3),
-                              Text(
-                                ratingPresentation.label,
-                                style: TextStyle(
-                                  color: colors.text,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 15,
-                                ),
-                              ),
-                              if (displayFavoriteCount > 0)
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 8),
-                                  child: Container(
-                                    width: 1,
-                                    height: 12,
-                                    color: colors.border,
-                                  ),
-                                ),
-                            ] else ...[
-                              Text(
-                                l10n.cafeNoRatingsYet,
-                                style: TextStyle(
-                                  color: colors.mutedText,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              if (displayFavoriteCount > 0)
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 8),
-                                  child: Container(
-                                    width: 1,
-                                    height: 12,
-                                    color: colors.border,
-                                  ),
-                                ),
-                            ],
-                            if (displayFavoriteCount > 0) ...[
-                              const SizedBox(width: 8),
-                              Icon(Icons.favorite_rounded,
-                                  color: colors.primary.withValues(alpha: 0.85),
-                                  size: 14),
-                              const SizedBox(width: 3),
-                              Text(
-                                displayFavoriteCount.toString(),
-                                style: TextStyle(
-                                  color: colors.mutedText,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        // ── Open / Closed badge ───────────────────────────
-
+                          const SizedBox(width: 3),
+                          Text(
+                            ratingPresentation.label,
+                            style: TextStyle(
+                              color: colors.text,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                        ],
                         Container(
-                          constraints: const BoxConstraints(maxWidth: 88),
+                          constraints: const BoxConstraints(maxWidth: 96),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8,
                             vertical: 3,
@@ -305,8 +252,8 @@ class CafeCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: AppSpacing.sm),
                     if (featuredSummary != null) ...[
+                      const SizedBox(height: AppSpacing.sm),
                       Text(
                         featuredSummary,
                         maxLines: 2,
@@ -317,87 +264,77 @@ class CafeCard extends StatelessWidget {
                           height: 1.25,
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.sm),
                     ],
-                    Text(
-                      '${cafePriceLabel(l10n, cafe)} | ${cafeWifiDisplayLabel(l10n, cafe)} Wi-Fi | ${cafeQuietnessDisplayLabel(l10n, cafe)}',
-                      style: TextStyle(
-                        color: colors.mutedText,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      cafeAddressLabel(l10n, cafe),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: colors.mutedText,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Wrap(
-                      spacing: AppSpacing.xs,
-                      runSpacing: AppSpacing.xs,
-                      children:
-                          normalizeDisplayTags(cafe.tags).take(4).map((tag) {
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.sm,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: colors.chip,
-                            borderRadius: BorderRadius.circular(AppRadius.pill),
-                          ),
-                          child: Text(
-                            tag,
-                            style: TextStyle(
-                              color: colors.text,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
+                    if (normalizeDisplayTags(cafe.tags).isNotEmpty) ...[
+                      const SizedBox(height: AppSpacing.sm),
+                      Wrap(
+                        spacing: AppSpacing.xs,
+                        runSpacing: AppSpacing.xs,
+                        children:
+                            normalizeDisplayTags(cafe.tags).take(3).map((tag) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.sm,
+                              vertical: 4,
                             ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
+                            decoration: BoxDecoration(
+                              color: colors.chip,
+                              borderRadius:
+                                  BorderRadius.circular(AppRadius.pill),
+                            ),
+                            child: Text(
+                              tag,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: colors.text,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
                     const SizedBox(height: AppSpacing.sm),
                     Row(
                       children: [
-                        _ActionButton(
-                          key: ValueKey('cafe-card-compare-${cafe.id}'),
-                          label: inCompare
-                              ? l10n.cafeCardCompared
-                              : l10n.cafeCardCompare,
-                          icon: Icons.compare_arrows,
-                          isActive: inCompare,
-                          activeColor: colors.accent,
-                          colors: colors,
-                          onTap: onComparePress,
+                        Expanded(
+                          child: _ActionButton(
+                            key: ValueKey('cafe-card-compare-${cafe.id}'),
+                            label: inCompare
+                                ? l10n.cafeCardCompared
+                                : l10n.cafeCardCompare,
+                            icon: Icons.compare_arrows,
+                            isActive: inCompare,
+                            activeColor: colors.accent,
+                            colors: colors,
+                            onTap: onComparePress,
+                          ),
                         ),
                         const SizedBox(width: AppSpacing.sm),
-                        _ActionButton(
-                          key: ValueKey('cafe-card-favorite-${cafe.id}'),
-                          label: isFavoritePending
-                              ? l10n.commonLoading
-                              : hasFavoriteError
-                                  ? l10n.commonRetry
-                                  : isFavorite
-                                      ? l10n.cafeCardSaved
-                                      : l10n.cafeCardSave,
-                          icon: hasFavoriteError
-                              ? Icons.error_outline_rounded
-                              : isFavorite
-                                  ? Icons.favorite
-                                  : Icons.favorite_border,
-                          isActive: isFavorite,
-                          isPending: isFavoritePending,
-                          hasError: hasFavoriteError,
-                          activeColor: colors.primary,
-                          colors: colors,
-                          onTap: onFavoritePress,
+                        Expanded(
+                          child: _ActionButton(
+                            key: ValueKey('cafe-card-favorite-${cafe.id}'),
+                            label: isFavoritePending
+                                ? l10n.commonLoading
+                                : hasFavoriteError
+                                    ? l10n.commonRetry
+                                    : isFavorite
+                                        ? l10n.cafeCardSaved
+                                        : l10n.cafeCardSave,
+                            icon: hasFavoriteError
+                                ? Icons.error_outline_rounded
+                                : isFavorite
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                            isActive: isFavorite,
+                            isPending: isFavoritePending,
+                            hasError: hasFavoriteError,
+                            activeColor: colors.primary,
+                            colors: colors,
+                            onTap: onFavoritePress,
+                          ),
                         ),
                       ],
                     ),
@@ -449,40 +386,6 @@ class _CafeCardRatingPresentation {
 
   final String label;
   final String source;
-}
-
-_CafeCardRatingPresentation? _ratingPresentationForCard(
-  Cafe cafe, {
-  required bool sponsored,
-}) {
-  if (sponsored) {
-    AppLogger.debug(
-      '[SPONSORED_RATING] source=supabase_google rating=${cafe.googleRating?.toStringAsFixed(1) ?? 'null'} reviewCount=${cafe.googleReviewCount?.toString() ?? 'null'}',
-      key: 'sponsored-rating-${cafe.id}',
-      throttle: Duration.zero,
-    );
-  }
-
-  final appRating = cafe.appRating;
-  if (appRating == null) {
-    return null;
-  }
-  final reviewCount = cafe.appReviewCount;
-  final suffix = reviewCount != null && reviewCount > 0
-      ? ' (${_compactCount(reviewCount)})'
-      : '';
-  return _CafeCardRatingPresentation(
-    label: '${appRating.toStringAsFixed(1)}$suffix',
-    source: 'app',
-  );
-}
-
-String _compactCount(int count) {
-  if (count >= 1000) {
-    final value = count / 1000;
-    return '${value.toStringAsFixed(value >= 10 ? 0 : 1)}k';
-  }
-  return count.toString();
 }
 
 String _shortCafeId(String cafeId) {
@@ -683,9 +586,11 @@ class _ActionButton extends StatelessWidget {
               onTap();
             },
       child: Container(
+        width: double.infinity,
+        alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm + 2,
-          vertical: AppSpacing.xs,
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.xs + 2,
         ),
         decoration: BoxDecoration(
           color: background,
@@ -693,6 +598,7 @@ class _ActionButton extends StatelessWidget {
           border: Border.all(color: borderColor),
         ),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
             if (isPending)
@@ -706,14 +612,18 @@ class _ActionButton extends StatelessWidget {
                 ),
               )
             else
-              Icon(icon, size: 16, color: foreground),
+              Icon(icon, size: AppIconSize.sm, color: foreground),
             const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
-                color: foreground,
-                fontWeight: FontWeight.w700,
-                fontSize: 12,
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: foreground,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12,
+                ),
               ),
             ),
           ],

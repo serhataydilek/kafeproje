@@ -86,6 +86,12 @@ class AppRadius {
   static const double pill = 999;
 }
 
+class AppIconSize {
+  static const double sm = 16;
+  static const double md = 20;
+  static const double lg = 24;
+}
+
 class BottomChromeTokens {
   static const double navContainerRadius = AppRadius.lg + 4;
   static const double navInnerRadius = AppRadius.lg;
@@ -150,9 +156,56 @@ ThemeData _buildTheme(AppColors colors, Brightness brightness) {
     cardTheme: CardThemeData(
       color: colors.card,
       elevation: 0,
+      margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.md),
         side: BorderSide(color: colors.border),
+      ),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: colors.card,
+      hintStyle:
+          TextStyle(color: colors.mutedText, fontWeight: FontWeight.w500),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm + 6,
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        borderSide: BorderSide(color: colors.border),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        borderSide: BorderSide(color: colors.border),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        borderSide: BorderSide(color: colors.primary, width: 1.4),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        borderSide: BorderSide(color: colors.danger),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        borderSide: BorderSide(color: colors.danger, width: 1.4),
+      ),
+    ),
+    dialogTheme: DialogThemeData(
+      backgroundColor: colors.card,
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+      ),
+    ),
+    bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: colors.card,
+      surfaceTintColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppRadius.lg),
+        ),
       ),
     ),
     filledButtonTheme: FilledButtonThemeData(
@@ -221,9 +274,9 @@ ThemeData _buildTheme(AppColors colors, Brightness brightness) {
       backgroundColor: colors.primary,
       foregroundColor: primaryForeground,
       elevation: 1,
-      focusElevation: 2,
+      focusElevation: 1,
       hoverElevation: 2,
-      highlightElevation: 3,
+      highlightElevation: 2,
       extendedPadding: const EdgeInsets.symmetric(
         horizontal: 14,
       ),

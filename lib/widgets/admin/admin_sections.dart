@@ -111,7 +111,10 @@ class _AdminShellState extends State<AdminShell> {
   @override
   void initState() {
     super.initState();
-    _activeTab = widget.initialTab;
+    const claimsEnabled = bool.fromEnvironment('ENABLE_OWNER_CLAIMS');
+    _activeTab = (!claimsEnabled && widget.initialTab == AdminTab.claims)
+        ? AdminTab.cafes
+        : widget.initialTab;
   }
 
   @override
@@ -295,16 +298,18 @@ class AdminTabBarSection extends StatelessWidget {
             onTap: () => onChanged(AdminTab.cafes),
           ),
         ),
-        const SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: _AdminTabButton(
-            key: const Key('admin-tab-claims'),
-            colors: colors,
-            label: 'Claims ($claimCount)',
-            isActive: activeTab == AdminTab.claims,
-            onTap: () => onChanged(AdminTab.claims),
+        if (const bool.fromEnvironment('ENABLE_OWNER_CLAIMS')) ...[
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: _AdminTabButton(
+              key: const Key('admin-tab-claims'),
+              colors: colors,
+              label: 'Claims ($claimCount)',
+              isActive: activeTab == AdminTab.claims,
+              onTap: () => onChanged(AdminTab.claims),
+            ),
           ),
-        ),
+        ],
         const SizedBox(width: AppSpacing.sm),
         Expanded(
           child: _AdminTabButton(

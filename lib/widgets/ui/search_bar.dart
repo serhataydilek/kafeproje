@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../theme/app_theme.dart';
 
 class AppSearchBar extends StatefulWidget {
@@ -86,18 +87,17 @@ class _AppSearchBarState extends State<AppSearchBar> {
             : widget.colors.card.withValues(alpha: 0.92);
 
         return AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          curve: Curves.easeOutCubic,
+          duration: const Duration(milliseconds: 160),
+          curve: Curves.easeOut,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppRadius.pill),
             boxShadow: [
               BoxShadow(
-                color: (isFocused
-                        ? widget.colors.primary
-                        : Colors.black.withValues(alpha: 0.3))
-                    .withValues(alpha: isFocused ? 0.14 : 0.05),
-                blurRadius: isFocused ? 20 : 12,
-                offset: const Offset(0, 8),
+                color: Colors.black.withValues(
+                  alpha: isFocused ? 0.06 : 0.03,
+                ),
+                blurRadius: isFocused ? 10 : 6,
+                offset: const Offset(0, 3),
               ),
             ],
           ),
@@ -134,7 +134,8 @@ class _AppSearchBarState extends State<AppSearchBar> {
                 children: [
                   if (hasInput)
                     IconButton(
-                      tooltip: 'Clear search',
+                      tooltip:
+                          AppLocalizations.of(context)?.commonClear ?? 'Clear',
                       visualDensity: VisualDensity.compact,
                       icon: Icon(
                         Icons.close_rounded,

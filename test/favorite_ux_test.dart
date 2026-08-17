@@ -448,7 +448,7 @@ void main() {
     });
 
     testWidgets(
-        'sponsored cafe favorite count is visible on initial home render without tapping',
+        'sponsored cafe favorite action is visible on initial home render',
         (tester) async {
       final sponsor = buildTestCafe(
         id: 'sponsor-1',
@@ -480,7 +480,10 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('Sponsored cafes'), findsOneWidget);
-      expect(find.text('1'), findsWidgets);
+      expect(
+        find.byKey(const ValueKey('cafe-card-favorite-sponsor-1')),
+        findsOneWidget,
+      );
     });
 
     test('failed sync rolls back favorite and count and marks retry state',
@@ -602,6 +605,40 @@ void main() {
       expect(
           container.read(isFavoriteMutationPendingProvider('cafe-1')), isFalse);
       expect(container.read(isCafeFavoritedProvider('cafe-1')), isTrue);
+    });
+
+    testWidgets('cafe card keeps scan-friendly fields and hides extra metadata',
+        (tester) async {
+      final container = createTestContainer(
+        state: buildTestAppShellState(currentUser: testUser),
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        buildTestApp(
+          container: container,
+          child: Scaffold(
+            body: CafeCardListItem(
+              cafe: buildTestCafe(id: 'cafe-scan', name: 'Scan Cafe'),
+              onPress: () {},
+              colors: lightColors,
+              surface: 'test',
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Scan Cafe'), findsOneWidget);
+      expect(find.textContaining('Moda'), findsOneWidget);
+      expect(find.text('4.5'), findsOneWidget);
+      expect(find.text('Coffee'), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('cafe-card-favorite-cafe-scan')),
+        findsOneWidget,
+      );
+      expect(find.textContaining('Wi-Fi'), findsNothing);
+      expect(find.text('Moda, Kadikoy'), findsNothing);
     });
   });
 }

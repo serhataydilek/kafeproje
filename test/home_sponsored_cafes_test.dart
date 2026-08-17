@@ -673,7 +673,7 @@ void main() {
           findsOneWidget);
       expect(find.text('4.9 (321)'), findsNothing);
       expect(find.text('4.9'), findsNothing);
-      expect(find.text('4.5 (120)'), findsOneWidget);
+      expect(find.text('4.5'), findsOneWidget);
       expect(find.text('0.0'), findsNothing);
     });
 
@@ -704,7 +704,7 @@ void main() {
       expect(find.byKey(const Key('home-sponsored-unrated-sponsor')),
           findsOneWidget);
       expect(find.text('0.0'), findsNothing);
-      expect(find.text('No ratings yet'), findsOneWidget);
+      expect(find.text('No ratings yet'), findsNothing);
     });
 
     testWidgets('sponsored card uses description and address fallback text',

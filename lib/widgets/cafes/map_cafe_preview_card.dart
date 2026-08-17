@@ -4,7 +4,6 @@ import '../../l10n/l10n.dart';
 import '../../models/index.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/cafe_hours.dart';
-import '../../utils/cafe_tag_utils.dart';
 import 'cafe_image_carousel.dart';
 import 'map_surface.dart';
 
@@ -45,7 +44,8 @@ class MapCafePreviewCard extends StatelessWidget {
     final imageRadius = BorderRadius.circular(
       _MapCafePreviewCardTokens.imageRadius,
     );
-    final hasVisibleRating = cafe.appRating != null;
+    final visibleRating = cafe.appRating ?? cafe.adminFallbackRating;
+    final hasVisibleRating = visibleRating != null;
     final openStatus = resolveCafeOpenStatus(cafe);
 
     return MapSurface(
@@ -63,14 +63,6 @@ class MapCafePreviewCard extends StatelessWidget {
           child: Ink(
             decoration: BoxDecoration(
               borderRadius: cardRadius,
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  colors.card.withValues(alpha: 0.98),
-                  colors.bg.withValues(alpha: 0.94),
-                ],
-              ),
             ),
             child: InkWell(
               onTap: onTap,
@@ -131,28 +123,14 @@ class MapCafePreviewCard extends StatelessWidget {
                                 ],
                               ),
                               const SizedBox(height: 6),
-                              Wrap(
-                                spacing: 6,
-                                runSpacing: 6,
-                                children: [
-                                  _StatusBadge(
-                                    colors: colors,
-                                    status: openStatus,
-                                    label: switch (openStatus) {
-                                      CafeOpenStatus.open => l10n.commonOpen,
-                                      CafeOpenStatus.closed =>
-                                        l10n.commonClosed,
-                                      CafeOpenStatus.unknown =>
-                                        l10n.commonUnknown,
-                                    },
-                                  ),
-                                  _SoftBadge(
-                                    colors: colors,
-                                    label: cafeCategoryLabel(l10n, cafe),
-                                    textColor: colors.primary,
-                                    background: colors.primarySoft,
-                                  ),
-                                ],
+                              _StatusBadge(
+                                colors: colors,
+                                status: openStatus,
+                                label: switch (openStatus) {
+                                  CafeOpenStatus.open => l10n.commonOpen,
+                                  CafeOpenStatus.closed => l10n.commonClosed,
+                                  CafeOpenStatus.unknown => l10n.commonUnknown,
+                                },
                               ),
                               const SizedBox(height: 8),
                               Text(
@@ -165,18 +143,6 @@ class MapCafePreviewCard extends StatelessWidget {
                                   fontSize: 12,
                                 ),
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                cafeAddressLabel(l10n, cafe),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: colors.mutedText,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
-                                  height: 1.25,
-                                ),
-                              ),
                             ],
                           ),
                         ),
@@ -186,37 +152,16 @@ class MapCafePreviewCard extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(
-                          child: Wrap(
-                            spacing: AppSpacing.xs,
-                            runSpacing: AppSpacing.xs,
-                            children: [
-                              _MetricPill(
-                                colors: colors,
-                                icon: hasVisibleRating
-                                    ? Icons.star_rounded
-                                    : Icons.star_outline_rounded,
-                                iconColor: hasVisibleRating
-                                    ? colors.primary
-                                    : colors.mutedText,
-                                label: cafeRatingLabel(l10n, cafe),
-                              ),
-                              _MetricPill(
-                                colors: colors,
-                                icon: Icons.attach_money_rounded,
-                                iconColor: colors.accent,
-                                label: cafePriceLabel(l10n, cafe),
-                              ),
-                              if (cafe.tags.isNotEmpty)
-                                _MetricPill(
-                                  colors: colors,
-                                  icon: Icons.local_cafe_rounded,
-                                  iconColor: colors.text,
-                                  label: normalizeDisplayTags(cafe.tags)
-                                          .isNotEmpty
-                                      ? normalizeDisplayTags(cafe.tags).first
-                                      : cafe.tags.first,
-                                ),
-                            ],
+                          child: _MetricPill(
+                            colors: colors,
+                            icon: hasVisibleRating
+                                ? Icons.star_rounded
+                                : Icons.star_outline_rounded,
+                            iconColor: hasVisibleRating
+                                ? colors.primary
+                                : colors.mutedText,
+                            label: visibleRating?.toStringAsFixed(1) ??
+                                l10n.cafeNoRatingsYet,
                           ),
                         ),
                         const SizedBox(width: AppSpacing.sm),
@@ -289,13 +234,6 @@ class _MapCardImageFrame extends StatelessWidget {
         border: Border.all(
           color: colors.border.withValues(alpha: 0.8),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 10,
-            offset: const Offset(0, 6),
-          ),
-        ],
       ),
       clipBehavior: Clip.antiAlias,
       child: child,
@@ -390,48 +328,6 @@ class _MetricPill extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SoftBadge extends StatelessWidget {
-  const _SoftBadge({
-    required this.colors,
-    required this.label,
-    required this.textColor,
-    required this.background,
-  });
-
-  final AppColors colors;
-  final String label;
-  final Color textColor;
-  final Color background;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: BorderRadius.circular(AppRadius.pill),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: _MapCafePreviewCardTokens.badgeMaxWidth,
-          ),
-          child: Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: textColor,
-              fontWeight: FontWeight.w800,
-              fontSize: 10,
-            ),
-          ),
         ),
       ),
     );

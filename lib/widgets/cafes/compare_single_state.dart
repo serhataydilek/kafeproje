@@ -47,7 +47,7 @@ class CompareSingleState extends ConsumerWidget {
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
-                    l10n.compareEmptyMessage,
+                    l10n.compareAddAnotherPrompt,
                     style: TextStyle(
                       color: colors.mutedText,
                       fontSize: 13,
@@ -96,6 +96,8 @@ class CompareSingleState extends ConsumerWidget {
                         children: [
                           Text(
                             cafe.name,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: colors.text,
                               fontSize: 18,
@@ -105,6 +107,8 @@ class CompareSingleState extends ConsumerWidget {
                           const SizedBox(height: AppSpacing.xs),
                           Text(
                             cafeLocationSummary(l10n, cafe),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: colors.mutedText,
                               fontSize: 13,

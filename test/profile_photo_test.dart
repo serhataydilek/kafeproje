@@ -56,8 +56,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Edit photo'), findsOneWidget);
-      expect(find.text('Add a photo to make your profile feel more personal.'),
-          findsOneWidget);
+      expect(
+        find.text('Add a photo to make your profile easier to recognize.'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('profile screen supports avatar url removal inline',

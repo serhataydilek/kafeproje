@@ -48,12 +48,12 @@ class AppActionButton extends StatelessWidget {
               border: Border.all(
                 color: isPrimary ? Colors.transparent : colors.border,
               ),
-              boxShadow: isPrimary
+              boxShadow: isPrimary && enabled
                   ? [
                       BoxShadow(
-                        color: colors.primary.withValues(alpha: 0.22),
-                        blurRadius: 18,
-                        offset: const Offset(0, 10),
+                        color: colors.primary.withValues(alpha: 0.16),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
                     ]
                   : const [],

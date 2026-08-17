@@ -226,11 +226,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
       if (!mounted) {
         return;
       }
-      setFormError(
-        _isTurkish(context)
-            ? 'Fotograf secilemedi. Lutfen tekrar dene.'
-            : 'Photo selection failed. Please try again.',
-      );
+      setFormError(context.l10n.profilePhotoPickFailed);
       setState(() {
         _pickingAvatar = false;
       });
@@ -251,7 +247,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
       MediaQuery.platformBrightnessOf(context),
     );
     final l10n = context.l10n;
-    final isTr = Localizations.localeOf(context).languageCode == 'tr';
     final isSavingProfile =
         profileUpdateState is async_result.AsyncLoading<void>;
 
@@ -315,16 +310,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                       avatarImageProvider: previewImageProvider,
                       subtitle: avatarUrl == null
                           ? (_pendingAvatarBytes != null
-                              ? (isTr
-                                  ? 'Yeni fotograf secildi. Kaydet dediginde profiline yuklenecek.'
-                                  : 'A new photo is ready. Save to upload it to your profile.')
-                              : (isTr
-                                  ? 'Foto ekleyerek profilini daha kolay taninir hale getir.'
-                                  : 'Add a photo to make your profile feel more personal.'))
+                              ? l10n.profilePhotoPending
+                              : l10n.profilePhotoHint)
                           : (_pendingAvatarBytes != null
-                              ? (isTr
-                                  ? 'Yeni fotograf secildi. Kaydet dediginde profiline yuklenecek.'
-                                  : 'A new photo is ready. Save to upload it to your profile.')
+                              ? l10n.profilePhotoPending
                               : null),
                       badge: user.isAdmin
                           ? Container(
@@ -354,8 +343,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                               ProfileAvatarActionChip(
                                 colors: colors,
                                 icon: Icons.photo_library_outlined,
-                                label:
-                                    isTr ? 'Fotoğrafı düzenle' : 'Edit photo',
+                                label: l10n.profilePhotoEdit,
                                 onTap: _pickingAvatar
                                     ? null
                                     : _pickAvatarFromGallery,
@@ -363,8 +351,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                               ProfileAvatarActionChip(
                                 colors: colors,
                                 icon: Icons.delete_outline,
-                                label:
-                                    isTr ? 'Fotoğrafı kaldır' : 'Remove photo',
+                                label: l10n.profilePhotoRemove,
                                 destructive: true,
                                 onTap: (avatarUrl == null &&
                                         _pendingAvatarBytes == null)
@@ -448,9 +435,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        isTr
-                            ? 'Tum profil duzenlemelerini artik burada yapabilirsin.'
-                            : 'You can now manage your entire profile from here.',
+                        l10n.profileEditIntro,
                         style: TextStyle(
                           color: colors.mutedText,
                           fontWeight: FontWeight.w500,
@@ -469,7 +454,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              isTr ? 'Profil fotoğrafı' : 'Profile photo',
+                              l10n.profilePhotoLabel,
                               style: TextStyle(
                                 color: colors.text,
                                 fontWeight: FontWeight.w700,
@@ -478,16 +463,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                             const SizedBox(height: AppSpacing.xs),
                             Text(
                               _pendingAvatarBytes != null
-                                  ? (isTr
-                                      ? 'Önizleme hazır. Kaydettiğinde sıkıştırılmış fotoğraf galeriden yüklenecek.'
-                                      : 'Preview ready. Saving will upload the compressed photo from your gallery.')
+                                  ? l10n.profilePhotoPreviewReady
                                   : avatarUrl != null
-                                      ? (isTr
-                                          ? 'Mevcut fotoğrafını değiştirebilir veya kaldırabilirsin.'
-                                          : 'You can replace or remove your current photo.')
-                                      : (isTr
-                                          ? 'Galeriden fotoğraf seçerek profilinde hemen önizlemesini görebilirsin.'
-                                          : 'Pick a photo from your gallery to preview it before saving.'),
+                                      ? l10n.profilePhotoReplaceHint
+                                      : l10n.profilePhotoPickHint,
                               style: TextStyle(
                                 color: colors.mutedText,
                                 fontSize: 12,
@@ -513,11 +492,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                                           )
                                         : const Icon(
                                             Icons.photo_library_outlined),
-                                    label: Text(
-                                      isTr
-                                          ? 'Galeriden sec'
-                                          : 'Choose from gallery',
-                                    ),
+                                    label: Text(l10n.profilePhotoChooseGallery),
                                   ),
                                 ),
                                 const SizedBox(width: AppSpacing.sm),
@@ -535,11 +510,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                                             });
                                           },
                                     icon: const Icon(Icons.delete_outline),
-                                    label: Text(
-                                      isTr
-                                          ? 'Fotoğrafı kaldır'
-                                          : 'Remove photo',
-                                    ),
+                                    label: Text(l10n.profilePhotoRemove),
                                   ),
                                 ),
                               ],
@@ -564,7 +535,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                         colors,
                         l10n.authUsername,
                         _usernameCtrl,
-                        hint: isTr ? '3-24 karakter' : '3-24 characters',
+                        hint: l10n.profileUsernameHint,
                         errorText: _fieldError(l10n, _usernameCtrl),
                       ),
                       _field(
@@ -605,7 +576,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       AppActionButton(
-                        label: isTr ? 'İptal' : 'Cancel',
+                        label: l10n.commonCancel,
                         onPressed: isSubmitting
                             ? null
                             : () {
@@ -780,10 +751,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
       ),
     );
   }
-}
-
-bool _isTurkish(BuildContext context) {
-  return Localizations.localeOf(context).languageCode == 'tr';
 }
 
 String _extensionForPath(String path) {

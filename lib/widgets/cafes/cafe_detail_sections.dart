@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../l10n/l10n.dart';
 import '../../models/index.dart';
 import '../../providers/app_provider.dart';
@@ -83,79 +84,82 @@ class CafeDetailHeaderSection extends StatelessWidget {
       CafeOpenStatus.unknown => l10n.commonUnknown,
     };
 
-    return Row(
+    return Column(
       key: ValueKey('cafe-detail-header-${cafe.id}'),
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                cafe.name,
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w800,
-                  color: colors.text,
-                ),
-              ),
-              if (cafe.isActiveFeatured) ...[
-                const SizedBox(height: 6),
-                Container(
-                  key: ValueKey('cafe-detail-sponsored-badge-${cafe.id}'),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: colors.primarySoft,
-                    borderRadius: BorderRadius.circular(AppRadius.pill),
-                    border: Border.all(
-                      color: colors.primary.withValues(alpha: 0.35),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.workspace_premium_rounded,
-                        color: colors.primary,
-                        size: 14,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        sponsoredLabel,
-                        style: TextStyle(
-                          color: colors.primary,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 11,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ],
+        Text(
+          cafe.name,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w800,
+            color: colors.text,
+            height: 1.15,
           ),
         ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: statusColor.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(AppRadius.pill),
-            border: Border.all(
-              color: statusColor.withValues(alpha: 0.3),
+        const SizedBox(height: AppSpacing.sm),
+        Wrap(
+          spacing: AppSpacing.sm,
+          runSpacing: AppSpacing.sm,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: statusColor.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(AppRadius.pill),
+                border: Border.all(
+                  color: statusColor.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Text(
+                turkishAwareUppercase(
+                  statusLabel,
+                  languageCode,
+                ),
+                style: TextStyle(
+                  color: statusColor,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 11,
+                  letterSpacing: 0.5,
+                ),
+              ),
             ),
-          ),
-          child: Text(
-            turkishAwareUppercase(
-              statusLabel,
-              languageCode,
-            ),
-            style: TextStyle(
-              color: statusColor,
-              fontWeight: FontWeight.w800,
-              fontSize: 11,
-              letterSpacing: 0.5,
-            ),
-          ),
+            if (cafe.isActiveFeatured)
+              Container(
+                key: ValueKey('cafe-detail-sponsored-badge-${cafe.id}'),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: colors.primarySoft,
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
+                  border: Border.all(
+                    color: colors.primary.withValues(alpha: 0.35),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.workspace_premium_rounded,
+                      color: colors.primary,
+                      size: 14,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      sponsoredLabel,
+                      style: TextStyle(
+                        color: colors.primary,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
         ),
       ],
     );
@@ -180,7 +184,10 @@ class CafeDetailRatingSection extends ConsumerWidget {
     final hasGoogleRating = (cafe.googleRating ?? 0) > 0;
     final hasGoogleReviewCount = (cafe.googleReviewCount ?? 0) > 0;
     final externalUpdatedLabel = hasGoogleRating || hasGoogleReviewCount
-        ? _externalMetadataFreshnessLabel(cafe.googlePlaceData?.lastSyncedAt)
+        ? _externalMetadataFreshnessLabel(
+            l10n,
+            cafe.googlePlaceData?.lastSyncedAt,
+          )
         : null;
     final hasSecondaryMetadata = hasGoogleRating || hasGoogleReviewCount;
 
@@ -255,32 +262,33 @@ class CafeDetailRatingSection extends ConsumerWidget {
                   ],
                 ),
               ),
-              Container(
-                key: ValueKey('cafe-detail-favorite-count-${cafe.id}'),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.sm, vertical: 6),
-                decoration: BoxDecoration(
-                  color: colors.card,
-                  borderRadius: BorderRadius.circular(AppRadius.pill),
-                  border: Border.all(color: colors.border),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.favorite_rounded,
-                        color: colors.primary, size: 16),
-                    const SizedBox(width: 4),
-                    Text(
-                      cafe.favoriteCount.toString(),
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: colors.text,
+              if (cafe.favoriteCount > 0)
+                Container(
+                  key: ValueKey('cafe-detail-favorite-count-${cafe.id}'),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: colors.card,
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                    border: Border.all(color: colors.border),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.favorite_rounded,
+                          color: colors.primary, size: 16),
+                      const SizedBox(width: 4),
+                      Text(
+                        cafe.favoriteCount.toString(),
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: colors.text,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
             ],
           ),
         ),
@@ -366,7 +374,10 @@ class CafeDetailRatingSection extends ConsumerWidget {
   }
 }
 
-String? _externalMetadataFreshnessLabel(String? rawTimestamp) {
+String? _externalMetadataFreshnessLabel(
+  AppLocalizations l10n,
+  String? rawTimestamp,
+) {
   final raw = rawTimestamp?.trim();
   if (raw == null || raw.isEmpty) {
     return null;
@@ -383,16 +394,16 @@ String? _externalMetadataFreshnessLabel(String? rawTimestamp) {
   }
 
   if (age.inMinutes < 1) {
-    return 'just now';
+    return l10n.metadataJustNow;
   }
   if (age.inHours < 1) {
-    return '${age.inMinutes}m ago';
+    return l10n.metadataMinutesAgo(age.inMinutes);
   }
   if (age.inDays < 1) {
-    return '${age.inHours}h ago';
+    return l10n.metadataHoursAgo(age.inHours);
   }
   if (age.inDays < 7) {
-    return '${age.inDays}d ago';
+    return l10n.metadataDaysAgo(age.inDays);
   }
 
   final utc = parsed.toUtc();
@@ -421,6 +432,8 @@ class CafeDetailInfoSection extends StatelessWidget {
       children: [
         Text(
           cafeLocationSummary(l10n, cafe),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             color: colors.mutedText,
             fontWeight: FontWeight.w500,
@@ -434,10 +447,12 @@ class CafeDetailInfoSection extends StatelessWidget {
             fontWeight: FontWeight.w700,
           ),
         ),
-        const SizedBox(height: AppSpacing.xs),
         if (cafeAddressLabel(l10n, cafe) != l10n.commonUnknown) ...[
+          const SizedBox(height: AppSpacing.xs),
           Text(
             cafeAddressLabel(l10n, cafe),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: colors.mutedText,
               fontWeight: FontWeight.w500,
@@ -450,7 +465,7 @@ class CafeDetailInfoSection extends StatelessWidget {
               ? cafe.description
               : l10n.cafeDetailDescriptionFallback,
           style: TextStyle(
-            color: colors.text,
+            color: cafe.description.isNotEmpty ? colors.text : colors.mutedText,
             fontWeight: FontWeight.w500,
             height: 1.5,
           ),
@@ -675,48 +690,64 @@ class CafeDetailHoursSection extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.sm),
         Container(
-          key: ValueKey('cafe-detail-hours-status-${cafe.id}'),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.sm,
-            vertical: 6,
-          ),
+          width: double.infinity,
+          padding: const EdgeInsets.all(AppSpacing.md),
           decoration: BoxDecoration(
-            color: statusColor.withValues(alpha: 0.12),
+            color: colors.card,
             borderRadius: BorderRadius.circular(AppRadius.md),
-            border: Border.all(color: statusColor.withValues(alpha: 0.28)),
+            border: Border.all(color: colors.border),
           ),
-          child: Text(
-            statusLabel,
-            style: TextStyle(
-              color: statusColor,
-              fontWeight: FontWeight.w800,
-              fontSize: 13,
-            ),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        if (!cafe.hasWorkingHours)
-          Text(
-            l10n.cafeDetailHoursEmpty,
-            style: TextStyle(
-              color: colors.mutedText,
-              fontWeight: FontWeight.w500,
-            ),
-          )
-        else
-          ...compactWorkingHoursLabel(l10n, cafe.openingHours).map(
-            (line) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 2),
-              child: Text(
-                line,
-                style: TextStyle(
-                  color: colors.mutedText,
-                  fontWeight: FontWeight.w600,
-                  height: 1.35,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                key: ValueKey('cafe-detail-hours-status-${cafe.id}'),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  border:
+                      Border.all(color: statusColor.withValues(alpha: 0.28)),
+                ),
+                child: Text(
+                  statusLabel,
+                  style: TextStyle(
+                    color: statusColor,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 13,
+                  ),
                 ),
               ),
-            ),
+              const SizedBox(height: AppSpacing.sm),
+              if (!cafe.hasWorkingHours)
+                Text(
+                  l10n.cafeDetailHoursEmpty,
+                  style: TextStyle(
+                    color: colors.mutedText,
+                    fontWeight: FontWeight.w500,
+                    height: 1.35,
+                  ),
+                )
+              else
+                ...compactWorkingHoursLabel(l10n, cafe.openingHours).map(
+                  (line) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    child: Text(
+                      line,
+                      style: TextStyle(
+                        color: colors.mutedText,
+                        fontWeight: FontWeight.w600,
+                        height: 1.35,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
+        ),
       ],
     );
   }

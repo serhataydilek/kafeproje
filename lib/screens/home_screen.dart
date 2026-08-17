@@ -218,29 +218,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         vertical: layout.sectionSpacing,
                       ),
                       children: [
-                        Text(
-                          l10n.homeTitle,
-                          style: TextStyle(
-                            fontSize: layout.isTablet ? 32 : 28,
-                            fontWeight: FontWeight.w800,
-                            color: colors.text,
-                          ),
+                        AppPageTitle(
+                          colors: colors,
+                          title: l10n.homeTitle,
+                          subtitle: l10n.homeSubtitle,
+                          large: layout.isTablet,
                         ),
                         if (isHomeCafesLoading && hasVisibleHomeContent) ...[
                           const SizedBox(height: AppSpacing.xs),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(AppRadius.pill),
-                            child: SizedBox(
-                              key: const Key(
-                                  'home-background-refresh-indicator'),
-                              height: 3,
-                              child: LinearProgressIndicator(
-                                minHeight: 3,
-                                color: colors.primary,
-                                backgroundColor:
-                                    colors.primary.withValues(alpha: 0.12),
-                              ),
+                          InlineRefreshBar(
+                            key: const Key(
+                              'home-background-refresh-indicator',
                             ),
+                            colors: colors,
                           ),
                         ],
                         if (cacheStatus != null &&
@@ -408,7 +398,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           SizedBox(height: layout.sectionSpacing),
                           AppSectionTitle(
                             colors: colors,
-                            title: _districtSectionTitle(context),
+                            title: l10n.homePopularDistricts,
                           ),
                           const SizedBox(height: AppSpacing.sm),
                           _HomeChipGroup(
@@ -447,31 +437,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             showNormalLoadingState ||
                             showNormalEmptyState) ...[
                           SizedBox(height: layout.sectionSpacing),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              AppSectionTitle(
-                                colors: colors,
-                                title: l10n.favoritesExploreAction,
-                              ),
-                              Tooltip(
-                                message: l10n.homeViewAll,
-                                child: Semantics(
-                                  button: true,
-                                  label: l10n.homeViewAll,
-                                  child: GestureDetector(
-                                    onTap: () => context.go('/explore'),
-                                    child: Text(
-                                      l10n.homeViewAll,
-                                      style: TextStyle(
-                                        color: colors.primary,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                          AppSectionTitle(
+                            colors: colors,
+                            title: l10n.favoritesExploreAction,
+                            actionLabel: l10n.homeViewAll,
+                            actionTooltip: l10n.homeViewAll,
+                            onAction: () => context.go('/explore'),
                           ),
                           const SizedBox(height: AppSpacing.sm),
                           if (showNormalLoadingState)
@@ -531,14 +502,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
       ),
     );
-  }
-
-  String _districtSectionTitle(BuildContext context) {
-    final languageCode = Localizations.localeOf(context).languageCode;
-    if (languageCode.toLowerCase() == 'tr') {
-      return 'Ilcelere Gore Kesfet';
-    }
-    return 'Browse by District';
   }
 
   Future<void> _openDistrictResults(String district) async {

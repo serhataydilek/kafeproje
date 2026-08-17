@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In tr, this message translates to:
-  /// **'Istanbul Kafe'**
+  /// **'İstanbul Kafe'**
   String get appTitle;
 
   /// No description provided for @commonBack.
@@ -149,7 +149,7 @@ abstract class AppLocalizations {
   /// Daha fazla icerik yuklemek icin genel eylem etiketi.
   ///
   /// In tr, this message translates to:
-  /// **'Daha fazla yukle'**
+  /// **'Daha fazla yükle'**
   String get commonLoadMore;
 
   /// No description provided for @commonReset.
@@ -197,7 +197,7 @@ abstract class AppLocalizations {
   /// No description provided for @cafeNoRatingsYet.
   ///
   /// In tr, this message translates to:
-  /// **'Henuz puan yok'**
+  /// **'Henüz puan yok'**
   String get cafeNoRatingsYet;
 
   /// No description provided for @commonNoData.
@@ -299,7 +299,7 @@ abstract class AppLocalizations {
   /// Cihaz cevrimdisiyken ve uygulama onbellekteki verileri gosterirken acilan banner mesaji.
   ///
   /// In tr, this message translates to:
-  /// **'Cevrimdisisin. Onbellekteki veriler gosteriliyor ve degisiklikler esitleme icin kuyruklaniyor.'**
+  /// **'Çevrimdışısın. Önbellekteki veriler gösteriliyor ve değişiklikler eşitleme için kuyruklanıyor.'**
   String get offlineBannerMessage;
 
   /// No description provided for @navHome.
@@ -605,8 +605,14 @@ abstract class AppLocalizations {
   /// No description provided for @homeTitle.
   ///
   /// In tr, this message translates to:
-  /// **'Istanbul\'da kafe bul'**
+  /// **'İstanbul\'da kafe bul'**
   String get homeTitle;
+
+  /// No description provided for @homeSubtitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Şehirdeki iyi kafeleri keşfet.'**
+  String get homeSubtitle;
 
   /// No description provided for @homeSearchHint.
   ///
@@ -680,6 +686,12 @@ abstract class AppLocalizations {
   /// **'Keşfet'**
   String get exploreTitle;
 
+  /// No description provided for @exploreResultCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} kafe'**
+  String exploreResultCount(int count);
+
   /// No description provided for @exploreEmptyTitle.
   ///
   /// In tr, this message translates to:
@@ -701,8 +713,14 @@ abstract class AppLocalizations {
   /// No description provided for @favoritesTitle.
   ///
   /// In tr, this message translates to:
-  /// **'Favori kafelerim'**
+  /// **'Favoriler'**
   String get favoritesTitle;
+
+  /// No description provided for @favoritesCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} kayıtlı'**
+  String favoritesCount(int count);
 
   /// No description provided for @favoritesLoading.
   ///
@@ -749,20 +767,92 @@ abstract class AppLocalizations {
   /// Profil degisikligi cevrimdisi kuyruga alindiginda gosterilen basari mesaji.
   ///
   /// In tr, this message translates to:
-  /// **'Degisikliklerin cevrimdisi kaydedildi ve baglanti gelince otomatik esitlenecek.'**
+  /// **'Değişikliklerin çevrimdışı kaydedildi ve bağlantı gelince otomatik eşitlenecek.'**
   String get profileSyncQueued;
 
   /// Hala kuyrukta bekleyen cevrimdisi degisiklik sayisini gosteren durum metni.
   ///
   /// In tr, this message translates to:
-  /// **'{count} degisiklik esitleme bekliyor.'**
+  /// **'{count} değişiklik eşitleme bekliyor.'**
   String profileSyncPending(int count);
 
   /// Otomatik esitlemesi basarisiz olan kuyruktaki degisiklik sayisini gosteren durum metni.
   ///
   /// In tr, this message translates to:
-  /// **'{count} degisiklik otomatik olarak esitlenemedi.'**
+  /// **'{count} değişiklik otomatik olarak eşitlenemedi.'**
   String profileSyncDeadLetters(int count);
+
+  /// No description provided for @profileEditIntro.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profil bilgilerini buradan güncelleyebilirsin.'**
+  String get profileEditIntro;
+
+  /// No description provided for @profilePhotoLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Profil fotoğrafı'**
+  String get profilePhotoLabel;
+
+  /// No description provided for @profilePhotoHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fotoğraf ekleyerek profilini daha kolay tanınır hale getir.'**
+  String get profilePhotoHint;
+
+  /// No description provided for @profilePhotoPending.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni fotoğraf seçildi. Kaydet dediğinde profiline yüklenecek.'**
+  String get profilePhotoPending;
+
+  /// No description provided for @profilePhotoPreviewReady.
+  ///
+  /// In tr, this message translates to:
+  /// **'Önizleme hazır. Kaydettiğinde fotoğraf yüklenecek.'**
+  String get profilePhotoPreviewReady;
+
+  /// No description provided for @profilePhotoReplaceHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mevcut fotoğrafını değiştirebilir veya kaldırabilirsin.'**
+  String get profilePhotoReplaceHint;
+
+  /// No description provided for @profilePhotoPickHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Galeriden fotoğraf seçerek kaydetmeden önce önizleyebilirsin.'**
+  String get profilePhotoPickHint;
+
+  /// No description provided for @profilePhotoEdit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fotoğrafı düzenle'**
+  String get profilePhotoEdit;
+
+  /// No description provided for @profilePhotoRemove.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fotoğrafı kaldır'**
+  String get profilePhotoRemove;
+
+  /// No description provided for @profilePhotoChooseGallery.
+  ///
+  /// In tr, this message translates to:
+  /// **'Galeriden seç'**
+  String get profilePhotoChooseGallery;
+
+  /// No description provided for @profilePhotoPickFailed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fotoğraf seçilemedi. Lütfen tekrar dene.'**
+  String get profilePhotoPickFailed;
+
+  /// No description provided for @profileUsernameHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'3-24 karakter'**
+  String get profileUsernameHint;
 
   /// No description provided for @profileEdit.
   ///
@@ -977,19 +1067,19 @@ abstract class AppLocalizations {
   /// Yorum cevrimdisi kuyruga alindiginda gosterilen basari mesaji.
   ///
   /// In tr, this message translates to:
-  /// **'Yorumun cevrimdisi kaydedildi ve baglanti gelince otomatik esitlenecek.'**
+  /// **'Yorumun çevrimdışı kaydedildi ve bağlantı gelince otomatik eşitlenecek.'**
   String get reviewsQueuedSuccess;
 
   /// No description provided for @onboardingBrand.
   ///
   /// In tr, this message translates to:
-  /// **'Istanbul Kafe'**
+  /// **'İstanbul Kafe'**
   String get onboardingBrand;
 
   /// No description provided for @onboardingTitle.
   ///
   /// In tr, this message translates to:
-  /// **'Istanbul\'da bir sonraki favori kafeni keşfet'**
+  /// **'İstanbul\'da bir sonraki favori kafeni keşfet'**
   String get onboardingTitle;
 
   /// No description provided for @onboardingSubtitle.
@@ -1087,6 +1177,48 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Uygula ({count} filtre)'**
   String filterApplyCount(int count);
+
+  /// No description provided for @filterPresetsTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kayıtlı filtreler'**
+  String get filterPresetsTitle;
+
+  /// No description provided for @filterPresetNameHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geçerli filtreleri bir hazır ayar olarak kaydet'**
+  String get filterPresetNameHint;
+
+  /// No description provided for @filterPresetNameEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hazır ayar adı boş olamaz.'**
+  String get filterPresetNameEmpty;
+
+  /// No description provided for @filterPresetNeedFilters.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kaydetmeden önce en az bir filtre ekleyin.'**
+  String get filterPresetNeedFilters;
+
+  /// No description provided for @filterPresetUpdated.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hazır ayar güncellendi.'**
+  String get filterPresetUpdated;
+
+  /// No description provided for @filterPresetSaved.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hazır ayar kaydedildi.'**
+  String get filterPresetSaved;
+
+  /// No description provided for @filterPresetEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Henüz hazır ayar yok. Tekrar kullanmak için geçerli filtreleri kaydedin.'**
+  String get filterPresetEmpty;
 
   /// No description provided for @mapPreparing.
   ///
@@ -1193,7 +1325,7 @@ abstract class AppLocalizations {
   /// No description provided for @mapDevLabel.
   ///
   /// In tr, this message translates to:
-  /// **'Istanbul geliştirme haritası'**
+  /// **'İstanbul geliştirme haritası'**
   String get mapDevLabel;
 
   /// No description provided for @cafeDetailNotFound.
@@ -1273,6 +1405,30 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Haritada aç'**
   String get cafeDetailOpenOnMap;
+
+  /// No description provided for @metadataJustNow.
+  ///
+  /// In tr, this message translates to:
+  /// **'az önce'**
+  String get metadataJustNow;
+
+  /// No description provided for @metadataMinutesAgo.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count}dk önce'**
+  String metadataMinutesAgo(int count);
+
+  /// No description provided for @metadataHoursAgo.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count}sa önce'**
+  String metadataHoursAgo(int count);
+
+  /// No description provided for @metadataDaysAgo.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count}g önce'**
+  String metadataDaysAgo(int count);
 
   /// No description provided for @metricWifi.
   ///
@@ -1667,7 +1823,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsAboutDescription.
   ///
   /// In tr, this message translates to:
-  /// **'Istanbul\'daki en iyi kafeleri keşfet, karşılaştır ve favorilerine ekle.'**
+  /// **'İstanbul\'daki en iyi kafeleri keşfet, karşılaştır ve favorilerine ekle.'**
   String get settingsAboutDescription;
 
   /// No description provided for @adminTitle.
